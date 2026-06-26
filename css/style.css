@@ -1,0 +1,133 @@
+body {
+    background-color: #232323;
+}
+.frame {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #ffffff;
+    margin: 30px 100px;
+    padding: 10px 30px 70px 30px;
+    min-height: calc(100vh - 40px);
+    box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.50);
+}
+.text1 {
+    font-size: 60px;
+    color: #000000;
+    text-align: left;
+    margin-top: 10px;
+}
+.text2 {
+    font-size: 20px;
+    color: #000000;
+    text-align: left;
+    margin-top: 10px;
+}
+.text3 {
+    font-size: 15px;
+    color: #000000;
+    text-align: left;
+    width: 85%;
+    max-width: 1000px;
+    margin: 70px auto;
+}
+.scrollbar {
+    width: auto;
+    overflow: hidden;
+}
+.font1 {
+    font-family: 'Noto Sans Thai', sans-serif;
+}
+.align-center {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    margin: 60px 40px;
+}
+
+.logo {
+    width: 400px;
+    height: auto;
+    border-radius: 1000px;
+    animation: vikingSwing 3s ease-in-out infinite;
+    transform-origin: center bottom;
+}
+
+.intro-line {
+    width: 3px;
+    height: 220px;
+    background-color: #000000;
+    border-radius: 10px;
+    position: relative;
+    overflow: visible;
+}
+
+.intro-line::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 100%;
+
+    width: 120px;
+    height: 100%;
+
+    background: linear-gradient(
+        to right,
+        rgba(255, 220, 120, 0.7),
+        rgba(255, 220, 120, 0)
+    );
+
+    transform-origin: left center;
+    animation: lightFade 1.4s ease forwards;
+}
+
+.intro-text {
+    text-align: left;
+    animation: textReveal 1.2s ease forwards;
+}
+.about-text {
+    width: 80%;
+    max-width: 1000px;
+    margin: 70px auto 0;
+}
+
+@keyframes textReveal {
+    from {
+        transform: translateX(-45px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes lightFade {
+    0% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+
+    35% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scaleX(1);
+    }
+}
+@keyframes vikingSwing {
+    0% {
+        transform: rotate(-4deg);
+    }
+
+    50% {
+        transform: rotate(4deg);
+    }
+
+    100% {
+        transform: rotate(-4deg);
+    }
+}
