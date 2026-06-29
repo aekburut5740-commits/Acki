@@ -13,31 +13,77 @@
 </head>
 
 <body>
+
+    <div class="modal" id="ruleModal">
+        <div class="modal-box font1">
+            <button class="close-btn" onclick="closeRule()">✕</button>
+            <h2 id="box1">You know?</h2>
+
+            <p id="box2">There is only one rule here.</p>
+
+            <p id="box3">
+                Be yourself
+            </p>
+
+            <p id="box4">Alright?</p>
+
+            <div class="modal-buttons">
+                <button id="btnnah" class="button3 font4" onclick="goGoogle()">Nah ?</button>
+                <button id="btnunderstand" class="button4 font4" onclick="goCommunity()">Understand !</button>
+            </div>
+        </div>
+    </div>
     <div class="frame scrollbar">
+
+        <button class="lang-btn" id="lang-btn" onclick="toggleLang()">TH</button>
+
         <div class="align-center">
-
-            <img src="Pic/sss.jpg" alt="Logo" class="logo">
-
+            <a href="firstpage.html">
+                <img src="Pic/sss.jpg" alt="Logo" class="logo">
+            </a>
             <div class="intro-line"></div>
 
             <div class="intro-text">
-                <h1 class="text1 font1">
+                <h1 id="title" class="text1 font1">
                     Welcome to Acki
                 </h1>
 
-                <p class="text2 font1">
-                    talk and share your ideas with the community.
+                <p id="subtitle" class="text2 font1">
+                    talk and share your ideas with the community. have fun and make new friends.<br>Let's get started!
                 </p>
             </div>
-
         </div>
+
+        <div class="box1">
+            <a href="https://www.google.com">
+                <button id="btnno" class="button1 font4" onclick="">No ?</button>
+            </a>
+
+            <button id="btngotit" class="button2 font4" onclick="openRule()">Got It !</button>
+        </div>
+
+
         <div class="align-center text3 font1 about-text">
-            <p>| Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tincidunt ut ligula fermentum sollicitudin. Aliquam posuere libero fringilla bibendum lacinia. Quisque luctus est purus, eu venenatis arcu rutrum et. Aenean pretium dapibus lectus, et imperdiet ante tristique a. Morbi a tempor enim. Sed sit amet massa ut odio sollicitudin semper quis vitae leo. Cras ac turpis purus. Proin rhoncus massa id risus convallis tempus ac non ex. Vivamus nibh eros, commodo at purus sed, aliquet aliquam magna. In id ex vitae enim auctor dictum. Cras semper efficitur varius. Nullam gravida, tellus vel tristique blandit, est enim scelerisque erat, at aliquam turpis tellus id sapien. Morbi tristique nunc nibh, et suscipit ipsum ultricies et.
+            <p id="abouttext">| Welcome to Acki.
 
-Fusce ac ligula in arcu accumsan consectetur sed quis mauris. Aenean facilisis scelerisque ipsum, a maximus ligula mattis vitae. Aliquam urna diam, rhoncus vel orci id, ultrices sollicitudin leo. Morbi ut neque a tortor lobortis elementum et non mi. Aliquam cursus nisi feugiat, vehicula lorem ac, pretium lacus. Nam ut sollicitudin lacus, at tincidunt ex. Vivamus rutrum interdum feugiat. Pellentesque ultricies dapibus leo quis pulvinar. Fusce gravida eleifend urna, sed ornare erat elementum id. Aliquam fringilla aliquam gravida. Ut consectetur sapien vel libero rutrum varius. Vivamus lobortis orci metus, a dapibus purus eleifend at. Aliquam non sapien diam. |</p>
+                This website was created with one simple idea: everyone has something worth sharing.
+
+                Acki is a place where people can freely post their ideas, thoughts, stories, artwork, questions, or
+                anything that comes to mind. There are no expectations to be perfect, and there is no pressure to
+                impress anyone. Sometimes the smallest idea can become the beginning of an interesting conversation.
+                Since this is only the first version of Acki, the community is still small and simple. You won't find
+                countless features or complicated menus here yet. Instead, the focus is on what matters most—sharing
+                ideas and enjoying what other people create.
+                As Acki continues to grow, more features and improvements will be added over time. But for now, this is
+                where the journey begins.
+                Take your time, explore the community, and maybe leave behind an idea that someone else will never
+                forget. |</p>
         </div>
+        <footer class="footer">
+            <p id="footertext" class="text4">© 2026 Acki. All rights reserved. <br><br>| not at all.</p>
+        </footer>
     </div>
-    <script src="js/script.js"></script>
+    <script src="js/js.js"></script>
 </body>
 
 </html>
