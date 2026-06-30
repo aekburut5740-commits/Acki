@@ -72,3 +72,112 @@ function toggleLang() {
     document.getElementById("footertext2").textContent = t.footertext2;
     document.getElementById("lang-btn").textContent = currentLang === "en" ? "TH" : "EN";
 }
+let activePost = null;
+let activePostId = null;
+
+const commentsData = {
+    1: ["Visitor: Nice first post!"],
+    2: ["Visitor: This second post looks good."],
+    3: ["Visitor: I like this one."]
+};
+
+function openComment(button) {
+    const post = button.closest(".post");
+    const postId = post.dataset.postId;
+
+    activePost = post;
+    activePostId = postId;
+
+    document.getElementById("commentTitle").textContent = "Comments for Post #" + postId;
+
+    renderComments(postId);
+
+    document.querySelectorAll(".post").forEach((p) => {
+        if (p !== post) {
+            p.classList.add("dimmed");
+        }
+    });
+
+    post.classList.add("focus");
+
+    document.getElementById("focusOverlay").classList.add("show");
+    document.getElementById("commentPanel").classList.add("show");
+}
+
+function renderComments(postId) {
+    const commentList = document.getElementById("commentList");
+    commentList.innerHTML = "";
+
+    const comments = commentsData[postId] || [];
+
+    comments.forEach((comment) => {
+        const p = document.createElement("p");
+        p.className = "comment-text";
+        p.textContent = comment;
+        commentList.appendChild(p);
+    });
+}
+
+function sendComment() {
+    const input = document.getElementById("commentInput");
+    const text = input.value.trim();
+
+    if (text === "" || !activePostId) {
+        return;
+    }
+
+    if (!commentsData[activePostId]) {
+        commentsData[activePostId] = [];
+    }
+
+    commentsData[activePostId].push("Visitor: " + text);
+
+    renderComments(activePostId);
+
+    input.value = "";
+}
+
+function commentEnter(event) {
+    if (event.key === "Enter") {
+        sendComment();
+    }
+}
+
+function closeComment() {
+    if (activePost) {
+        activePost.classList.remove("focus");
+        activePost = null;
+    }
+
+    activePostId = null;
+
+    document.querySelectorAll(".post").forEach((p) => {
+        p.classList.remove("dimmed");
+    });
+
+    document.getElementById("focusOverlay").classList.remove("show");
+    document.getElementById("commentPanel").classList.remove("show");
+}
+function sendComment() {
+    const input = document.getElementById("commentInput");
+    const text = input.value.trim();
+
+    if (text === "" || !activePostId) {
+        return;
+    }
+
+    if (!commentsData[activePostId]) {
+        commentsData[activePostId] = [];
+    }
+
+    commentsData[activePostId].push("Visitor: " + text);
+
+    renderComments(activePostId);
+
+    input.value = "";
+}
+function commentEnter(event) {
+    if (event.key === "Enter") {
+        sendComment();
+    }
+}

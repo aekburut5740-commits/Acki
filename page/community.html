@@ -1,12 +1,96 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acki-community</title>
+    <link rel="stylesheet" href="../css/community.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
 </head>
+
 <body>
-    ยังไม่เสร็จ
-    <a href="../index.html">กลับหน้าแรก</a>
+    <div class="edge-tab edge-top">
+        <i class="ti ti-bell"></i>
+        <i class="ti ti-mail"></i>
+    </div>
+    <div class="content">
+        <div class="post" data-post-id="1">
+            <div class="post-header">
+                <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
+
+                <div>
+                    <p class="post-name">Visitor</p>
+                    <p class="post-time">just now</p>
+                </div>
+            </div>
+            <div class="post-body">
+                <p>This is first post By aek.</p>
+            </div>
+            <div class="post-active">
+                <button class="ti ti-heart btn-like"></button>
+                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)"></button>
+                <button class="ti ti-circle-plus btn-save"></button>
+                <button class="ti ti-share-3 btn-share"></button>
+            </div>
+        </div>
+
+        <div class="post" data-post-id="2">
+            <div class="post-header">
+                <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
+
+                <div>
+                    <p class="post-name">Visitor</p>
+                    <p class="post-time">just now</p>
+                </div>
+            </div>
+            <div class="post-body">
+                <p>This is maybe second post By aek.</p>
+            </div>
+            <div class="post-active">
+                <button class="ti ti-heart btn-like"></button>
+                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)"></button>
+                <button class="ti ti-circle-plus btn-save"></button>
+                <button class="ti ti-share-3 btn-share"></button>
+            </div>
+        </div>
+
+        <div class="post" data-post-id="3">
+            <div class="post-header">
+                <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
+
+                <div>
+                    <p class="post-name">Visitor</p>
+                    <p class="post-time">just now</p>
+                </div>
+            </div>
+            <div class="post-body">
+                <p>This is not first post By aek.</p>
+            </div>
+            <div class="post-active">
+                <button class="ti ti-heart btn-like"></button>
+                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)"></button>
+                <button class="ti ti-circle-plus btn-save"></button>
+                <button class="ti ti-share-3 btn-share"></button>
+            </div>
+        </div>
+
+    </div>
+    <div class="focus-overlay" id="focusOverlay" onclick="closeComment()"></div>
+
+    <div class="comment-panel" id="commentPanel">
+        <h3 id="commentTitle">Comments</h3>
+        <div id="commentList"></div>
+
+        <div class="comment-input">
+            <input id="commentInput" type="text" placeholder="Write a comment..." onkeydown="commentEnter(event)">
+            <button onclick="sendComment()">Send</button>
+            
+        </div>
+    </div>
+    <script src="../js/js.js"></script>
 </body>
+
 </html>

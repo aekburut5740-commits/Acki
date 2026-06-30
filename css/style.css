@@ -344,6 +344,13 @@ body {
     }
 }
 
+@media (min-width: 1200px) {
+    .frame {
+        max-width: 1350px;
+        margin: 30px auto;
+    }
+}
+
 @media (max-width: 1024px) {
     .frame {
         margin: 25px 40px;

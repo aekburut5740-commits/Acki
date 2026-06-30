@@ -1,0 +1,507 @@
+body {
+    margin: 0;
+    background-color: rgb(230, 227, 205);
+    background-image: url();
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        linear-gradient(to right,
+            rgba(0,0,0,.50),
+            transparent 180px,
+            transparent calc(100% - 180px),
+            rgba(0,0,0,.50));
+
+    z-index: 0;
+}
+
+.edge-tab {
+    position: fixed;
+    background: #000000;
+    z-index: 1003;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 40px;
+    gap: 24px;
+}
+
+.edge-tab i {
+    font-size: 24px;
+    color: #e5e5e5;
+    cursor: pointer;
+}
+
+.edge-tab i:hover {
+    transform: scale(1.1);
+    transition: all 0.2s ease-in-out;
+    color: #ffffff;
+}
+
+.edge-top {
+    left: 0;
+    right: 0;
+    height: 50px;
+    flex-direction: row;
+    top: 0;
+}
+
+.edge-top {
+    top: 0;
+}
+
+.content {
+    position: relative;
+    width: min(760px, 92%);
+    margin: 0 auto;
+    padding-top: 80px;
+}
+
+.post {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    min-height: 120px;
+    background: #ffffff;
+    border-radius: 10px;
+    margin-bottom: 100px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+}
+.post-header {
+    display: flex;
+    align-items: center;
+    border-bottom: #dddddd solid 2px;
+    gap: 12px;
+    margin: 10px;
+}
+
+.post-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 8px 6px;
+}
+
+.post-name {
+    margin: 0;
+    font-weight: 700;
+}
+
+.post-time {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #777;
+}
+.post-body {
+    padding: 2px 67px 12px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+.post-active {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: -50px;
+    height: 50px;
+    background: #2f2f2f;
+    border-radius: 0 0 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    z-index: -1;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.post-active button {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 25px;
+    cursor: pointer;
+    transition:color .25s ease,
+        transform .25s ease,
+        text-shadow .25s ease;
+}
+
+.btn-like:hover {
+    color: #ff4b4b;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(255, 91, 91, .8);
+}
+.btn-comment:hover {
+    color: #ffd54f;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(255, 213, 79, .8);
+}
+.btn-save:hover {
+    color: #63ff7b;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(109,255,133,.8);
+}
+.btn-share:hover {
+    color: #59c8ff;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(79,195,255,.8);
+}
+.focus-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(23, 23, 23, 0.471);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: .25s;
+    z-index: 1000;
+}
+
+.focus-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.post.focus {
+    z-index: 1001;
+    animation: focusFloat 3s ease-in-out infinite;
+}
+
+.comment-panel {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    width: 300px;
+    height: calc(100vh - 130px);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    z-index: 1002;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(40px);
+    transition: .25s;
+}
+
+.comment-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    animation: commentGlow 3s ease-in-out infinite;
+}
+.post.focus .btn-comment {
+    color: #ffd54f;
+    animation: activeCommentGlow 1.8s ease-in-out infinite;
+}
+
+.comment-input {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.comment-input input {
+    flex: 1;
+    padding: 10px;
+}
+.post.dimmed {
+    animation: softFocusFade 2.5s ease-in-out infinite;
+}
+@keyframes softFocusFade {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes focusFloat {
+    0% {
+        transform: translateY(0) scale(1.010);
+    }
+    50% {
+        transform: translateY(-2px) scale(1.015);
+    }
+    100% {
+        transform: translateY(0) scale(1.010);
+    }
+}
+
+.edge-tab {
+    position: fixed;
+    background: #000000;
+    z-index: 1003;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 40px;
+    gap: 24px;
+}
+
+.edge-tab i {
+    font-size: 24px;
+    color: #e5e5e5;
+    cursor: pointer;
+}
+
+.edge-tab i:hover {
+    transform: scale(1.1);
+    transition: all 0.2s ease-in-out;
+    color: #ffffff;
+}
+
+.edge-top {
+    left: 0;
+    right: 0;
+    height: 50px;
+    flex-direction: row;
+    top: 0;
+}
+
+.edge-top {
+    top: 0;
+}
+
+.content {
+    position: relative;
+    width: min(760px, 92%);
+    margin: 0 auto;
+    padding-top: 80px;
+}
+
+.post {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    min-height: 120px;
+    background: #ffffff;
+    border-radius: 10px;
+    margin-bottom: 100px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+}
+.post-header {
+    display: flex;
+    align-items: center;
+    border-bottom: #dddddd solid 2px;
+    gap: 12px;
+    margin: 10px;
+}
+
+.post-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 8px 6px;
+}
+
+.post-name {
+    margin: 0;
+    font-weight: 700;
+}
+
+.post-time {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #777;
+}
+.post-body {
+    padding: 2px 67px 12px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+.post-active {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: -50px;
+    height: 50px;
+    background: #2f2f2f;
+    border-radius: 0 0 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    z-index: -1;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.post-active button {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 25px;
+    cursor: pointer;
+    transition:color .25s ease,
+        transform .25s ease,
+        text-shadow .25s ease;
+}
+
+.btn-like:hover {
+    color: #ff4b4b;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(255, 91, 91, .8);
+}
+.btn-comment:hover {
+    color: #ffd54f;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(255, 213, 79, .8);
+}
+.btn-save:hover {
+    color: #63ff7b;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(109,255,133,.8);
+}
+.btn-share:hover {
+    color: #59c8ff;
+    transform: scale(1.15);
+    text-shadow: 0 0 8px rgba(79,195,255,.8);
+}
+.focus-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(23, 23, 23, 0.471);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: .25s;
+    z-index: 1000;
+}
+
+.focus-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.post.focus {
+    z-index: 1001;
+    animation: focusFloat 3s ease-in-out infinite;
+}
+
+.comment-panel {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    width: 300px;
+    height: calc(100vh - 130px);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 20px 30px rgba(0,0,0,.25);
+    z-index: 1002;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(40px);
+    transition: .25s;
+}
+
+.comment-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    animation: commentGlow 2s ease-in-out infinite;
+}
+.post.focus .btn-comment {
+    color: #ffd54f;
+    animation: activeCommentGlow 1.8s ease-in-out infinite;
+}
+
+.comment-input {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.comment-input input {
+    flex: 1;
+    padding: 10px;
+}
+.post.dimmed {
+    animation: softFocusFade 2.5s ease-in-out infinite;
+}
+@keyframes softFocusFade {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes focusFloat {
+    0% {
+        transform: translateY(0) scale(1.010);
+    }
+    50% {
+        transform: translateY(-2px) scale(1.015);
+    }
+    100% {
+        transform: translateY(0) scale(1.010);
+    }
+}
+@keyframes panelBreath {
+    0% {
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    50% {
+        box-shadow: 0 20px 75px rgba(0,0,0,.58);
+    }
+    100% {
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+}
+
+@keyframes commentGlow {
+    0%, 100% {
+        box-shadow:
+            0 20px 60px rgba(0,0,0,.35),
+            0 0 0 rgba(255, 213, 79, 0);
+    }
+
+    50% {
+        box-shadow:
+            0 25px 80px rgba(0,0,0,.50),
+            0 0 20px rgb(250, 255, 199);
+    }
+}
+
+@keyframes activeCommentGlow {
+    0% {
+        text-shadow: 0 0 5px rgba(255, 213, 79, .5);
+    }
+
+    50% {
+        text-shadow: 0 0 15px rgba(255, 213, 79, 1);
+    }
+
+    100% {
+        text-shadow: 0 0 5px rgba(255, 213, 79, .5);
+    }
+}
