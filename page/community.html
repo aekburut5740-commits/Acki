@@ -12,11 +12,46 @@
 </head>
 
 <body>
+
+    <div class="share-overlay" id="shareOverlay" onclick="closeShareBox()"></div>
+
+    <div class="share-box" id="shareBox" onclick="event.stopPropagation()">
+        <h3>Share Post</h3>
+
+        <input class="share-link" id="shareLink" type="text" readonly>
+
+        <button class="btn-copylink" onclick="copyShareLink()">Copy Link</button>
+    </div>
+
     <div class="edge-tab edge-top">
         <i class="ti ti-bell"></i>
         <i class="ti ti-mail"></i>
     </div>
+
+    <button class="create-post-tab" onclick="toggleCreatePost()">
+        Create Post
+    </button>
+
     <div class="content">
+        <div class="create-post" id="createPost">
+            <div class="create-header">
+
+                <img src="../Pic/sss.jpg" class="create-avatar">
+
+                <div class="create-user">
+                    <p class="create-username">Visitor</p>
+                    <span class="create-status">
+                        What's on your mind today?
+                    </span>
+                </div>
+
+            </div>
+
+            <textarea id="createText" class="create-text" placeholder="Share something..."
+                oninput="autoResizePost(this)"></textarea>
+
+            <button class="create-btn" onclick="createNewPost()">Post</button>
+        </div>
         <div class="post" data-post-id="1">
             <div class="post-header">
                 <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
@@ -30,10 +65,14 @@
                 <p>This is first post By aek.</p>
             </div>
             <div class="post-active">
-                <button class="ti ti-heart btn-like"></button>
-                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)"></button>
-                <button class="ti ti-circle-plus btn-save"></button>
-                <button class="ti ti-share-3 btn-share"></button>
+                <button class="ti ti-heart btn-like" onclick="toggleLike(this)">
+                    <span class="like-count">0</span>
+                </button>
+                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)">
+                    <span class="comment-count">0</span>
+                </button>
+                <button class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
+                <button class="ti ti-share-3 btn-share" onclick="sharePost(this)"></button>
             </div>
         </div>
 
@@ -50,10 +89,14 @@
                 <p>This is maybe second post By aek.</p>
             </div>
             <div class="post-active">
-                <button class="ti ti-heart btn-like"></button>
-                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)"></button>
-                <button class="ti ti-circle-plus btn-save"></button>
-                <button class="ti ti-share-3 btn-share"></button>
+                <button class="ti ti-heart btn-like" onclick="toggleLike(this)">
+                    <span class="like-count">0</span>
+                </button>
+                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)">
+                    <span class="comment-count">0</span>
+                </button>
+                <button class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
+                <button class="ti ti-share-3 btn-share" onclick="sharePost(this)"></button>
             </div>
         </div>
 
@@ -70,10 +113,14 @@
                 <p>This is not first post By aek.</p>
             </div>
             <div class="post-active">
-                <button class="ti ti-heart btn-like"></button>
-                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)"></button>
-                <button class="ti ti-circle-plus btn-save"></button>
-                <button class="ti ti-share-3 btn-share"></button>
+                <button class="ti ti-heart btn-like" onclick="toggleLike(this)">
+                    <span class="like-count">0</span>
+                </button>
+                <button class="ti ti-message-circle btn-comment" onclick="openComment(this)">
+                    <span class="comment-count">0</span>
+                </button>
+                <button class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
+                <button class="ti ti-share-3 btn-share" onclick="sharePost(this)"></button>
             </div>
         </div>
 
@@ -86,8 +133,8 @@
 
         <div class="comment-input">
             <input id="commentInput" type="text" placeholder="Write a comment..." onkeydown="commentEnter(event)">
-            <button onclick="sendComment()">Send</button>
-            
+            <button class="btn-send" onclick="sendComment()">Send</button>
+
         </div>
     </div>
     <script src="../js/js.js"></script>
