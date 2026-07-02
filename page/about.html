@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acki-About</title>
+    <link rel="stylesheet" href="../css/middle.css">
+    <link rel="stylesheet" href="../css/about.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="edge-tab edge-top">
+        <i class="ti ti-home" title="Home" onclick="goHome()"></i>
+        <i class="ti ti-bell" title="Notification" onclick="goCommunity()"></i>
+        <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
+        <i class="ti ti-info-hexagon" title="About"></i>
+    </div>
+
+    <main class="about-page">
+        <button class="back-link" onclick="goCommunity()" title="Back to Community">
+            <i class="ti ti-chevron-left"></i>
+        </button>
+        <section class="about-hero">
+
+
+            <h1 class="font1-light">About</h1>
+            <p class="about-version font1-thin">Version 0.1 Prototype</p>
+        </section>
+
+        <section class="about-grid">
+            <div class="about-box">
+                <h2 class="font1">What is this website?</h2>
+                <p class="font1">
+                    This is a simple community space where people can share ideas,
+                    stories, artwork, questions, or anything on their mind.
+                </p>
+            </div>
+
+            <div class="about-box">
+                <h2 class="font1">Community Rule</h2>
+                <p class="font1"><strong>Be Yourself.</strong></p>
+                <p class="font1">Share freely, but respect others too.</p>
+            </div>
+
+            <div class="about-box">
+                <h2 class="font1">How to use</h2>
+                <ul>
+                    <li class="font1">Create a post to share something.</li>
+                    <li class="font1">Comment to join a conversation.</li>
+                    <li class="font1">Like, save, or share posts you care about.</li>
+                </ul>
+            </div>
+
+            <div class="about-box">
+                <h2 class="font1">Coming Soon</h2>
+                <ul>
+                    <li class="font1">Profile</li>
+                    <li class="font1">Search</li>
+                    <li class="font1">Backend API</li>
+                    <li class="font1">Database</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="../js/js.js"></script>
+</body>
+
+</html>

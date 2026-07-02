@@ -1,0 +1,19 @@
+body.bg-morning {
+    background-image: url("../pic/bg-morning.png");
+}
+
+body.bg-afternoon {
+    background-image: url("../pic/bg-afternoon.png");
+}
+
+body.bg-evening {
+    background-image: url("../pic/bg-evening.png");
+}
+
+body.bg-night {
+    background-image: url("../pic/bg-night.png");
+}
+
+body.bg-midnight {
+    background-image: url("../pic/bg-midnight.png");
+}

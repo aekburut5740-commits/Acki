@@ -6,12 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acki-community</title>
     <link rel="stylesheet" href="../css/community.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/middle.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
 </head>
 
 <body>
+
+    <!-- Ambient weather / time-of-day events layer (community.html only) -->
+    <div id="weatherEvents" aria-hidden="true"></div>
 
     <div class="share-overlay" id="shareOverlay" onclick="closeShareBox()"></div>
 
@@ -24,8 +29,13 @@
     </div>
 
     <div class="edge-tab edge-top">
-        <i class="ti ti-bell"></i>
-        <i class="ti ti-mail"></i>
+        <i class="ti ti-home" title="Home" onclick="goHome()"></i>
+        <div class="nav-icon-wrap">
+            <i class="ti ti-bell" title="Notification" onclick="toggleNotificationMini()"></i>
+            <span class="notification-dot" id="notificationDot"></span>
+        </div>
+        <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
+        <i class="ti ti-info-hexagon" title="About" onclick="goAbout()"></i>
     </div>
 
     <button class="create-post-tab" onclick="toggleCreatePost()">
@@ -137,6 +147,30 @@
 
         </div>
     </div>
+
+    <div class="notification-mini" id="notificationMini">
+    <h3>Notification</h3>
+    <div id="notificationMiniList"></div>
+
+    <button class="notification-more-btn" onclick="openNotificationFull()">
+        More
+    </button>
+</div>
+
+<div class="notification-blur" id="notificationBlur" onclick="closeNotificationFull()"></div>
+
+<div class="notification-full" id="notificationFull">
+    <h2>Notification</h2>
+
+    <div class="notification-tabs">
+        <button onclick="filterNotification('all')" class="active">All</button>
+        <button onclick="filterNotification('like')">Like</button>
+        <button onclick="filterNotification('comment')">Comment</button>
+        <button onclick="filterNotification('share')">Share</button>
+    </div>
+
+    <div id="notificationFullList"></div>
+</div>
     <script src="../js/js.js"></script>
 </body>
 

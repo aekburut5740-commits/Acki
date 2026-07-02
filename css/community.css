@@ -1,61 +1,45 @@
 body {
     margin: 0;
     background-color: rgb(230, 227, 205);
-    background-image: url();
+    background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    overflow-x: hidden;
 }
 
 body::before {
     content: "";
     position: fixed;
     inset: 0;
-    pointer-events: none;
+
+    background-image: inherit;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    filter:
+        blur(1px) saturate(.7) brightness(.85) contrast(.9);
+
+    transform: scale(1.03);
+
+    z-index: -2;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
 
     background:
         linear-gradient(to right,
-            rgba(0,0,0,.50),
+            rgba(0, 0, 0, .50),
             transparent 180px,
             transparent calc(100% - 180px),
-            rgba(0,0,0,.50));
+            rgba(0, 0, 0, .50));
 
-    z-index: 0;
-}
-
-.edge-tab {
-    position: fixed;
-    background: #000000;
-    z-index: 1003;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 40px;
-    gap: 24px;
-}
-
-.edge-tab i {
-    font-size: 24px;
-    color: #e5e5e5;
-    cursor: pointer;
-}
-
-.edge-tab i:hover {
-    transform: scale(1.1);
-    transition: all 0.2s ease-in-out;
-    color: #ffffff;
-}
-
-.edge-top {
-    left: 0;
-    right: 0;
-    height: 50px;
-    flex-direction: row;
-    top: 0;
-}
-
-.edge-top {
-    top: 0;
+    z-index: -1;
+    pointer-events: none;
 }
 
 .content {
@@ -72,8 +56,9 @@ body::before {
     background: #ffffff;
     border-radius: 10px;
     margin-bottom: 100px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 1);
 }
+
 .post-header {
     display: flex;
     align-items: center;
@@ -100,6 +85,7 @@ body::before {
     font-size: 13px;
     color: #777;
 }
+
 .post-body {
     padding: 18px 67px 24px;
     line-height: 1.8;
@@ -111,6 +97,7 @@ body::before {
     margin: 0;
     white-space: pre-wrap;
 }
+
 .post-active {
     position: absolute;
     left: 30px;
@@ -124,7 +111,7 @@ body::before {
     justify-content: center;
     gap: 80px;
     z-index: -1;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .post-active button {
@@ -133,10 +120,11 @@ body::before {
     color: #ffffff;
     font-size: 25px;
     cursor: pointer;
-    transition:color .25s ease,
+    transition: color .25s ease,
         transform .25s ease,
         text-shadow .25s ease;
 }
+
 .post.share-active {
     z-index: 1001;
 }
@@ -146,21 +134,25 @@ body::before {
     transform: scale(1.15);
     text-shadow: 0 0 8px rgba(255, 91, 91, .8);
 }
+
 .btn-comment:hover {
     color: #ffd54f;
     transform: scale(1.15);
     text-shadow: 0 0 8px rgba(255, 213, 79, .8);
 }
+
 .btn-save:hover {
     color: #63ff7b;
     transform: scale(1.15);
-    text-shadow: 0 0 8px rgba(109,255,133,.8);
+    text-shadow: 0 0 8px rgba(109, 255, 133, .8);
 }
+
 .btn-share:hover {
     color: #59c8ff;
     transform: scale(1.15);
-    text-shadow: 0 0 8px rgba(79,195,255,.8);
+    text-shadow: 0 0 8px rgba(79, 195, 255, .8);
 }
+
 .focus-overlay {
     position: fixed;
     inset: 0;
@@ -190,10 +182,10 @@ body::before {
     background: #ffffff;
     border-radius: 18px;
     padding: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
     z-index: 1002;
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    flex-direction: column;
     opacity: 0;
     visibility: hidden;
     transform: translateX(40px);
@@ -206,13 +198,14 @@ body::before {
     transform: translateX(0);
     animation: commentGlow 3s ease-in-out infinite;
 }
+
 .post.focus .btn-comment {
     color: #ffd54f;
     animation: activeCommentGlow 1.8s ease-in-out infinite;
 }
 
 .comment-input {
-    margin-top:auto;
+    margin-top: auto;
     display: flex;
     gap: 10px;
 }
@@ -223,6 +216,7 @@ body::before {
     flex: 1;
     padding: 10px;
 }
+
 .post.dimmed {
     animation: softFocusFade 2.5s ease-in-out infinite;
     background-color: #d5d5d5;
@@ -231,12 +225,14 @@ body::before {
 .comment-input input:hover {
     border-color: #999999;
 }
-.comment-text{
+
+.comment-text {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     word-break: break-word;
-    margin-bottom:12px;
+    margin-bottom: 12px;
 }
+
 .comment-item {
     display: flex;
     align-items: flex-start;
@@ -265,13 +261,15 @@ body::before {
     font-size: 14px;
     font-family: 'Noto Sans Thai', sans-serif;
 }
-#commentList{
-    flex:1;
-    overflow-y:auto;
-    overflow-x:hidden;
-    margin:15px 0;
-    padding-right:6px;
+
+#commentList {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 15px 0;
+    padding-right: 6px;
 }
+
 .btn-send {
     background-color: #828282;
     color: white;
@@ -281,6 +279,7 @@ body::before {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 .btn-send:hover {
     background-color: #5a5a5a;
 }
@@ -298,8 +297,9 @@ body::before {
         opacity: 0.5;
     }
 }
+
 .create-post {
-    background:#f2f2f2;
+    background: #f2f2f2;
     border-radius: 10px;
     position: fixed;
     padding: 80px 50px 50px 50px;
@@ -309,7 +309,7 @@ body::before {
     width: min(780px, 90%);
     z-index: 1001;
     transition: transform .3s ease;
-    box-shadow:0 15px 40px rgba(0,0,0,.25);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, .25);
 }
 
 .create-post.show {
@@ -332,6 +332,7 @@ body::before {
     z-index: 1002;
     transition: all .1s ease-in-out;
 }
+
 .create-post-tab:hover {
     background: #212121;
     transform: translateX(-50%) translateY(15px);
@@ -369,36 +370,38 @@ body::before {
 .create-btn:hover {
     background: #000000;
 }
-.create-header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:15px;
+
+.create-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
 }
 
-.create-avatar{
-    width:48px;
-    height:48px;
-    border-radius:50%;
-    object-fit:cover;
-    box-shadow:0 3px 10px rgba(0,0,0,.15);
+.create-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .15);
 }
 
-.create-user{
-    display:flex;
-    flex-direction:column;
+.create-user {
+    display: flex;
+    flex-direction: column;
 }
 
-.create-username{
-    margin:0;
-    font-weight:700;
-    font-size:17px;
+.create-username {
+    margin: 0;
+    font-weight: 700;
+    font-size: 17px;
 }
 
-.create-status{
-    color:#777;
-    font-size:14px;
+.create-status {
+    color: #777;
+    font-size: 14px;
 }
+
 .btn-like {
     display: flex;
     align-items: center;
@@ -414,10 +417,12 @@ body::before {
     font-size: 14px;
     font-family: 'Noto Sans Thai', sans-serif;
 }
+
 .btn-save.saved {
     color: #63ff7b;
     text-shadow: 0 0 10px rgba(99, 255, 123, .8);
 }
+
 .share-overlay {
     position: fixed;
     inset: 0;
@@ -442,7 +447,7 @@ body::before {
     border-radius: 16px;
     padding: 7px 20px 20px 20px;
     z-index: 1002;
-    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
     opacity: 0;
     visibility: hidden;
     transform: translateX(30px) scale(.96);
@@ -462,6 +467,7 @@ body::before {
     padding: 10px;
     margin-bottom: 12px;
 }
+
 .btn-copylink {
     background: #2f2f2f;
     color: white;
@@ -471,12 +477,180 @@ body::before {
     cursor: pointer;
     transition: all .2s ease-in-out;
 }
+
 .btn-copylink:hover {
     background: #000000;
 }
+
 .share-link {
     width: 100%;
     box-sizing: border-box;
     padding: 10px;
     margin-bottom: 12px;
+}
+/* ==========================================================================
+   Ambient Weather / Time-of-Day Events (community.html only)
+   Sits above the .theme background layers (body::before z:-2, body::after z:-1)
+   but stays below every real UI element (.post z:1, panels/nav z:1000+).
+   pointer-events:none so it never blocks clicks, links or scrolling.
+   ========================================================================== */
+#weatherEvents {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* ---------- หมอก (Fog) ---------- */
+.weather-fog-band {
+    position: absolute;
+    left: -25%;
+    width: 150%;
+    height: 280px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, .88), transparent);
+    filter: blur(20px);
+    animation-name: fogDrift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes fogDrift {
+    0% { transform: translateX(-20%); }
+    50% { transform: translateX(20%); }
+    100% { transform: translateX(-20%); }
+}
+
+/* ---------- เมฆ (Clouds) ---------- */
+.weather-cloud {
+    position: absolute;
+    width: 180px;
+    height: 60px;
+    background: rgba(255, 255, 255, .55);
+    border-radius: 50px;
+    filter: blur(6px);
+    box-shadow:
+        40px 10px 0 -6px rgba(255, 255, 255, .5),
+        -30px 15px 0 -10px rgba(255, 255, 255, .45);
+    animation-name: cloudDrift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes cloudDrift {
+    from { transform: translateX(-25vw) scale(var(--cloud-scale, 1)); }
+    to   { transform: translateX(125vw) scale(var(--cloud-scale, 1)); }
+}
+
+/* ---------- แดด (Sunshine) ---------- */
+.weather-sun-glow {
+    position: absolute;
+    top: -140px;
+    right: -140px;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 236, 150, .88), rgba(255, 236, 150, 0) 70%);
+    animation: sunPulse 6s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+    0%, 100% { opacity: .65; transform: scale(1); }
+    50%      { opacity: 1;   transform: scale(1.08); }
+}
+
+.weather-sun-ray {
+    position: absolute;
+    top: -5%;
+    right: 5%;
+    width: 6px;
+    height: 45vh;
+    background: linear-gradient(to bottom, rgba(255, 250, 205, .5), transparent);
+    transform-origin: top center;
+    animation-name: rayFade;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes rayFade {
+    0%, 100% { opacity: .12; }
+    50%      { opacity: .5; }
+}
+
+/* ---------- ฝน (Rain) ---------- */
+.weather-rain-drop {
+    position: absolute;
+    top: -10vh;
+    width: 2px;
+    height: 70px;
+    background: linear-gradient(to bottom, transparent, rgba(190, 220, 255, .8));
+    animation-name: rainFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes rainFall {
+    0%   { transform: translateY(-10vh); opacity: .9; }
+    100% { transform: translateY(110vh); opacity: .5; }
+}
+
+/* ---------- ลม (Wind) ---------- */
+.weather-wind-streak {
+    position: absolute;
+    height: 5px;
+    width: 100px;
+    left: -120px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, .55), transparent);
+    animation-name: windGust;
+    animation-timing-function: ease-in;
+    animation-iteration-count: infinite;
+}
+
+@keyframes windGust {
+    0%   { transform: translateX(-20vw); opacity: 0; }
+    10%  { opacity: .8; }
+    90%  { opacity: .35; }
+    100% { transform: translateX(120vw); opacity: 0; }
+}
+
+/* ---------- ใบไม้ตก (Falling leaves) ---------- */
+.weather-leaf {
+    position: absolute;
+    top: -8vh;
+    line-height: 1;
+    animation-name: leafFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes leafFall {
+    0%   { transform: translateY(-8vh) translateX(0) rotate(0deg); opacity: 0; }
+    8%   { opacity: .9; }
+    100% { transform: translateY(112vh) translateX(var(--leaf-drift, 60px)) rotate(360deg); opacity: .55; }
+}
+
+/* ---------- หิ่งห้อย (Fireflies) ---------- */
+.weather-firefly {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d4ff7a;
+    box-shadow: 0 0 8px 3px rgba(212, 255, 122, .9);
+    animation-name: fireflyFloat, fireflyGlow;
+    animation-timing-function: ease-in-out, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+}
+
+@keyframes fireflyFloat {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(30px, -25px); }
+    50%  { transform: translate(-15px, -45px); }
+    75%  { transform: translate(-35px, -10px); }
+    100% { transform: translate(0, 0); }
+}
+
+@keyframes fireflyGlow {
+    0%, 100% { opacity: .2; }
+    50%      { opacity: 1; }
 }

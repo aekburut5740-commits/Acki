@@ -136,28 +136,6 @@ function renderComments(postId) {
     });
 }
 
-function sendComment() {
-    const input = document.getElementById("commentInput");
-    const text = input.value.trim();
-
-    if (text === "" || !activePostId) {
-        return;
-    }
-
-    if (!commentsData[activePostId]) {
-        commentsData[activePostId] = [];
-    }
-
-    commentsData[activePostId].push({
-        user: "Visitor",
-        text: text
-    });
-
-    renderComments(activePostId);
-
-    input.value = "";
-}
-
 function commentEnter(event) {
     if (event.key === "Enter") {
         sendComment();
@@ -192,6 +170,8 @@ function sendComment() {
     }
 
     commentsData[activePostId].push("Visitor: " + text);
+
+    addNotification("comment", "Visitor commented on your post.", activePostId);
 
     renderComments(activePostId);
 
@@ -298,6 +278,9 @@ function toggleLike(button) {
         button.classList.remove("ti-heart");
         button.classList.add("ti-heart-filled");
         count++;
+
+        const post = button.closest(".post");
+        addNotification("like", "Visitor liked your post.", post.dataset.postId);
     }
 
     countSpan.textContent = count;
@@ -377,6 +360,8 @@ function sharePost(button) {
         return;
     }
 
+    addNotification("share", "Your post was shared.", postId);
+
     const link = `${window.location.origin}${window.location.pathname}?post=${postId}`;
     document.getElementById("shareLink").value = link;
 
@@ -428,3 +413,385 @@ window.addEventListener("load", () => {
 
     }, 300);
 });
+
+function goHome() {
+    window.location.href = "../index.html";
+}
+function goAbout() {
+    window.location.href = "about.html";
+}
+function goContact() {
+    window.location.href = "contact.html";
+}
+
+function sendContactMail() {
+    const email = document.getElementById("contactEmail").value.trim();
+    const subject = document.getElementById("contactSubject").value;
+    const message = document.getElementById("contactMessage").value.trim();
+
+    if (message === "") {
+        alert("Please write your message first.");
+        return;
+    }
+
+    const body = `From: ${email || "Not provided"}\n\n${message}`;
+
+    window.location.href =
+        `mailto:aekburut5740@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function goNotification() {
+    window.location.href = "notification.html";
+}
+let notifications = [
+    { type: "comment", text: "Visitor commented on your post.", time: "just now", postId: "1" },
+    { type: "like", text: "Visitor liked your post.", time: "2 min ago", postId: "2" },
+    { type: "share", text: "Your post was shared.", time: "5 min ago", postId: "3" }
+];
+
+let currentNotificationFilter = "all";
+
+function showNotificationDot() {
+    document.getElementById("notificationDot").classList.add("show");
+}
+
+function hideNotificationDot() {
+    document.getElementById("notificationDot").classList.remove("show");
+}
+
+function addNotification(type, text, postId) {
+    notifications.unshift({
+        type,
+        text,
+        time: "just now",
+        postId
+    });
+
+    showNotificationDot();
+    renderNotificationMini();
+    renderNotificationFull();
+}
+
+function toggleNotificationMini() {
+    const mini = document.getElementById("notificationMini");
+    const full = document.getElementById("notificationFull");
+    const blur = document.getElementById("notificationBlur");
+
+    hideNotificationDot();
+
+    if (full) full.classList.remove("show");
+    if (blur) blur.classList.remove("show");
+
+    renderNotificationMini();
+
+    mini.classList.toggle("show");
+}
+
+function renderNotificationMini() {
+    const list = document.getElementById("notificationMiniList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    notifications.slice(0, 3).forEach((noti) => {
+        const item = document.createElement("div");
+        item.className = "notification-item-mini";
+        item.innerHTML = `
+        ${noti.text}
+        <span>${noti.time}</span>
+    `;
+
+        item.onclick = () => openPostFromNotification(noti.postId);
+
+        list.appendChild(item);
+    });
+}
+
+function openNotificationFull() {
+    document.getElementById("notificationMini").classList.remove("show");
+    document.getElementById("notificationBlur").classList.add("show");
+    document.getElementById("notificationFull").classList.add("show");
+
+    renderNotificationFull();
+}
+
+function closeNotificationFull() {
+    document.getElementById("notificationBlur").classList.remove("show");
+    document.getElementById("notificationFull").classList.remove("show");
+}
+
+function filterNotification(type) {
+    currentNotificationFilter = type;
+
+    document.querySelectorAll(".notification-tabs button").forEach((btn) => {
+        btn.classList.remove("active");
+    });
+
+    event.target.classList.add("active");
+
+    renderNotificationFull();
+}
+
+function renderNotificationFull() {
+    const list = document.getElementById("notificationFullList");
+    if (!list) return;
+
+    list.innerHTML = "";
+
+    const filtered = currentNotificationFilter === "all"
+        ? notifications
+        : notifications.filter((noti) => noti.type === currentNotificationFilter);
+
+    filtered.forEach((noti) => {
+        const item = document.createElement("div");
+        item.className = "notification-item-full";
+        item.innerHTML = `
+            ${noti.text}
+            <span>${noti.time}</span>
+        `;
+
+        item.onclick = () => openPostFromNotification(noti.postId);
+
+        list.appendChild(item);
+    });
+}
+
+renderNotificationMini();
+renderNotificationFull();
+
+function openPostFromNotification(postId) {
+    closeNotificationFull();
+    document.getElementById("notificationMini").classList.remove("show");
+
+    const post = document.querySelector(`.post[data-post-id="${postId}"]`);
+    if (!post) return;
+
+    post.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+    setTimeout(() => {
+        const commentBtn = post.querySelector(".btn-comment");
+        openComment(commentBtn);
+    }, 500);
+}
+
+function updateBackgroundTheme() {
+    const hour = new Date().getHours();
+
+    document.body.classList.remove(
+        "bg-morning",
+        "bg-afternoon",
+        "bg-evening",
+        "bg-night",
+        "bg-midnight"
+    );
+
+    if (hour >= 5 && hour < 11) {
+        document.body.classList.add("bg-morning");
+
+    } else if (hour >= 11 && hour < 16) {
+        document.body.classList.add("bg-afternoon");
+
+    } else if (hour >= 16 && hour < 19) {
+        document.body.classList.add("bg-evening");
+
+    } else if (hour >= 19 && hour <= 23) {
+        document.body.classList.add("bg-night");
+
+    } else {
+        document.body.classList.add("bg-midnight");
+    }
+}
+
+updateBackgroundTheme();
+
+setInterval(updateBackgroundTheme, 60000);
+
+function goHome() {
+    window.location.href = "/index.html";
+}
+
+function goAbout() {
+    window.location.href = "/page/about.html";
+}
+
+function goContact() {
+    window.location.href = "/page/contact.html";
+}
+
+function goCommunity() {
+    window.location.href = "/page/community.html";
+}
+/* ==========================================================================
+   Ambient Weather / Time-of-Day Events (community.html only)
+   - Guarded by #weatherEvents so this never runs/affects other pages
+     (js.js is shared by index.html, about.html, contact.html too).
+   - Picks a random event every real-world :00 / :30 mark ("ทุก 30 นาที").
+   - Day pool (bg-morning / bg-afternoon / bg-evening): fog, cloud, sun, rain, wind, leaf
+   - Night pool (bg-night / bg-midnight): cloud, rain, wind, leaf, firefly
+   - Never repeats the same event twice in a row.
+   - The layer itself (#weatherEvents) is fixed, z-index:0 and
+     pointer-events:none, so it always renders above the theme background
+     (z:-2 / z:-1) but never covers posts, nav or any UI (all z-index >= 1).
+   ========================================================================== */
+(function () {
+    const weatherLayer = document.getElementById("weatherEvents");
+    if (!weatherLayer) return; // only run on community.html
+
+    const DAY_EVENTS = ["fog", "cloud", "sun", "rain", "wind", "leaf"];
+    const NIGHT_EVENTS = ["cloud", "rain", "wind", "leaf", "firefly"];
+
+    let lastEvent = null;
+
+    function isDaytime() {
+        const hour = new Date().getHours();
+        // matches bg-morning / bg-afternoon / bg-evening range used above
+        return hour >= 5 && hour < 19;
+    }
+
+    function rand(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function pickEvent() {
+        const pool = isDaytime() ? DAY_EVENTS : NIGHT_EVENTS;
+        const choices = pool.filter((e) => e !== lastEvent);
+        const list = choices.length ? choices : pool;
+        const chosen = list[Math.floor(Math.random() * list.length)];
+        lastEvent = chosen;
+        return chosen;
+    }
+
+    function clearWeather() {
+        weatherLayer.innerHTML = "";
+    }
+
+    function spawnFog() {
+        for (let i = 0; i < 3; i++) {
+            const band = document.createElement("div");
+            band.className = "weather-fog-band";
+            band.style.top = `${15 + i * 25}%`;
+            band.style.animationDuration = `${rand(50, 80)}s`;
+            band.style.animationDelay = `${rand(-30, 0)}s`;
+            band.style.opacity = rand(0.4, 0.8);
+            weatherLayer.appendChild(band);
+        }
+    }
+
+    function spawnCloud() {
+        for (let i = 0; i < 5; i++) {
+            const cloud = document.createElement("div");
+            cloud.className = "weather-cloud";
+            cloud.style.top = `${rand(5, 40)}%`;
+            cloud.style.animationDuration = `${rand(50, 100)}s`;
+            cloud.style.animationDelay = `${rand(-80, 0)}s`;
+            cloud.style.opacity = rand(0.4, 0.8);
+            cloud.style.setProperty("--cloud-scale", rand(0.7, 1.4).toFixed(2));
+            weatherLayer.appendChild(cloud);
+        }
+    }
+
+    function spawnSun() {
+        const glow = document.createElement("div");
+        glow.className = "weather-sun-glow";
+        weatherLayer.appendChild(glow);
+
+        for (let i = 0; i < 6; i++) {
+            const ray = document.createElement("div");
+            ray.className = "weather-sun-ray";
+            ray.style.right = `${rand(20, 320)}px`;
+            ray.style.transform = `rotate(${rand(-30, 30)}deg)`;
+            ray.style.animationDuration = `${rand(6, 10)}s`;
+            ray.style.animationDelay = `${rand(0, 6)}s`;
+            weatherLayer.appendChild(ray);
+        }
+    }
+
+    function spawnRain() {
+        for (let i = 0; i < 60; i++) {
+            const drop = document.createElement("div");
+            drop.className = "weather-rain-drop";
+            drop.style.left = `${rand(0, 100)}%`;
+            drop.style.animationDuration = `${rand(0.6, 1.4)}s`;
+            drop.style.animationDelay = `${rand(0, 2)}s`;
+            weatherLayer.appendChild(drop);
+        }
+    }
+
+    function spawnWind() {
+        for (let i = 0; i < 10; i++) {
+            const streak = document.createElement("div");
+            streak.className = "weather-wind-streak";
+            streak.style.top = `${rand(0, 100)}%`;
+            streak.style.animationDuration = `${rand(3, 6)}s`;
+            streak.style.animationDelay = `${rand(0, 5)}s`;
+            weatherLayer.appendChild(streak);
+        }
+    }
+
+    function spawnLeaf() {
+        const emojis = ["🍂", "🍃"];
+        for (let i = 0; i < 14; i++) {
+            const leaf = document.createElement("div");
+            leaf.className = "weather-leaf";
+            leaf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            leaf.style.left = `${rand(0, 100)}%`;
+            leaf.style.fontSize = `${rand(14, 24)}px`;
+            leaf.style.animationDuration = `${rand(7, 13)}s`;
+            leaf.style.animationDelay = `${rand(0, 10)}s`;
+            leaf.style.setProperty("--leaf-drift", `${rand(-60, 60)}px`);
+            weatherLayer.appendChild(leaf);
+        }
+    }
+
+    function spawnFirefly() {
+        for (let i = 0; i < 18; i++) {
+            const fly = document.createElement("div");
+            fly.className = "weather-firefly";
+            fly.style.left = `${rand(0, 100)}%`;
+            fly.style.top = `${rand(30, 95)}%`;
+            fly.style.animationDuration = `${rand(6, 12)}s, ${rand(2, 4)}s`;
+            fly.style.animationDelay = `${rand(0, 6)}s, ${rand(0, 4)}s`;
+            weatherLayer.appendChild(fly);
+        }
+    }
+
+    const spawners = {
+        fog: spawnFog,
+        cloud: spawnCloud,
+        sun: spawnSun,
+        rain: spawnRain,
+        wind: spawnWind,
+        leaf: spawnLeaf,
+        firefly: spawnFirefly
+    };
+
+    function triggerWeatherEvent() {
+        clearWeather();
+        const event = pickEvent();
+        const spawn = spawners[event];
+        if (spawn) spawn();
+    }
+
+    function msUntilNextHalfHour() {
+        const now = new Date();
+        const next = new Date(now);
+        if (now.getMinutes() < 30) {
+            next.setMinutes(30, 0, 0);
+        } else {
+            next.setHours(now.getHours() + 1, 0, 0, 0);
+        }
+        return next.getTime() - now.getTime();
+    }
+
+    // Show an event immediately so the background isn't empty on load
+    triggerWeatherEvent();
+
+    // Then align every future change to real-world :00 / :30 marks (ทุก 30 นาที)
+    setTimeout(function scheduleNext() {
+        triggerWeatherEvent();
+        setInterval(triggerWeatherEvent, 30 * 60 * 1000);
+    }, msUntilNextHalfHour());
+})();

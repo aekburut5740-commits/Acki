@@ -14,13 +14,13 @@ body {
 .frame {
     border: 2px solid #000000;
     border-radius: 10px;
-    background-color: #ffffff;
+    background-color: rgb(242, 241, 232);
     margin: 30px 100px;
     padding: 10px 30px 70px 30px;
     min-height: calc(100vh - 40px);
     overflow: visible;
     box-shadow: 0px 20px 60px rgba(0, 0, 0, 0.50),
-                inset 20px 0px 50px rgba(0,0,0,0.2),
+                inset 20px 0px 50px rgba(0,0,0,0.5),
                 inset -20px 0px 50px rgba(0,0,0,0.2);
 }
 
