@@ -1,0 +1,226 @@
+/* ==========================================================================
+   Acki Ambient Weather / Time-of-Day Events
+   --------------------------------------------------------------------------
+   #weatherEvents sits above background image layers but below posts and panels.
+   All effects are pointer-events:none so they never block clicking or scrolling.
+   ========================================================================== */
+
+#weatherEvents {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* ---------- หมอก (Fog) ---------- */
+.weather-fog-band {
+    position: absolute;
+    left: -25%;
+    width: 150%;
+    height: 280px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, .72), transparent);
+    filter: blur(24px);
+    animation-name: fogDrift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+@keyframes fogDrift {
+    0% { transform: translateX(-20%); }
+    50% { transform: translateX(20%); }
+    100% { transform: translateX(-20%); }
+}
+
+/* ---------- เมฆเป็นกลุ่ม (Cloud Groups) ---------- */
+.weather-cloud-group {
+    position: absolute;
+    left: -360px;
+    width: 360px;
+    height: 130px;
+    opacity: var(--cloud-opacity, .55);
+    filter: blur(var(--cloud-blur, 5px));
+    transform: scale(var(--cloud-scale, 1));
+    animation-name: cloudGroupDrift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.weather-cloud-puff {
+    position: absolute;
+    display: block;
+    border-radius: 999px;
+    background: var(--cloud-color-main, rgba(255, 255, 255, .72));
+    box-shadow:
+        28px 10px 40px var(--cloud-color-soft, rgba(255, 255, 255, .24)),
+        -18px 12px 34px var(--cloud-color-soft, rgba(255, 255, 255, .22));
+}
+
+/* เมฆเปลี่ยนสีตามเวลา */
+body.bg-morning {
+    --cloud-color-main: rgba(255, 239, 203, .72);
+    --cloud-color-soft: rgba(255, 213, 150, .30);
+}
+
+body.bg-afternoon {
+    --cloud-color-main: rgba(255, 255, 255, .70);
+    --cloud-color-soft: rgba(215, 235, 255, .24);
+}
+
+body.bg-evening {
+    --cloud-color-main: rgba(255, 211, 166, .66);
+    --cloud-color-soft: rgba(255, 146, 94, .26);
+}
+
+body.bg-night,
+body.bg-midnight {
+    --cloud-color-main: rgba(150, 178, 213, .34);
+    --cloud-color-soft: rgba(90, 125, 170, .22);
+}
+
+@keyframes cloudGroupDrift {
+    from { transform: translateX(-25vw) scale(var(--cloud-scale, 1)); }
+    to   { transform: translateX(145vw) scale(var(--cloud-scale, 1)); }
+}
+
+/* ---------- ฝน (Rain) ---------- */
+.weather-rain-drop {
+    position: absolute;
+    top: -12vh;
+    width: 2px;
+    height: 70px;
+    background: linear-gradient(to bottom, transparent, rgba(190, 220, 255, .75));
+    filter: blur(.2px);
+    animation-name: rainFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes rainFall {
+    0%   { transform: translateY(-10vh) translateX(0); opacity: .9; }
+    100% { transform: translateY(112vh) translateX(-35px); opacity: .45; }
+}
+
+/* ---------- ใบไม้ตก (Falling Leaves) ---------- */
+.weather-leaf {
+    position: absolute;
+    top: -8vh;
+    line-height: 1;
+    filter: saturate(.82) brightness(.92);
+    animation-name: leafFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes leafFall {
+    0%   { transform: translateY(-8vh) translateX(0) rotate(0deg); opacity: 0; }
+    8%   { opacity: .85; }
+    100% { transform: translateY(112vh) translateX(var(--leaf-drift, 60px)) rotate(360deg); opacity: .45; }
+}
+
+/* ---------- หิ่งห้อย (Fireflies) ---------- */
+.weather-firefly {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(255, 238, 147, .95);
+    box-shadow:
+        0 0 5px 2px rgba(255, 235, 130, .52),
+        0 0 14px 5px rgba(255, 219, 88, .20);
+    opacity: 0;
+    animation-name: fireflyFloatNatural, fireflyPulseNatural;
+    animation-timing-function: ease-in-out, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+}
+
+@keyframes fireflyFloatNatural {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(var(--fly-x1, 16px), var(--fly-y1, -12px)); }
+    50%  { transform: translate(var(--fly-x2, -22px), var(--fly-y2, 10px)); }
+    75%  { transform: translate(calc(var(--fly-x1, 16px) * -0.7), calc(var(--fly-y1, -12px) * 0.6)); }
+    100% { transform: translate(0, 0); }
+}
+
+@keyframes fireflyPulseNatural {
+    0%, 100% { opacity: 0; }
+    18%      { opacity: .18; }
+    30%      { opacity: .95; }
+    42%      { opacity: .22; }
+    65%      { opacity: .75; }
+    82%      { opacity: .12; }
+}
+
+/* ---------- Sunshine / แดดแบบบรรยากาศ ---------- */
+.sunshine-mode::before {
+    filter:
+        blur(1px)
+        saturate(.82)
+        brightness(.98)
+        contrast(.9);
+}
+
+.sunshine-warm-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: var(--sunshine-layer-bg);
+    opacity: 0;
+    transition: opacity 2s ease;
+}
+
+.sunshine-warm-layer.show {
+    opacity: 1;
+    animation: sunlightBreath 35s ease-in-out infinite;
+}
+
+/* แดดเปลี่ยนสีตามเวลา */
+body.bg-morning {
+    --sunshine-layer-bg:
+        radial-gradient(
+            circle at 78% 35%,
+            rgba(255, 232, 151, .46),
+            rgba(255, 207, 107, .23) 24%,
+            transparent 58%
+        ),
+        rgba(255, 222, 144, .12);
+}
+
+body.bg-afternoon {
+    --sunshine-layer-bg:
+        radial-gradient(
+            circle at 78% 34%,
+            rgba(255, 255, 227, 0.692),
+            rgba(255, 255, 255, 0.444) 24%,
+            transparent 58%
+        ),
+        rgba(255, 255, 255, .07);
+}
+
+body.bg-evening {
+    --sunshine-layer-bg:
+        radial-gradient(
+            circle at 76% 42%,
+            rgba(255, 186, 104, .42),
+            rgba(255, 142, 74, .22) 24%,
+            transparent 58%
+        ),
+        rgba(255, 176, 96, .10);
+}
+
+body.bg-night,
+body.bg-midnight {
+    --sunshine-layer-bg:
+        radial-gradient(
+            circle at 78% 35%,
+            rgba(175, 205, 255, .18),
+            transparent 55%
+        );
+}
+
+@keyframes sunlightBreath {
+    0%   { transform: translateX(-6px) translateY(0); }
+    50%  { transform: translateX(6px) translateY(3px); }
+    100% { transform: translateX(-6px) translateY(0); }
+}
