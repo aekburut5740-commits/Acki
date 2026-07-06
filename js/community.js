@@ -1,4 +1,5 @@
 // Community feed: posts, comments, likes, saves, share links.
+const API_URL = "http://localhost:3000";
 
 let activePost = null;
 let activePostId = null;
@@ -129,24 +130,17 @@ function closeAllPanels() {
     }
 }
 
-function createNewPost() {
-    const textarea = document.getElementById("createText");
-    const content = document.querySelector(".content");
-    if (!textarea || !content) return;
-
-    const text = textarea.value.trim();
-    if (text === "") return;
-
+function createPostElement(postData) {
     const post = document.createElement("div");
     post.className = "post";
-    post.dataset.postId = nextPostId;
-    post.dataset.createdAt = Date.now();
+    post.dataset.postId = postData.id;
+    post.dataset.createdAt = new Date(postData.createdAt).getTime();
 
     post.innerHTML = `
         <div class="post-header">
             <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
             <div>
-                <p class="post-name">Visitor</p>
+                <p class="post-name">${postData.username || "Visitor"}</p>
                 <p class="post-time">just now</p>
             </div>
         </div>
@@ -156,28 +150,90 @@ function createNewPost() {
         </div>
 
         <div class="post-active">
-            <button class="ti ti-heart btn-like" onclick="toggleLike(this)">
-                <span class="like-count">0</span>
-            </button>
-            <button class="ti ti-message-circle btn-comment" onclick="openComment(this)">
-                <span class="comment-count">0</span>
-            </button>
-            <button class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
-            <button class="ti ti-share-3 btn-share" onclick="sharePost(this)"></button>
-        </div>
-    `;
+    <button type="button" class="ti ti-heart btn-like" onclick="toggleLike(this)">
+        <span class="like-count">${postData.likes || 0}</span>
+    </button>
 
-    post.querySelector(".post-body p").textContent = text;
+    <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
+        <span class="comment-count">0</span>
+    </button>
 
-    const firstPost = document.querySelector(".post");
-    content.insertBefore(post, firstPost);
+    <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
+
+    <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)"></button>
+</div>`;
+
+    post.querySelector(".post-body p").textContent = postData.content;
+
+    const likedKey = `acki-liked-${postData.id}`;
+    const likeButton = post.querySelector(".btn-like");
+
+    if (localStorage.getItem(likedKey) === "true") {
+        likeButton.classList.add("liked", "ti-heart-filled");
+        likeButton.classList.remove("ti-heart");
+    }
+
+    return post;
+}
+async function createNewPost() {
+    try {
+        const textarea = document.getElementById("createText");
+        const content = document.querySelector(".content");
+        if (!textarea || !content) return;
+
+        const text = textarea.value.trim();
+        if (text === "") return;
+
+        const response = await fetch(`${API_URL}/posts`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: "Visitor",
+                content: text
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("Cannot create post");
+        }
+
+        const newPost = await response.json();
+        const postElement = createPostElement(newPost);
+        const firstPost = document.querySelector(".post");
+        content.insertBefore(postElement, firstPost);
+
+        commentsData[newPost.id] = [];
+
+        textarea.value = "";
+        closeCreatePost();
+        updatePostTimes();
+    } catch (error) {
+        console.error("Create post error:", error);
+        alert("สร้างโพสต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
+    }
+}
+
+async function loadPostsFromBackend() {
+    const content = document.querySelector(".content");
+    if (!content) return;
+
+    const response = await fetch(`${API_URL}/posts`);
+    const posts = await response.json();
+
+    posts.forEach((postData) => {
+        const alreadyExists = document.querySelector(`.post[data-post-id="${postData.id}"]`);
+        if (alreadyExists) return;
+
+        const postElement = createPostElement(postData);
+        const firstPost = document.querySelector(".post");
+        content.insertBefore(postElement, firstPost);
+
+        if (!commentsData[postData.id]) commentsData[postData.id] = [];
+    });
 
     updatePostTimes();
-    commentsData[nextPostId] = [];
-    nextPostId++;
-
-    textarea.value = "";
-    closeCreatePost();
 }
 
 function autoResizePost(textarea) {
@@ -185,28 +241,46 @@ function autoResizePost(textarea) {
     textarea.style.height = textarea.scrollHeight + "px";
 }
 
-function toggleLike(button) {
-    const countSpan = button.querySelector(".like-count");
-    let count = Number(countSpan.textContent);
+async function toggleLike(button) {
 
-    if (button.classList.contains("liked")) {
-        button.classList.remove("liked");
-        button.classList.remove("ti-heart-filled");
-        button.classList.add("ti-heart");
-        count--;
-    } else {
-        button.classList.add("liked");
-        button.classList.remove("ti-heart");
-        button.classList.add("ti-heart-filled");
-        count++;
-
+    try {
         const post = button.closest(".post");
-        if (typeof addNotification === "function") {
-            addNotification("like", "Visitor liked your post.", post.dataset.postId);
-        }
-    }
+        const postId = post.dataset.postId;
+        const countSpan = button.querySelector(".like-count");
 
-    countSpan.textContent = count;
+        const likedKey = `acki-liked-${postId}`;
+        const isLiked = localStorage.getItem(likedKey) === "true";
+        const change = isLiked ? -1 : 1;
+
+        const response = await fetch(`${API_URL}/posts/${postId}/like`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ change })
+        });
+
+        if (!response.ok) {
+            throw new Error("Cannot update like");
+        }
+
+        const updatedPost = await response.json();
+
+        if (isLiked) {
+            localStorage.removeItem(likedKey);
+            button.classList.remove("liked", "ti-heart-filled");
+            button.classList.add("ti-heart");
+        } else {
+            localStorage.setItem(likedKey, "true");
+            button.classList.add("liked", "ti-heart-filled");
+            button.classList.remove("ti-heart");
+        }
+
+        countSpan.textContent = updatedPost.likes;
+    } catch (error) {
+        console.error("Like error:", error);
+        alert("กดหัวใจไม่ได้ เช็กว่า backend เปิดอยู่หรือมี route /like หรือยัง");
+    }
 }
 
 function toggleSave(button) {
@@ -332,7 +406,54 @@ function openPostFromUrl() {
     }, 300);
 }
 
+function updateAckiScene() {
+    const hour = new Date().getHours();
+    const scene = document.getElementById("ackiScene");
+    const skyObject = document.getElementById("skyObject");
+
+    if (!scene || !skyObject) return;
+
+    skyObject.className = "scene-sky-object";
+
+    if (hour >= 6 && hour < 12) {
+        scene.style.background = "#bfe9ff";
+        skyObject.classList.add("sun");
+        skyObject.style.right = "15%";
+        skyObject.style.left = "auto";
+        skyObject.style.top = "18%";
+    } else if (hour >= 12 && hour < 17) {
+        scene.style.background = "#8ed8ff";
+        skyObject.classList.add("sun");
+        skyObject.style.left = "50%";
+        skyObject.style.right = "auto";
+        skyObject.style.top = "10%";
+    } else if (hour >= 17 && hour < 19) {
+        scene.style.background = "#ffb07c";
+        skyObject.classList.add("sun");
+        skyObject.style.left = "15%";
+        skyObject.style.right = "auto";
+        skyObject.style.top = "24%";
+    } else if (hour >= 19 || hour < 24) {
+        scene.style.background = "#13213a";
+        skyObject.classList.add("moon");
+        skyObject.style.right = "15%";
+        skyObject.style.left = "auto";
+        skyObject.style.top = "18%";
+    } else {
+        scene.style.background = "#0b1020";
+        skyObject.classList.add("moon");
+        skyObject.style.left = "15%";
+        skyObject.style.right = "auto";
+        skyObject.style.top = "20%";
+    }
+}
+
+updateAckiScene();
+setInterval(updateAckiScene, 60 * 1000);
+
 document.addEventListener("DOMContentLoaded", () => {
+    loadPostsFromBackend();
+
     document.querySelectorAll(".post").forEach((post) => {
         if (!post.dataset.createdAt) post.dataset.createdAt = Date.now();
     });

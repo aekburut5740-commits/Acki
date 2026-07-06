@@ -190,12 +190,18 @@ const WEATHER_CHANCE = 0.65;    // โอกาสเกิด weather ในร
     }
 
     function triggerWeatherEvent() {
+        clearWeather();
+
+        if (Math.random() > WEATHER_CHANCE) {
+            lastEvent = null;
+            return;
+        }
+
         const event = pickEvent();
         const spawn = spawners[event];
 
-        if (spawn) spawn(WEATHER_INTENSITY);
+        if (spawn) spawn();
     }
-
     function msUntilNextHalfHour() {
         const now = new Date();
         const next = new Date(now);
