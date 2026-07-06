@@ -86,24 +86,46 @@ function closeComment() {
     document.getElementById("commentPanel")?.classList.remove("show");
 }
 
-function sendComment() {
+async function sendComment() {
     const input = document.getElementById("commentInput");
     if (!input) return;
 
     const text = input.value.trim();
     if (text === "" || !activePostId) return;
 
-    if (!commentsData[activePostId]) commentsData[activePostId] = [];
+    try {
+        const response = await fetch(`${API_URL}/posts/${activePostId}/comments`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                user: "Visitor",
+                text: text
+            })
+        });
 
-    commentsData[activePostId].push({ user: "Visitor", text });
+        if (!response.ok) {
+            throw new Error("Cannot send comment");
+        }
 
-    if (typeof addNotification === "function") {
-        addNotification("comment", "Visitor commented on your post.", activePostId);
+        const newComment = await response.json();
+
+        if (!commentsData[activePostId]) commentsData[activePostId] = [];
+        commentsData[activePostId].push(newComment);
+
+        renderComments(activePostId);
+        updateCommentCount(activePostId);
+
+        input.value = "";
+
+        if (typeof addNotification === "function") {
+            addNotification("comment", "Visitor commented on your post.", activePostId);
+        }
+    } catch (error) {
+        console.error("Comment error:", error);
+        alert("ส่งคอมเมนต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
     }
-
-    renderComments(activePostId);
-    updateCommentCount(activePostId);
-    input.value = "";
 }
 
 function toggleCreatePost() {
@@ -155,8 +177,8 @@ function createPostElement(postData) {
     </button>
 
     <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
-        <span class="comment-count">0</span>
-    </button>
+    <span class="comment-count">${postData.comments ? postData.comments.length : 0}</span>
+</button>
 
     <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
 
@@ -172,6 +194,8 @@ function createPostElement(postData) {
         likeButton.classList.add("liked", "ti-heart-filled");
         likeButton.classList.remove("ti-heart");
     }
+
+    commentsData[postData.id] = postData.comments || [];
 
     return post;
 }

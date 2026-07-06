@@ -64,3 +64,28 @@ app.patch("/posts/:id/like", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Acki backend running at http://localhost:${PORT}`);
 });
+
+app.post("/posts/:id/comments", (req, res) => {
+  const posts = readPosts();
+  const postId = Number(req.params.id);
+
+  const post = posts.find((p) => Number(p.id) === postId);
+
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
+  }
+
+  const newComment = {
+    id: Date.now(),
+    user: req.body.user || "Visitor",
+    text: req.body.text || "",
+    createdAt: new Date().toISOString()
+  };
+
+  if (!post.comments) post.comments = [];
+
+  post.comments.push(newComment);
+  savePosts(posts);
+
+  res.status(201).json(newComment);
+});
