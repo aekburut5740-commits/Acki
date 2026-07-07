@@ -225,3 +225,95 @@ html, body {
     border-radius: 10px;
     cursor: pointer;
 }
+.notification-disabled {
+    color: #888;
+    position: relative;
+    opacity: 0.65;
+}
+
+.notification-disabled::after {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    width: 28px;
+    height: 2px;
+    background: #ff4b4b;
+    transform: rotate(-35deg);
+    transform-origin: center;
+}
+.settings-wrap {
+    position: relative;
+}
+
+.settings-wrap i {
+    cursor: pointer;
+}
+
+.settings-menu {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    width: 190px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.35);
+    display: none;
+    z-index: 5000;
+}
+
+.settings-menu.show {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-menu button {
+    background: none;
+    border: none;
+    padding: 10px 12px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.settings-menu button:hover {
+    background: #eeeeee;
+}
+
+.settings-menu hr {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #dddddd;
+}
+
+.lang-toggle {
+    background: #f2f2f2;
+    color: #000;
+    border: none;
+    border-radius: 18px;
+    padding: 6px 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Theme */
+body.theme-light {
+    background: #f5f5f5;
+    color: #000;
+}
+
+body.theme-dark {
+    background: #242424;
+    color: #fff;
+}
+
+/* ปิดพื้นหลังเวที */
+body.scene-off .acki-scene {
+    display: none;
+}
+
+/* ปิด weather */
+body.weather-off #weatherEvents {
+    display: none;
+}

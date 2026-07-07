@@ -142,16 +142,6 @@ function closeCreatePost() {
     document.getElementById("createPost")?.classList.remove("show");
 }
 
-function closeAllPanels() {
-    closeComment();
-    closeCreatePost();
-    closeShareBox();
-
-    if (typeof closeNotificationPanels === "function") {
-        closeNotificationPanels();
-    }
-}
-
 function createPostElement(postData) {
     const post = document.createElement("div");
     post.className = "post";
@@ -222,8 +212,8 @@ function createPostElement(postData) {
 async function createNewPost() {
     try {
         const textarea = document.getElementById("createText");
-        const content = document.querySelector(".content");
-        if (!textarea || !content) return;
+        const contentBox = document.querySelector(".content");
+        if (!textarea || !contentBox) return;
 
         const text = textarea.value.trim();
         if (text === "") return;
@@ -244,9 +234,13 @@ async function createNewPost() {
         }
 
         const newPost = await response.json();
-        const postElement = createPostElement(newPost);
         const firstPost = document.querySelector(".post");
-        content.insertBefore(postElement, firstPost);
+
+        if (firstPost) {
+            contentBox.insertBefore(postElement, firstPost);
+        } else {
+            contentBox.appendChild(postElement);
+        }
 
         commentsData[newPost.id] = [];
 
@@ -544,17 +538,24 @@ function updateAckiScene() {
     }
 }
 
-function showComingSoon(featureName) {
-    const popup = document.getElementById("comingSoonPopup");
-    const title = document.getElementById("comingSoonTitle");
+document.addEventListener("copy", (event) => {
+    const selection = window.getSelection();
+    if (!selection || selection.toString().trim() === "") return;
 
-    if (title) title.textContent = `${featureName} Coming Soon`;
-    popup?.classList.add("show");
-}
+    const selectedNode = selection.anchorNode;
+    const parentElement = selectedNode.nodeType === 3
+        ? selectedNode.parentElement
+        : selectedNode;
 
-function closeComingSoon() {
-    document.getElementById("comingSoonPopup")?.classList.remove("show");
-}
+    const isPostBody = parentElement.closest(".post-body");
+
+    if (!isPostBody) return;
+
+    event.preventDefault();
+
+    const cleanText = selection.toString().trim();
+    event.clipboardData.setData("text/plain", cleanText);
+});
 
 updateAckiScene();
 setInterval(updateAckiScene, 60 * 1000);

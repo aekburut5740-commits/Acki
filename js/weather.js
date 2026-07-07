@@ -19,7 +19,7 @@ const WEATHER_TEST_MODE = false; // true = test one effect, false = normal rando
 const TEST_WEATHER = "rain";  // "sun", "fog", "cloud", "rain", "wind", "leaf", "firefly"
 /* 0.2 = very light, 0.5 = normal, 0.8 = strong, 1 = heavy */
 const WEATHER_INTENSITY = 0.7; // ความเยอะของเอฟเฟกต์
-const WEATHER_CHANCE = 0.65;    // โอกาสเกิด weather ในรอบนั้น
+const WEATHER_CHANCE = 0.85;    // โอกาสเกิด weather ในรอบนั้น
 
 (function () {
     const weatherLayer = document.getElementById("weatherEvents");

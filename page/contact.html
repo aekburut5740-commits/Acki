@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact</title>
 
-    <link rel="stylesheet" href="../css/contact.css">
     <link rel="stylesheet" href="../css/middle.css">
+    <link rel="stylesheet" href="../css/contact.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 
@@ -15,11 +15,26 @@
     <div class="edge-tab edge-top">
         <i class="ti ti-home" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
-            <i class="ti ti-bell" title="Notification" onclick="toggleNotificationMini()"></i>
+            <i class="ti ti-bell notification-disabled" title="Notification coming soon"
+                onclick="showComingSoon('Notification')"></i>
             <span class="notification-dot" id="notificationDot"></span>
         </div>
         <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
         <i class="ti ti-info-hexagon" title="About" onclick="goAbout()"></i>
+        <div class="settings-wrap">
+            <i class="ti ti-dots-vertical" title="Settings" onclick="toggleSettingsMenu()"></i>
+
+            <div class="settings-menu" id="settingsMenu">
+                <button type="button" onclick="setThemeMode('light')">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')">Dark Theme</button>
+
+                <hr>
+
+                <button type="button" onclick="toggleSceneBackground()">Toggle Stage Background</button>
+                <button type="button" onclick="toggleWeather()">Toggle Weather</button>
+            </div>
+        </div>
+        <button type="button" class="lang-toggle" onclick="toggleLanguage()">EN</button>
     </div>
 
     <main class="contact-page">
@@ -54,31 +69,42 @@
     </main>
 
     <div class="notification-mini" id="notificationMini">
-    <h3>Notification</h3>
-    <div id="notificationMiniList"></div>
+        <h3>Notification</h3>
+        <div id="notificationMiniList"></div>
 
-    <button class="notification-more-btn" onclick="openNotificationFull()">
-        More
-    </button>
-</div>
-
-<div class="notification-blur" id="notificationBlur" onclick="closeNotificationFull()"></div>
-
-<div class="notification-full" id="notificationFull">
-    <h2>Notification</h2>
-
-    <div class="notification-tabs">
-        <button onclick="filterNotification('all', event)" class="active">All</button>
-        <button onclick="filterNotification('like', event)">Like</button>
-        <button onclick="filterNotification('comment', event)">Comment</button>
-        <button onclick="filterNotification('share', event)">Share</button>
+        <button class="notification-more-btn" onclick="openNotificationFull()">
+            More
+        </button>
     </div>
 
-    <div id="notificationFullList"></div>
-</div>
+    <div class="notification-blur" id="notificationBlur" onclick="closeNotificationFull()"></div>
+
+    <div class="notification-full" id="notificationFull">
+        <h2>Notification</h2>
+
+        <div class="notification-tabs">
+            <button onclick="filterNotification('all', event)" class="active">All</button>
+            <button onclick="filterNotification('like', event)">Like</button>
+            <button onclick="filterNotification('comment', event)">Comment</button>
+            <button onclick="filterNotification('share', event)">Share</button>
+        </div>
+
+        <div id="notificationFullList"></div>
+    </div>
+
+    <div class="coming-soon-popup" id="comingSoonPopup">
+        <div class="coming-soon-box">
+            <h3 id="comingSoonTitle">Coming Soon</h3>
+            <p>ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ</p>
+            <button type="button" onclick="closeComingSoon()">OK</button>
+        </div>
+    </div>
+
     <script src="../js/navigation.js"></script>
     <script src="../js/notification.js"></script>
     <script src="../js/contact.js"></script>
+    <script src="../js/js.js"></script>
+    <script src="js/language.js"></script>
 </body>
 
 </html>

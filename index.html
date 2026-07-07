@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acki</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/middle.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
@@ -19,10 +20,10 @@
             <button class="close-btn" onclick="closeRule()">✕</button>
             <h2 id="box1">You know?</h2>
 
-            <p id="box2">There is only one rule here.</p>
+            <p id="box2">This website is a prototype.</p>
 
             <p id="box3">
-                Be yourself
+                if it have a bug or problem i sorry for this but you have a contact me from a contact page.
             </p>
 
             <p id="box4">Alright?</p>
@@ -35,7 +36,7 @@
     </div>
     <div class="frame scrollbar">
 
-        <button class="lang-btn" id="lang-btn" onclick="toggleLang()">TH</button>
+        <button type="button" class="lang-toggle" onclick="toggleLanguage()">EN</button>
 
         <div class="align-center">
             <a href="index.html">
@@ -44,7 +45,7 @@
             <div class="intro-line"></div>
 
             <div class="intro-text">
-                <h1 id="title" class="text1 font1">
+                <h1 id="title" class="text1 font1" data-en="Welcome to Acki" data-th="ยินดีต้อนรับสู่ Acki">
                     Welcome to Acki
                 </h1>
 
@@ -86,6 +87,8 @@
     </div>
     <script src="js/navigation.js"></script>
     <script src="js/language.js"></script>
+    <script src="js/js.js"></script>
+    
 </body>
 
 </html>

@@ -14,9 +14,27 @@
 <body>
     <div class="edge-tab edge-top">
         <i class="ti ti-home" title="Home" onclick="goHome()"></i>
-        <i class="ti ti-bell" title="Notification" onclick="goCommunity()"></i>
+        <div class="nav-icon-wrap">
+            <i class="ti ti-bell notification-disabled" title="Notification coming soon"
+                onclick="showComingSoon('Notification')"></i>
+            <span class="notification-dot" id="notificationDot"></span>
+        </div>
         <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
         <i class="ti ti-info-hexagon" title="About"></i>
+        <div class="settings-wrap">
+            <i class="ti ti-dots-vertical" title="Settings" onclick="toggleSettingsMenu()"></i>
+
+            <div class="settings-menu" id="settingsMenu">
+                <button type="button" onclick="setThemeMode('light')">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')">Dark Theme</button>
+
+                <hr>
+
+                <button type="button" onclick="toggleSceneBackground()">Toggle Stage Background</button>
+                <button type="button" onclick="toggleWeather()">Toggle Weather</button>
+            </div>
+        </div>
+        <button type="button" class="lang-toggle" onclick="toggleLanguage()">EN</button>
     </div>
 
     <main class="about-page">
@@ -26,7 +44,7 @@
         <section class="about-hero">
 
 
-            <h1 class="font1-light">About</h1>
+            <h1 class="font1-light about-title">About</h1>
             <p class="about-version font1-thin">Version 0.1 Prototype</p>
         </section>
 
@@ -34,15 +52,16 @@
             <div class="about-box">
                 <h2 class="font1">What is this website?</h2>
                 <p class="font1">
-                    This is a simple community space where people can share ideas,
-                    stories, artwork, questions, or anything on their mind.
+                    Acki is a calm community where people can share ideas, artwork, stories, questions, and everyday
+                    moments without pressure.
+                    We believe every post has value, whether it's a masterpiece or just a random thought.
                 </p>
             </div>
 
             <div class="about-box">
                 <h2 class="font1">Community Rule</h2>
-                <p class="font1"><strong>Be Yourself.</strong></p>
-                <p class="font1">Share freely, but respect others too.</p>
+                <p class="font1"><strong>just.</strong></p>
+                <p class="font1">don't be bad!.</p>
             </div>
 
             <div class="about-box">
@@ -55,19 +74,35 @@
             </div>
 
             <div class="about-box">
-                <h2 class="font1">Coming Soon</h2>
+                <h2 class="font1">Current Features.</h2>
                 <ul>
-                    <li class="font1">Profile</li>
-                    <li class="font1">Search</li>
-                    <li class="font1">Backend API</li>
-                    <li class="font1">Database</li>
+                    <li class="font1">Create Posts</li>
+                    <li class="font1">Comment on Posts</li>
+                    <li class="font1">Like Posts</li>
+                    <li class="font1">Save Posts</li>
+                    <li class="font1">Share Posts</li>
+                    <li class="font1">View Post Times</li>
+                    <li class="font1">Day Circle</li>
+                    <li class="font1">Weather</li>
+                    <li class="font1">Little animate the background</li>
+                    <li class="font1">Contact Mail</li>
                 </ul>
             </div>
         </section>
 
     </main>
 
+    <div class="coming-soon-popup" id="comingSoonPopup">
+        <div class="coming-soon-box">
+            <h3 id="comingSoonTitle">Coming Soon</h3>
+            <p>ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ</p>
+            <button type="button" onclick="closeComingSoon()">OK</button>
+        </div>
+    </div>
+
     <script src="../js/navigation.js"></script>
+    <script src="../js/js.js"></script>
+    <script src="../js/language.js"></script>
 </body>
 
 </html>

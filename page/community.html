@@ -38,6 +38,21 @@
         </div>
         <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
         <i class="ti ti-info-hexagon" title="About" onclick="goAbout()"></i>
+
+        <div class="settings-wrap">
+            <i class="ti ti-dots-vertical" title="Settings" onclick="toggleSettingsMenu()"></i>
+
+            <div class="settings-menu" id="settingsMenu">
+                <button type="button" onclick="setThemeMode('light')" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')">Dark Theme</button>
+
+                <hr>
+
+                <button type="button" onclick="toggleSceneBackground()">Toggle Stage Background</button>
+                <button type="button" onclick="toggleWeather()">Toggle Weather</button>
+            </div>
+        </div>
+        <button type="button" class="lang-toggle" onclick="toggleLanguage()">EN</button>
     </div>
 
     <button type="button" class="create-post-tab" onclick="toggleCreatePost()">
@@ -64,163 +79,72 @@
 
             <button type="button" class="create-btn" onclick="createNewPost()">Post</button>
         </div>
-        <div class="post" data-post-id="1">
-            <div class="post-header">
-                <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
 
-                <div>
-                    <p class="post-name">Visitor</p>
-                    <p class="post-time">just now</p>
-                </div>
-                <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
+        <div class="focus-overlay" id="focusOverlay" onclick="closeComment()"></div>
 
-                <div class="post-menu">
-                    <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
-                    <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
-                </div>
-            </div>
-            <div class="post-body">
-                <p>This is first post By aek.</p>
-            </div>
-            <div class="post-active">
-                <button type="button" class="ti ti-heart btn-like" onclick="toggleLike(this)">
-                    <span class="like-count">0</span>
-                </button>
-                <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
-                    <span class="comment-count">0</span>
-                </button>
-                <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
-                <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
-                    <span class="share-count">0</span>
-                </button>
+        <div class="comment-panel" id="commentPanel">
+            <h3 id="commentTitle">Comments</h3>
+            <div id="commentList"></div>
+
+            <div class="comment-input">
+                <input id="commentInput" type="text" placeholder="Write a comment..." onkeydown="commentEnter(event)">
+                <button type="button" class="btn-send" onclick="sendComment()">Send</button>
+
             </div>
         </div>
 
-        <div class="post" data-post-id="2">
-            <div class="post-header">
-                <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
+        <div class="notification-mini" id="notificationMini">
+            <h3>Notification</h3>
+            <div id="notificationMiniList"></div>
 
-                <div>
-                    <p class="post-name">Visitor</p>
-                    <p class="post-time">just now</p>
-                </div>
-                <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
+            <button type="button" class="notification-more-btn" onclick="openNotificationFull()">
+                More
+            </button>
+        </div>
 
-                <div class="post-menu">
-                    <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
-                    <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
-                </div>
+        <div class="notification-blur" id="notificationBlur" onclick="closeNotificationFull()"></div>
+
+        <div class="notification-full" id="notificationFull">
+            <h2>Notification</h2>
+
+            <div class="notification-tabs">
+                <button onclick="filterNotification('all', event)" class="active">All</button>
+                <button onclick="filterNotification('like', event)">Like</button>
+                <button onclick="filterNotification('comment', event)">Comment</button>
+                <button onclick="filterNotification('share', event)">Share</button>
             </div>
-            <div class="post-body">
-                <p>This is maybe second post By aek.</p>
-            </div>
-            <div class="post-active">
-                <button type="button" class="ti ti-heart btn-like" onclick="toggleLike(this)">
-                    <span class="like-count">0</span>
-                </button>
-                <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
-                    <span class="comment-count">0</span>
-                </button>
-                <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
-                <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
-                    <span class="share-count">0</span>
-                </button>
+
+            <div id="notificationFullList"></div>
+        </div>
+
+        <div class="acki-scene" id="ackiScene">
+            <div class="scene-sky-object" id="skyObject"></div>
+
+            <div class="walking-tree tree-a"></div>
+            <div class="walking-tree tree-b"></div>
+            <div class="walking-tree tree-c"></div>
+            <div class="walking-tree tree-d"></div>
+            <div class="walking-tree tree-e"></div>
+
+
+            <div class="scene-front"></div>
+        </div>
+
+        <div class="coming-soon-popup" id="comingSoonPopup">
+            <div class="coming-soon-box">
+                <h3 id="comingSoonTitle">Coming Soon</h3>
+                <p>ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ</p>
+                <button type="button" onclick="closeComingSoon()">OK</button>
             </div>
         </div>
 
-        <div class="post" data-post-id="3">
-            <div class="post-header">
-                <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
-
-                <div>
-                    <p class="post-name">Visitor</p>
-                    <p class="post-time">just now</p>
-                </div>
-                <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
-
-                <div class="post-menu">
-                    <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
-                    <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
-                </div>
-            </div>
-            <div class="post-body">
-                <p>This is not first post By aek.</p>
-            </div>
-            <div class="post-active">
-                <button type="button" class="ti ti-heart btn-like" onclick="toggleLike(this)">
-                    <span class="like-count">0</span>
-                </button>
-                <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
-                    <span class="comment-count">0</span>
-                </button>
-                <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
-                <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
-                    <span class="share-count">0</span>
-                </button>
-            </div>
-        </div>
-
-    </div>
-    <div class="focus-overlay" id="focusOverlay" onclick="closeComment()"></div>
-
-    <div class="comment-panel" id="commentPanel">
-        <h3 id="commentTitle">Comments</h3>
-        <div id="commentList"></div>
-
-        <div class="comment-input">
-            <input id="commentInput" type="text" placeholder="Write a comment..." onkeydown="commentEnter(event)">
-            <button type="button" class="btn-send" onclick="sendComment()">Send</button>
-
-        </div>
-    </div>
-
-    <div class="notification-mini" id="notificationMini">
-        <h3>Notification</h3>
-        <div id="notificationMiniList"></div>
-
-        <button type="button" class="notification-more-btn" onclick="openNotificationFull()">
-            More
-        </button>
-    </div>
-
-    <div class="notification-blur" id="notificationBlur" onclick="closeNotificationFull()"></div>
-
-    <div class="notification-full" id="notificationFull">
-        <h2>Notification</h2>
-
-        <div class="notification-tabs">
-            <button onclick="filterNotification('all', event)" class="active">All</button>
-            <button onclick="filterNotification('like', event)">Like</button>
-            <button onclick="filterNotification('comment', event)">Comment</button>
-            <button onclick="filterNotification('share', event)">Share</button>
-        </div>
-
-        <div id="notificationFullList"></div>
-    </div>
-
-    <div class="acki-scene" id="ackiScene">
-        <div class="scene-sky-object" id="skyObject"></div>
-
-        <div class="walking-tree tree-a"></div>
-        <div class="walking-tree tree-b"></div>
-        <div class="walking-tree tree-c"></div>
-
-        <div class="scene-front"></div>
-    </div>
-
-    <div class="coming-soon-popup" id="comingSoonPopup">
-        <div class="coming-soon-box">
-            <h3 id="comingSoonTitle">Coming Soon</h3>
-            <p>ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ</p>
-            <button type="button" onclick="closeComingSoon()">OK</button>
-        </div>
-    </div>
-
-    <script src="../js/navigation.js"></script>
-    <script src="../js/notification.js"></script>
-    <script src="../js/community.js"></script>
-    <script src="../js/theme.js"></script>
-    <script src="../js/weather.js"></script>
+        <script src="../js/navigation.js"></script>
+        <script src="../js/notification.js"></script>
+        <script src="../js/community.js"></script>
+        <script src="../js/theme.js"></script>
+        <script src="../js/weather.js"></script>
+        <script src="../js/js.js"></script>
+        <script src="../js/language.js"></script>
 </body>
 
 </html>
