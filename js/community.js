@@ -182,7 +182,9 @@ function createPostElement(postData) {
 
     <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
 
-    <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)"></button>
+    <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
+    <span class="share-count">${postData.shares || 0}</span>
+</button>
 </div>`;
 
     post.querySelector(".post-body p").textContent = postData.content;
@@ -193,6 +195,14 @@ function createPostElement(postData) {
     if (localStorage.getItem(likedKey) === "true") {
         likeButton.classList.add("liked", "ti-heart-filled");
         likeButton.classList.remove("ti-heart");
+    }
+
+    const savedKey = `acki-saved-${postData.id}`;
+    const saveButton = post.querySelector(".btn-save");
+
+    if (localStorage.getItem(savedKey) === "true") {
+        saveButton.classList.add("saved", "ti-bookmark-filled");
+        saveButton.classList.remove("ti-bookmark");
     }
 
     commentsData[postData.id] = postData.comments || [];
@@ -307,15 +317,39 @@ async function toggleLike(button) {
     }
 }
 
-function toggleSave(button) {
-    if (button.classList.contains("saved")) {
-        button.classList.remove("saved");
-        button.classList.remove("ti-bookmark-filled");
-        button.classList.add("ti-bookmark");
-    } else {
-        button.classList.add("saved");
-        button.classList.remove("ti-bookmark");
-        button.classList.add("ti-bookmark-filled");
+async function toggleSave(button) {
+    try {
+        const post = button.closest(".post");
+        const postId = post.dataset.postId;
+
+        const savedKey = `acki-saved-${postId}`;
+        const isSaved = localStorage.getItem(savedKey) === "true";
+        const change = isSaved ? -1 : 1;
+
+        const response = await fetch(`${API_URL}/posts/${postId}/save`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ change })
+        });
+
+        if (!response.ok) {
+            throw new Error("Cannot update save");
+        }
+
+        if (isSaved) {
+            localStorage.removeItem(savedKey);
+            button.classList.remove("saved", "ti-bookmark-filled");
+            button.classList.add("ti-bookmark");
+        } else {
+            localStorage.setItem(savedKey, "true");
+            button.classList.add("saved", "ti-bookmark-filled");
+            button.classList.remove("ti-bookmark");
+        }
+    } catch (error) {
+        console.error("Save error:", error);
+        alert("กด Bookmark ไม่ได้ เช็กว่า backend มี route /save หรือยัง");
     }
 }
 
@@ -392,12 +426,29 @@ function sharePost(button) {
     shareOverlay.classList.add("show");
 }
 
-function copyShareLink() {
+async function copyShareLink() {
     const input = document.getElementById("shareLink");
-    if (!input) return;
+    const shareBox = document.getElementById("shareBox");
+    if (!input || !shareBox) return;
 
     input.select();
-    navigator.clipboard.writeText(input.value);
+    await navigator.clipboard.writeText(input.value);
+
+    const post = shareBox.closest(".post");
+    if (!post) return;
+
+    const postId = post.dataset.postId;
+    const countSpan = post.querySelector(".share-count");
+
+    const response = await fetch(`${API_URL}/posts/${postId}/share`, {
+        method: "PATCH"
+    });
+
+    const updatedPost = await response.json();
+
+    if (countSpan) {
+        countSpan.textContent = updatedPost.shares || 0;
+    }
 }
 
 function closeShareBox() {

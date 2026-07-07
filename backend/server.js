@@ -34,7 +34,8 @@ app.post("/posts", (req, res) => {
     createdAt: new Date().toISOString(),
     likes: 0,
     comments: [],
-    saves: 0
+    saves: 0,
+    shares: 0
   };
 
   posts.unshift(newPost);
@@ -78,6 +79,22 @@ app.patch("/posts/:id/save", (req, res) => {
 
   savePosts(posts);
 
+  res.json(post);
+});
+
+app.patch("/posts/:id/share", (req, res) => {
+  const posts = readPosts();
+  const postId = Number(req.params.id);
+
+  const post = posts.find((p) => Number(p.id) === postId);
+
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
+  }
+
+  post.shares = Number(post.shares || 0) + 1;
+
+  savePosts(posts);
   res.json(post);
 });
 
