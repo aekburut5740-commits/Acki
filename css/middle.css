@@ -189,3 +189,39 @@ html, body {
     background: #2f2f2f;
     color: white;
 }
+
+.coming-soon-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: .2s;
+}
+
+.coming-soon-popup.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.coming-soon-box {
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+.coming-soon-box button {
+    margin-top: 15px;
+    border: none;
+    background: #2f2f2f;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+}

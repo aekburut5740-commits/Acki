@@ -32,7 +32,8 @@
     <div class="edge-tab edge-top">
         <i class="ti ti-home" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
-            <i class="ti ti-bell" title="Notification" onclick="toggleNotificationMini()"></i>
+            <i class="ti ti-bell notification-disabled" title="Notification coming soon"
+                onclick="showComingSoon('Notification')"></i>
             <span class="notification-dot" id="notificationDot"></span>
         </div>
         <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
@@ -47,7 +48,7 @@
         <div class="create-post" id="createPost">
             <div class="create-header">
 
-                <img src="../pic/sss.jpg" class="create-avatar">
+                <img src="../pic/visitor.jpg" class="create-avatar">
 
                 <div class="create-user">
                     <p class="create-username">Visitor</p>
@@ -65,11 +66,17 @@
         </div>
         <div class="post" data-post-id="1">
             <div class="post-header">
-                <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
+                <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
 
                 <div>
                     <p class="post-name">Visitor</p>
                     <p class="post-time">just now</p>
+                </div>
+                <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
+
+                <div class="post-menu">
+                    <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
+                    <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
                 </div>
             </div>
             <div class="post-body">
@@ -91,11 +98,17 @@
 
         <div class="post" data-post-id="2">
             <div class="post-header">
-                <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
+                <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
 
                 <div>
                     <p class="post-name">Visitor</p>
                     <p class="post-time">just now</p>
+                </div>
+                <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
+
+                <div class="post-menu">
+                    <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
+                    <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
                 </div>
             </div>
             <div class="post-body">
@@ -117,11 +130,17 @@
 
         <div class="post" data-post-id="3">
             <div class="post-header">
-                <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
+                <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
 
                 <div>
                     <p class="post-name">Visitor</p>
                     <p class="post-time">just now</p>
+                </div>
+                <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
+
+                <div class="post-menu">
+                    <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
+                    <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
                 </div>
             </div>
             <div class="post-body">
@@ -180,8 +199,26 @@
     </div>
 
     <div class="acki-scene" id="ackiScene">
+        <div class="scene-layer scene-back"></div>
+        <div class="scene-layer scene-mid"></div>
+
         <div class="scene-sky-object" id="skyObject"></div>
-        <div class="scene-ground"></div>
+
+        <div class="rotating-ground">
+            <div class="tree tree-1"></div>
+            <div class="tree tree-2"></div>
+            <div class="tree tree-3"></div>
+        </div>
+
+        <div class="scene-layer scene-front"></div>
+    </div>
+
+    <div class="coming-soon-popup" id="comingSoonPopup">
+        <div class="coming-soon-box">
+            <h3 id="comingSoonTitle">Coming Soon</h3>
+            <p>ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ</p>
+            <button type="button" onclick="closeComingSoon()">OK</button>
+        </div>
     </div>
 
     <script src="../js/navigation.js"></script>

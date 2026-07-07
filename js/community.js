@@ -160,10 +160,18 @@ function createPostElement(postData) {
 
     post.innerHTML = `
         <div class="post-header">
-            <img src="../pic/sss.jpg" class="post-avatar" alt="Visitor">
+            <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
+
             <div>
                 <p class="post-name">${postData.username || "Visitor"}</p>
                 <p class="post-time">just now</p>
+            </div>
+
+            <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
+
+            <div class="post-menu">
+                <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
+                <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
             </div>
         </div>
 
@@ -172,20 +180,21 @@ function createPostElement(postData) {
         </div>
 
         <div class="post-active">
-    <button type="button" class="ti ti-heart btn-like" onclick="toggleLike(this)">
-        <span class="like-count">${postData.likes || 0}</span>
-    </button>
+            <button type="button" class="ti ti-heart btn-like" onclick="toggleLike(this)">
+                <span class="like-count">${postData.likes || 0}</span>
+            </button>
 
-    <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
-    <span class="comment-count">${postData.comments ? postData.comments.length : 0}</span>
-</button>
+            <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
+                <span class="comment-count">${postData.comments ? postData.comments.length : 0}</span>
+            </button>
 
-    <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
+            <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
 
-    <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
-    <span class="share-count">${postData.shares || 0}</span>
-</button>
-</div>`;
+            <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
+                <span class="share-count">${postData.shares || 0}</span>
+            </button>
+        </div>
+    `;
 
     post.querySelector(".post-body p").textContent = postData.content;
 
@@ -209,6 +218,7 @@ function createPostElement(postData) {
 
     return post;
 }
+
 async function createNewPost() {
     try {
         const textarea = document.getElementById("createText");
@@ -351,6 +361,17 @@ async function toggleSave(button) {
         console.error("Save error:", error);
         alert("กด Bookmark ไม่ได้ เช็กว่า backend มี route /save หรือยัง");
     }
+}
+
+function togglePostMenu(button) {
+    const post = button.closest(".post");
+    const menu = post.querySelector(".post-menu");
+
+    document.querySelectorAll(".post-menu").forEach((m) => {
+        if (m !== menu) m.classList.remove("show");
+    });
+
+    menu.classList.toggle("show");
 }
 
 function updateCommentCount(postId) {
@@ -521,6 +542,18 @@ function updateAckiScene() {
         skyObject.style.right = "auto";
         skyObject.style.top = "20%";
     }
+}
+
+function showComingSoon(featureName) {
+    const popup = document.getElementById("comingSoonPopup");
+    const title = document.getElementById("comingSoonTitle");
+
+    if (title) title.textContent = `${featureName} Coming Soon`;
+    popup?.classList.add("show");
+}
+
+function closeComingSoon() {
+    document.getElementById("comingSoonPopup")?.classList.remove("show");
 }
 
 updateAckiScene();
