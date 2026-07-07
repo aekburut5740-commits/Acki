@@ -21,7 +21,11 @@ function openComment(button) {
     activePostId = postId;
 
     const title = document.getElementById("commentTitle");
-    if (title) title.textContent = "Comments for Post #" + postId;
+    if (title) {
+        title.textContent = (typeof t === "function")
+            ? t("Comments for Post #", "ความคิดเห็นของโพสต์ #") + postId
+            : "Comments for Post #" + postId;
+    }
 
     renderComments(postId);
 
@@ -124,7 +128,7 @@ async function sendComment() {
         }
     } catch (error) {
         console.error("Comment error:", error);
-        alert("ส่งคอมเมนต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
+        alert(typeof t === "function" ? t("Cannot send comment. Please check if the backend is running.", "ส่งคอมเมนต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง") : "ส่งคอมเมนต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
     }
 }
 
@@ -160,8 +164,8 @@ function createPostElement(postData) {
             <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
 
             <div class="post-menu">
-                <button type="button" onclick="showComingSoon('Edit Post')">Edit Post</button>
-                <button type="button" onclick="showComingSoon('Delete Post')">Delete Post</button>
+                <button type="button" onclick="showComingSoon('Edit Post')" data-en="Edit Post" data-th="แก้ไขโพสต์">Edit Post</button>
+                <button type="button" onclick="showComingSoon('Delete Post')" data-en="Delete Post" data-th="ลบโพสต์">Delete Post</button>
             </div>
         </div>
 
@@ -234,6 +238,7 @@ async function createNewPost() {
         }
 
         const newPost = await response.json();
+        const postElement = createPostElement(newPost);
         const firstPost = document.querySelector(".post");
 
         if (firstPost) {
@@ -242,6 +247,8 @@ async function createNewPost() {
             contentBox.appendChild(postElement);
         }
 
+        if (typeof applyLanguage === "function") applyLanguage();
+
         commentsData[newPost.id] = [];
 
         textarea.value = "";
@@ -249,7 +256,7 @@ async function createNewPost() {
         updatePostTimes();
     } catch (error) {
         console.error("Create post error:", error);
-        alert("สร้างโพสต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
+        alert(typeof t === "function" ? t("Cannot create post. Please check if the backend is running.", "สร้างโพสต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง") : "สร้างโพสต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
     }
 }
 
@@ -271,6 +278,7 @@ async function loadPostsFromBackend() {
         if (!commentsData[postData.id]) commentsData[postData.id] = [];
     });
 
+    if (typeof applyLanguage === "function") applyLanguage();
     updatePostTimes();
 }
 
@@ -317,7 +325,7 @@ async function toggleLike(button) {
         countSpan.textContent = updatedPost.likes;
     } catch (error) {
         console.error("Like error:", error);
-        alert("กดหัวใจไม่ได้ เช็กว่า backend เปิดอยู่หรือมี route /like หรือยัง");
+        alert(typeof t === "function" ? t("Cannot like this post. Please check the backend or /like route.", "กดหัวใจไม่ได้ เช็กว่า backend เปิดอยู่หรือมี route /like หรือยัง") : "กดหัวใจไม่ได้ เช็กว่า backend เปิดอยู่หรือมี route /like หรือยัง");
     }
 }
 
@@ -353,7 +361,7 @@ async function toggleSave(button) {
         }
     } catch (error) {
         console.error("Save error:", error);
-        alert("กด Bookmark ไม่ได้ เช็กว่า backend มี route /save หรือยัง");
+        alert(typeof t === "function" ? t("Cannot bookmark this post. Please check the backend or /save route.", "กด Bookmark ไม่ได้ เช็กว่า backend มี route /save หรือยัง") : "กด Bookmark ไม่ได้ เช็กว่า backend มี route /save หรือยัง");
     }
 }
 
@@ -382,17 +390,18 @@ function updateCommentCount(postId) {
 function timeAgo(time) {
     const now = Date.now();
     const diff = Math.floor((now - time) / 1000);
+    const lang = typeof getCurrentLanguage === "function" ? getCurrentLanguage() : "en";
 
-    if (diff < 60) return "just now";
+    if (diff < 60) return lang === "th" ? "เมื่อกี้" : "just now";
 
     const minutes = Math.floor(diff / 60);
-    if (minutes < 60) return minutes + " min ago";
+    if (minutes < 60) return lang === "th" ? `${minutes} นาทีที่แล้ว` : `${minutes} min ago`;
 
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return hours + " hr ago";
+    if (hours < 24) return lang === "th" ? `${hours} ชม.ที่แล้ว` : `${hours} hr ago`;
 
     const days = Math.floor(hours / 24);
-    return days + " day ago";
+    return lang === "th" ? `${days} วันที่แล้ว` : `${days} day ago`;
 }
 
 function updatePostTimes() {
@@ -559,6 +568,18 @@ document.addEventListener("copy", (event) => {
 
 updateAckiScene();
 setInterval(updateAckiScene, 60 * 1000);
+
+window.addEventListener("acki-language-change", () => {
+    updatePostTimes();
+    if (activePostId) {
+        const title = document.getElementById("commentTitle");
+        if (title) {
+            title.textContent = (typeof t === "function")
+                ? t("Comments for Post #", "ความคิดเห็นของโพสต์ #") + activePostId
+                : "Comments for Post #" + activePostId;
+        }
+    }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     loadPostsFromBackend();

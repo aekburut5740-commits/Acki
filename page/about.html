@@ -13,90 +13,87 @@
 
 <body>
     <div class="edge-tab edge-top">
-        <i class="ti ti-home" title="Home" onclick="goHome()"></i>
+        <i class="ti ti-home" data-en-title="Home" data-th-title="หน้าแรก" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
-            <i class="ti ti-bell notification-disabled" title="Notification coming soon"
+            <i class="ti ti-bell notification-disabled" data-en-title="Notification coming soon" data-th-title="การแจ้งเตือนยังไม่เปิดใช้งาน" title="Notification coming soon"
                 onclick="showComingSoon('Notification')"></i>
             <span class="notification-dot" id="notificationDot"></span>
         </div>
-        <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
-        <i class="ti ti-info-hexagon" title="About"></i>
+        <i class="ti ti-mail" data-en-title="Contact" data-th-title="ติดต่อ" title="Contact" onclick="goContact()"></i>
+        <i class="ti ti-info-hexagon" data-en-title="About" data-th-title="เกี่ยวกับ" title="About"></i>
         <div class="settings-wrap">
-            <i class="ti ti-dots-vertical" title="Settings" onclick="toggleSettingsMenu()"></i>
+            <i class="ti ti-dots-vertical" data-en-title="Settings" data-th-title="ตั้งค่า" title="Settings" onclick="toggleSettingsMenu()"></i>
 
             <div class="settings-menu" id="settingsMenu">
-                <button type="button" onclick="setThemeMode('light')">Light Theme</button>
-                <button type="button" onclick="setThemeMode('dark')">Dark Theme</button>
+                <button type="button" onclick="setThemeMode('light')" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')" data-en="Dark Theme" data-th="ธีมมืด">Dark Theme</button>
 
                 <hr>
 
-                <button type="button" onclick="toggleSceneBackground()">Toggle Stage Background</button>
-                <button type="button" onclick="toggleWeather()">Toggle Weather</button>
+                <button type="button" onclick="toggleSceneBackground()" data-en="Toggle Stage Background" data-th="เปิด/ปิดพื้นหลังเวที">Toggle Stage Background</button>
+                <button type="button" onclick="toggleWeather()" data-en="Toggle Weather" data-th="เปิด/ปิดสภาพอากาศ">Toggle Weather</button>
             </div>
         </div>
-        <button type="button" class="lang-toggle" onclick="toggleLanguage()">EN</button>
+        <button type="button" class="lang-toggle" onclick="toggleLanguage()">TH</button>
     </div>
 
     <main class="about-page">
-        <button class="back-link" onclick="goCommunity()" title="Back to Community">
+        <button class="back-link" onclick="goCommunity()" data-en-title="Back to Community" data-th-title="กลับไปหน้าชุมชน" title="Back to Community">
             <i class="ti ti-chevron-left"></i>
         </button>
         <section class="about-hero">
-
-
-            <h1 class="font1-light about-title">About</h1>
-            <p class="about-version font1-thin">Version 0.1 Prototype</p>
+            <h1 class="font1-light about-title" data-en="About" data-th="เกี่ยวกับ Acki">About</h1>
+            <p class="about-version font1-thin" data-en="Version 0.1 Prototype" data-th="เวอร์ชัน 0.1 ต้นแบบ">Version 0.1 Prototype</p>
         </section>
 
         <section class="about-grid">
             <div class="about-box">
-                <h2 class="font1">What is this website?</h2>
-                <p class="font1">
-                    Acki is a calm community where people can share ideas, artwork, stories, questions, and everyday
-                    moments without pressure.
-                    We believe every post has value, whether it's a masterpiece or just a random thought.
+                <h2 class="font1" data-en="What is this website?" data-th="เว็บนี้คืออะไร?">What is this website?</h2>
+                <p class="font1"
+                   data-en="Acki is a calm community where people can share ideas, artwork, stories, questions, and everyday moments without pressure. We believe every post has value, whether it's a masterpiece or just a random thought."
+                   data-th="Acki คือชุมชนเล็ก ๆ ที่สงบและเป็นกันเอง ที่ทุกคนสามารถแบ่งปันไอเดีย งานศิลปะ เรื่องราว คำถาม หรือช่วงเวลาในชีวิตประจำวันได้โดยไม่ต้องกดดัน เราเชื่อว่าทุกโพสต์มีคุณค่า ไม่ว่าจะเป็นผลงานชิ้นใหญ่ หรือเป็นเพียงความคิดเล็ก ๆ ที่แวบเข้ามาในหัว">
+                    Acki is a calm community where people can share ideas, artwork, stories, questions, and everyday moments without pressure. We believe every post has value, whether it's a masterpiece or just a random thought.
                 </p>
             </div>
 
             <div class="about-box">
-                <h2 class="font1">Community Rule</h2>
-                <p class="font1"><strong>just.</strong></p>
-                <p class="font1">don't be bad!.</p>
+                <h2 class="font1" data-en="Community Rule" data-th="กฎของชุมชน">Community Rule</h2>
+                <p class="font1"><strong data-en="Be kind." data-th="ใจดีกับคนอื่นไว้ครับ">Be kind.</strong></p>
+                <p class="font1" data-en="Share freely, but respect others too." data-th="แบ่งปันได้อย่างอิสระ แต่ก็อย่าลืมเคารพคนอื่นด้วยนะครับ">Share freely, but respect others too.</p>
             </div>
 
             <div class="about-box">
-                <h2 class="font1">How to use</h2>
+                <h2 class="font1" data-en="How to use" data-th="วิธีใช้งาน">How to use</h2>
                 <ul>
-                    <li class="font1">Create a post to share something.</li>
-                    <li class="font1">Comment to join a conversation.</li>
-                    <li class="font1">Like, save, or share posts you care about.</li>
+                    <li class="font1" data-en="Create a post to share something." data-th="สร้างโพสต์เพื่อแบ่งปันอะไรบางอย่าง">Create a post to share something.</li>
+                    <li class="font1" data-en="Comment to join a conversation." data-th="คอมเมนต์เพื่อร่วมพูดคุยกับคนอื่น">Comment to join a conversation.</li>
+                    <li class="font1" data-en="Like, save, or share posts you care about." data-th="กดถูกใจ บันทึก หรือแชร์โพสต์ที่คุณสนใจ">Like, save, or share posts you care about.</li>
                 </ul>
             </div>
 
             <div class="about-box">
-                <h2 class="font1">Current Features.</h2>
+                <h2 class="font1" data-en="Current Features" data-th="ฟีเจอร์ที่ใช้งานได้ตอนนี้">Current Features</h2>
                 <ul>
-                    <li class="font1">Create Posts</li>
-                    <li class="font1">Comment on Posts</li>
-                    <li class="font1">Like Posts</li>
-                    <li class="font1">Save Posts</li>
-                    <li class="font1">Share Posts</li>
-                    <li class="font1">View Post Times</li>
-                    <li class="font1">Day Circle</li>
-                    <li class="font1">Weather</li>
-                    <li class="font1">Little animate the background</li>
-                    <li class="font1">Contact Mail</li>
+                    <li class="font1" data-en="Create Posts" data-th="สร้างโพสต์">Create Posts</li>
+                    <li class="font1" data-en="Comment on Posts" data-th="แสดงความคิดเห็นในโพสต์">Comment on Posts</li>
+                    <li class="font1" data-en="Like Posts" data-th="กดถูกใจโพสต์">Like Posts</li>
+                    <li class="font1" data-en="Save Posts" data-th="บันทึกโพสต์">Save Posts</li>
+                    <li class="font1" data-en="Share Posts" data-th="แชร์โพสต์">Share Posts</li>
+                    <li class="font1" data-en="View Post Times" data-th="ดูเวลาของโพสต์">View Post Times</li>
+                    <li class="font1" data-en="Day Cycle" data-th="ฉากเปลี่ยนตามช่วงเวลา">Day Cycle</li>
+                    <li class="font1" data-en="Weather Effects" data-th="เอฟเฟกต์สภาพอากาศ">Weather Effects</li>
+                    <li class="font1" data-en="Animated Background" data-th="พื้นหลังเคลื่อนไหวเล็ก ๆ">Animated Background</li>
+                    <li class="font1" data-en="Contact Mail" data-th="ติดต่อผ่านอีเมล">Contact Mail</li>
                 </ul>
             </div>
         </section>
-
     </main>
 
     <div class="coming-soon-popup" id="comingSoonPopup">
         <div class="coming-soon-box">
-            <h3 id="comingSoonTitle">Coming Soon</h3>
-            <p>ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ</p>
-            <button type="button" onclick="closeComingSoon()">OK</button>
+            <h3 id="comingSoonTitle" data-en="Coming Soon" data-th="เร็ว ๆ นี้">Coming Soon</h3>
+            <p data-en="This feature is not available yet." data-th="ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ">This feature is not available yet.</p>
+            <button type="button" onclick="closeComingSoon()" data-en="OK" data-th="ตกลง">OK</button>
         </div>
     </div>
 

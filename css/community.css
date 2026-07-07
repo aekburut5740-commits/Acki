@@ -435,16 +435,16 @@ body::after {
 .share-overlay.show {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .share-box {
-    position: absolute;
-    left: calc(100% + 20px);
-    top: calc(100% - 55px);
+    position: fixed;
     width: 320px;
+    max-width: 90vw;
     background: #ffffffe8;
     border-radius: 16px;
-    padding: 7px 20px 20px 20px;
+    padding: 16px 20px 20px;
     z-index: 1002;
     box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
     opacity: 0;
@@ -516,7 +516,7 @@ body::after {
     left: 0;
     right: 0;
     pointer-events: none;
-    
+
 }
 
 .scene-front {
@@ -528,7 +528,7 @@ body::after {
     background: #5f8d45;
     border-radius: 50% 50% 0 0;
     z-index: -5;
-    filter: drop-shadow(0 0 18px rgba(0,0,0,100));
+    filter: drop-shadow(0 0 18px rgba(0, 0, 0, 100));
 }
 
 .scene-sky-object {
@@ -537,7 +537,7 @@ body::after {
     height: 90px;
     border-radius: 50%;
     animation: floatSky 5s ease-in-out infinite alternate;
-    filter: drop-shadow(0 0 18px rgba(0,0,0,100));
+    filter: drop-shadow(0 0 18px rgba(0, 0, 0, 100));
 }
 
 .scene-sky-object.sun {
@@ -617,6 +617,7 @@ body::after {
     cursor: pointer;
     text-align: left;
 }
+
 .walking-tree {
     position: fixed;
     bottom: 95px;
@@ -625,7 +626,7 @@ body::after {
     height: 95px;
     z-index: -4;
     animation: walkTree 28s linear infinite;
-    filter: drop-shadow(0 8px 6px rgba(0,0,0,.25));
+    filter: drop-shadow(0 8px 6px rgba(0, 0, 0, .25));
 }
 
 .walking-tree::before {

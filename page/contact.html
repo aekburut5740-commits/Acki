@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -9,70 +9,72 @@
     <link rel="stylesheet" href="../css/middle.css">
     <link rel="stylesheet" href="../css/contact.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="edge-tab edge-top">
-        <i class="ti ti-home" title="Home" onclick="goHome()"></i>
+        <i class="ti ti-home" data-en-title="Home" data-th-title="หน้าแรก" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
-            <i class="ti ti-bell notification-disabled" title="Notification coming soon"
+            <i class="ti ti-bell notification-disabled" data-en-title="Notification coming soon" data-th-title="การแจ้งเตือนยังไม่เปิดใช้งาน" title="Notification coming soon"
                 onclick="showComingSoon('Notification')"></i>
             <span class="notification-dot" id="notificationDot"></span>
         </div>
-        <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
-        <i class="ti ti-info-hexagon" title="About" onclick="goAbout()"></i>
+        <i class="ti ti-mail" data-en-title="Contact" data-th-title="ติดต่อ" title="Contact" onclick="goContact()"></i>
+        <i class="ti ti-info-hexagon" data-en-title="About" data-th-title="เกี่ยวกับ" title="About" onclick="goAbout()"></i>
         <div class="settings-wrap">
-            <i class="ti ti-dots-vertical" title="Settings" onclick="toggleSettingsMenu()"></i>
+            <i class="ti ti-dots-vertical" data-en-title="Settings" data-th-title="ตั้งค่า" title="Settings" onclick="toggleSettingsMenu()"></i>
 
             <div class="settings-menu" id="settingsMenu">
-                <button type="button" onclick="setThemeMode('light')">Light Theme</button>
-                <button type="button" onclick="setThemeMode('dark')">Dark Theme</button>
+                <button type="button" onclick="setThemeMode('light')" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')" data-en="Dark Theme" data-th="ธีมมืด">Dark Theme</button>
 
                 <hr>
 
-                <button type="button" onclick="toggleSceneBackground()">Toggle Stage Background</button>
-                <button type="button" onclick="toggleWeather()">Toggle Weather</button>
+                <button type="button" onclick="toggleSceneBackground()" data-en="Toggle Stage Background" data-th="เปิด/ปิดพื้นหลังเวที">Toggle Stage Background</button>
+                <button type="button" onclick="toggleWeather()" data-en="Toggle Weather" data-th="เปิด/ปิดสภาพอากาศ">Toggle Weather</button>
             </div>
         </div>
-        <button type="button" class="lang-toggle" onclick="toggleLanguage()">EN</button>
+        <button type="button" class="lang-toggle" onclick="toggleLanguage()">TH</button>
     </div>
 
     <main class="contact-page">
 
         <section class="contact-card">
             <div class="page-title">
-                <button class="back-btn" onclick="goCommunity()" title="Back to Community">
+                <button class="back-btn" onclick="goCommunity()" data-en-title="Back to Community" data-th-title="กลับไปหน้าชุมชน" title="Back to Community">
                     <i class="ti ti-chevron-left"></i>
                 </button>
             </div>
 
-            <h1 class="contact-title1">Contact</h1>
+            <h1 class="contact-title1" data-en="Contact" data-th="ติดต่อ">Contact</h1>
 
-            <p class="contact-desc">
-                Use this form to report bugs, suggest improvements, or tell us what you need.
-                Please explain your request as clearly as possible.
+            <p class="contact-desc"
+               data-en="Use this form to report bugs, suggest improvements, or tell me what you need. Please explain your request as clearly as possible."
+               data-th="ใช้หน้านี้เพื่อแจ้งบั๊ก เสนอไอเดีย หรือบอกสิ่งที่อยากให้ปรับปรุงได้เลยครับ พยายามอธิบายให้ชัดที่สุดเท่าที่ทำได้ก็พอครับ">
+                Use this form to report bugs, suggest improvements, or tell me what you need. Please explain your request as clearly as possible.
             </p>
 
-            <input id="contactEmail" type="email" placeholder="Your email">
+            <input id="contactEmail" type="email" placeholder="Your email" data-en-placeholder="Your email" data-th-placeholder="อีเมลของคุณ">
 
             <select id="contactSubject">
-                <option value="Bug Report">Bug Report</option>
-                <option value="Suggestion">Suggestion</option>
-                <option value="Question">Question</option>
-                <option value="Other">Other</option>
+                <option value="Bug Report" data-en="Bug Report" data-th="แจ้งบั๊ก">Bug Report</option>
+                <option value="Suggestion" data-en="Suggestion" data-th="ข้อเสนอแนะ">Suggestion</option>
+                <option value="Question" data-en="Question" data-th="คำถาม">Question</option>
+                <option value="Other" data-en="Other" data-th="อื่น ๆ">Other</option>
             </select>
 
-            <textarea id="contactMessage" placeholder="Write your message..."></textarea>
+            <textarea id="contactMessage" placeholder="Write your message..." data-en-placeholder="Write your message..." data-th-placeholder="เขียนข้อความของคุณ..."></textarea>
 
-            <button onclick="sendContactMail()">Send</button>
+            <button onclick="sendContactMail()" data-en="Send" data-th="ส่งข้อความ">Send</button>
         </section>
     </main>
 
     <div class="notification-mini" id="notificationMini">
-        <h3>Notification</h3>
+        <h3 data-en="Notification" data-th="การแจ้งเตือน">Notification</h3>
         <div id="notificationMiniList"></div>
 
-        <button class="notification-more-btn" onclick="openNotificationFull()">
+        <button class="notification-more-btn" onclick="openNotificationFull()" data-en="More" data-th="เพิ่มเติม">
             More
         </button>
     </div>
@@ -80,13 +82,13 @@
     <div class="notification-blur" id="notificationBlur" onclick="closeNotificationFull()"></div>
 
     <div class="notification-full" id="notificationFull">
-        <h2>Notification</h2>
+        <h2 data-en="Notification" data-th="การแจ้งเตือน">Notification</h2>
 
         <div class="notification-tabs">
-            <button onclick="filterNotification('all', event)" class="active">All</button>
-            <button onclick="filterNotification('like', event)">Like</button>
-            <button onclick="filterNotification('comment', event)">Comment</button>
-            <button onclick="filterNotification('share', event)">Share</button>
+            <button onclick="filterNotification('all', event)" class="active" data-en="All" data-th="ทั้งหมด">All</button>
+            <button onclick="filterNotification('like', event)" data-en="Like" data-th="ถูกใจ">Like</button>
+            <button onclick="filterNotification('comment', event)" data-en="Comment" data-th="ความคิดเห็น">Comment</button>
+            <button onclick="filterNotification('share', event)" data-en="Share" data-th="แชร์">Share</button>
         </div>
 
         <div id="notificationFullList"></div>
@@ -94,9 +96,9 @@
 
     <div class="coming-soon-popup" id="comingSoonPopup">
         <div class="coming-soon-box">
-            <h3 id="comingSoonTitle">Coming Soon</h3>
-            <p>ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ</p>
-            <button type="button" onclick="closeComingSoon()">OK</button>
+            <h3 id="comingSoonTitle" data-en="Coming Soon" data-th="เร็ว ๆ นี้">Coming Soon</h3>
+            <p data-en="This feature is not available yet." data-th="ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ">This feature is not available yet.</p>
+            <button type="button" onclick="closeComingSoon()" data-en="OK" data-th="ตกลง">OK</button>
         </div>
     </div>
 
@@ -104,7 +106,7 @@
     <script src="../js/notification.js"></script>
     <script src="../js/contact.js"></script>
     <script src="../js/js.js"></script>
-    <script src="js/language.js"></script>
+    <script src="../js/language.js"></script>
 </body>
 
 </html>

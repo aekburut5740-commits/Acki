@@ -3,8 +3,22 @@
 function showComingSoon(featureName) {
     const popup = document.getElementById("comingSoonPopup");
     const title = document.getElementById("comingSoonTitle");
+    const lang = typeof getCurrentLanguage === "function" ? getCurrentLanguage() : "en";
 
-    if (title) title.textContent = `${featureName} Coming Soon`;
+    const featureNames = {
+        "Notification": { en: "Notification", th: "การแจ้งเตือน" },
+        "Edit Post": { en: "Edit Post", th: "แก้ไขโพสต์" },
+        "Delete Post": { en: "Delete Post", th: "ลบโพสต์" }
+    };
+
+    const translatedFeature = featureNames[featureName]?.[lang] || featureName;
+
+    if (title) {
+        title.textContent = lang === "th"
+            ? `${translatedFeature} ยังไม่เปิดใช้งาน`
+            : `${translatedFeature} Coming Soon`;
+    }
+
     popup?.classList.add("show");
 }
 
