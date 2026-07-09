@@ -22,36 +22,42 @@
     <div class="share-box" id="shareBox" onclick="event.stopPropagation()">
         <h3 data-en="Share Post" data-th="แชร์โพสต์">Share Post</h3>
         <input class="share-link" id="shareLink" type="text" readonly>
-        <button type="button" class="btn-copylink" onclick="copyShareLink()" data-en="Copy Link" data-th="คัดลอกลิงก์">Copy Link</button>
+        <button type="button" class="btn-copylink" onclick="copyShareLink()" data-en="Copy Link"
+            data-th="คัดลอกลิงก์">Copy Link</button>
     </div>
 
     <div class="edge-tab edge-top">
         <i class="ti ti-home" data-en-title="Home" data-th-title="หน้าแรก" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
-            <i class="ti ti-bell notification-disabled" data-en-title="Notification coming soon" data-th-title="การแจ้งเตือนยังไม่เปิดใช้งาน" title="Notification coming soon"
+            <i class="ti ti-bell notification-disabled" data-en-title="Notification coming soon"
+                data-th-title="การแจ้งเตือนยังไม่เปิดใช้งาน" title="Notification coming soon"
                 onclick="showComingSoon('Notification')"></i>
             <span class="notification-dot" id="notificationDot"></span>
         </div>
         <i class="ti ti-mail" data-en-title="Contact" data-th-title="ติดต่อ" title="Contact" onclick="goContact()"></i>
-        <i class="ti ti-info-hexagon" data-en-title="About" data-th-title="เกี่ยวกับ" title="About" onclick="goAbout()"></i>
+        <i class="ti ti-info-hexagon" data-en-title="About" data-th-title="เกี่ยวกับ" title="About"
+            onclick="goAbout()"></i>
 
         <div class="settings-wrap">
-            <i class="ti ti-dots-vertical" data-en-title="Settings" data-th-title="ตั้งค่า" title="Settings" onclick="toggleSettingsMenu()"></i>
+            <i class="ti ti-dots-vertical" data-en-title="Settings" data-th-title="ตั้งค่า" title="Settings"
+                onclick="toggleSettingsMenu()"></i>
 
             <div class="settings-menu" id="settingsMenu">
-                <button type="button" onclick="setThemeMode('light')" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
-                <button type="button" onclick="setThemeMode('dark')" data-en="Dark Theme" data-th="ธีมมืด">Dark Theme</button>
+                <button type="button" onclick="setThemeMode('auto')" data-theme-option="auto" data-en="Default Theme" data-th="ธีมปกติ">Default Theme</button>
+                <button type="button" onclick="setThemeMode('light')" data-theme-option="light" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')" data-theme-option="dark" data-en="Dark Theme" data-th="ธีมมืด">Dark Theme</button>
 
                 <hr>
 
-                <button type="button" onclick="toggleSceneBackground()" data-en="Toggle Stage Background" data-th="เปิด/ปิดพื้นหลังเวที">Toggle Stage Background</button>
-                <button type="button" onclick="toggleWeather()" data-en="Toggle Weather" data-th="เปิด/ปิดสภาพอากาศ">Toggle Weather</button>
+                <button type="button" onclick="toggleSceneBackground()" data-en-html="Stage Background <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>On</span>" data-th-html="พื้นหลังเวที <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>เปิด</span>">Stage Background <span class="setting-state" data-setting-state="scene">On</span></button>
+                <button type="button" onclick="toggleWeather()" data-en-html="Weather Effects <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>On</span>" data-th-html="สภาพอากาศ <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>เปิด</span>">Weather Effects <span class="setting-state" data-setting-state="weather">On</span></button>
             </div>
         </div>
         <button type="button" class="lang-toggle" onclick="toggleLanguage()">TH</button>
     </div>
 
-    <button type="button" class="create-post-tab" onclick="toggleCreatePost()" data-en="Create Post" data-th="สร้างโพสต์">
+    <button type="button" class="create-post-tab" onclick="toggleCreatePost()" data-en="Create Post"
+        data-th="สร้างโพสต์">
         Create Post
     </button>
 
@@ -62,16 +68,19 @@
 
                 <div class="create-user">
                     <p class="create-username">Visitor</p>
-                    <span class="create-status" data-en="What's on your mind today?" data-th="วันนี้อยากแบ่งปันอะไรดีครับ?">
+                    <span class="create-status" data-en="What's on your mind today?"
+                        data-th="วันนี้อยากแบ่งปันอะไรดีครับ?">
                         What's on your mind today?
                     </span>
                 </div>
             </div>
 
-            <textarea id="createText" class="create-text" placeholder="Share something..." data-en-placeholder="Share something..." data-th-placeholder="อยากแบ่งปันอะไรบ้าง..."
+            <textarea id="createText" class="create-text" placeholder="Share something..."
+                data-en-placeholder="Share something..." data-th-placeholder="อยากแบ่งปันอะไรบ้าง..."
                 oninput="autoResizePost(this)"></textarea>
 
-            <button type="button" class="create-btn" onclick="createNewPost()" data-en="Post" data-th="โพสต์">Post</button>
+            <button type="button" class="create-btn" onclick="createNewPost()" data-en="Post"
+                data-th="โพสต์">Post</button>
         </div>
     </div>
 
@@ -82,7 +91,9 @@
         <div id="commentList"></div>
 
         <div class="comment-input">
-            <input id="commentInput" type="text" placeholder="Write a comment..." data-en-placeholder="Write a comment..." data-th-placeholder="เขียนความคิดเห็น..." onkeydown="commentEnter(event)">
+            <input id="commentInput" type="text" placeholder="Write a comment..."
+                data-en-placeholder="Write a comment..." data-th-placeholder="เขียนความคิดเห็น..."
+                onkeydown="commentEnter(event)">
             <button type="button" class="btn-send" onclick="sendComment()" data-en="Send" data-th="ส่ง">Send</button>
         </div>
     </div>
@@ -91,7 +102,8 @@
         <h3 data-en="Notification" data-th="การแจ้งเตือน">Notification</h3>
         <div id="notificationMiniList"></div>
 
-        <button type="button" class="notification-more-btn" onclick="openNotificationFull()" data-en="More" data-th="เพิ่มเติม">
+        <button type="button" class="notification-more-btn" onclick="openNotificationFull()" data-en="More"
+            data-th="เพิ่มเติม">
             More
         </button>
     </div>
@@ -102,9 +114,11 @@
         <h2 data-en="Notification" data-th="การแจ้งเตือน">Notification</h2>
 
         <div class="notification-tabs">
-            <button onclick="filterNotification('all', event)" class="active" data-en="All" data-th="ทั้งหมด">All</button>
+            <button onclick="filterNotification('all', event)" class="active" data-en="All"
+                data-th="ทั้งหมด">All</button>
             <button onclick="filterNotification('like', event)" data-en="Like" data-th="ถูกใจ">Like</button>
-            <button onclick="filterNotification('comment', event)" data-en="Comment" data-th="ความคิดเห็น">Comment</button>
+            <button onclick="filterNotification('comment', event)" data-en="Comment"
+                data-th="ความคิดเห็น">Comment</button>
             <button onclick="filterNotification('share', event)" data-en="Share" data-th="แชร์">Share</button>
         </div>
 
@@ -126,18 +140,20 @@
     <div class="coming-soon-popup" id="comingSoonPopup">
         <div class="coming-soon-box">
             <h3 id="comingSoonTitle" data-en="Coming Soon" data-th="เร็ว ๆ นี้">Coming Soon</h3>
-            <p data-en="This feature is not available yet." data-th="ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ">This feature is not available yet.</p>
+            <p data-en="This feature is not available yet." data-th="ฟีเจอร์นี้ยังไม่สามารถใช้งานได้ในตอนนี้ครับ">This
+                feature is not available yet.</p>
             <button type="button" onclick="closeComingSoon()" data-en="OK" data-th="ตกลง">OK</button>
         </div>
     </div>
 
     <script src="../js/navigation.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/appearance.js"></script>
     <script src="../js/notification.js"></script>
     <script src="../js/community.js"></script>
     <script src="../js/theme.js"></script>
     <script src="../js/weather.js"></script>
     <script src="../js/js.js"></script>
-    <script src="../js/language.js"></script>
 </body>
 
 </html>

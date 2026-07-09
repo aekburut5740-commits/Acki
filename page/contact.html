@@ -7,6 +7,7 @@
     <title>Contact</title>
 
     <link rel="stylesheet" href="../css/middle.css">
+    <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/contact.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
@@ -26,13 +27,14 @@
             <i class="ti ti-dots-vertical" data-en-title="Settings" data-th-title="ตั้งค่า" title="Settings" onclick="toggleSettingsMenu()"></i>
 
             <div class="settings-menu" id="settingsMenu">
-                <button type="button" onclick="setThemeMode('light')" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
-                <button type="button" onclick="setThemeMode('dark')" data-en="Dark Theme" data-th="ธีมมืด">Dark Theme</button>
+                <button type="button" onclick="setThemeMode('auto')" data-theme-option="auto" data-en="Default Theme" data-th="ธีมปกติ">Default Theme</button>
+                <button type="button" onclick="setThemeMode('light')" data-theme-option="light" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')" data-theme-option="dark" data-en="Dark Theme" data-th="ธีมมืด">Dark Theme</button>
 
                 <hr>
 
-                <button type="button" onclick="toggleSceneBackground()" data-en="Toggle Stage Background" data-th="เปิด/ปิดพื้นหลังเวที">Toggle Stage Background</button>
-                <button type="button" onclick="toggleWeather()" data-en="Toggle Weather" data-th="เปิด/ปิดสภาพอากาศ">Toggle Weather</button>
+                <button type="button" onclick="toggleSceneBackground()" data-en-html="Stage Background <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>On</span>" data-th-html="พื้นหลังเวที <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>เปิด</span>">Stage Background <span class="setting-state" data-setting-state="scene">On</span></button>
+                <button type="button" onclick="toggleWeather()" data-en-html="Weather Effects <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>On</span>" data-th-html="สภาพอากาศ <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>เปิด</span>">Weather Effects <span class="setting-state" data-setting-state="weather">On</span></button>
             </div>
         </div>
         <button type="button" class="lang-toggle" onclick="toggleLanguage()">TH</button>
@@ -103,10 +105,11 @@
     </div>
 
     <script src="../js/navigation.js"></script>
+    <script src="../js/language.js"></script>
+    <script src="../js/appearance.js"></script>
     <script src="../js/notification.js"></script>
     <script src="../js/contact.js"></script>
     <script src="../js/js.js"></script>
-    <script src="../js/language.js"></script>
 </body>
 
 </html>

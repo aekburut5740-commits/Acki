@@ -18,11 +18,19 @@ body {
 .about-hero h1 {
     font-size: 64px;
     margin-bottom: 10px;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 1));
 }
 
 .about-hero p {
     font-size: 22px;
     color: #d0d0d0;
+    background-color: #949494;
+    width: auto;
+    height: auto;
+    margin: 0px 500px 0px 500px;
+    padding: 7px 0px 7px 0px;
+    border: none;
+    border-radius: 30px;
 }
 
 .about-grid {

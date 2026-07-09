@@ -1,5 +1,8 @@
-// Deprecated: Acki JavaScript has been split into smaller files.
-// See: navigation.js, language.js, community.js, notification.js, contact.js, theme.js, weather.js
+// Shared helpers used by multiple Acki pages.
+// Most feature-specific code lives in smaller files:
+// navigation.js, language.js, community.js, notification.js, contact.js,
+// appearance.js, theme.js, weather.js
+
 function showComingSoon(featureName) {
     const popup = document.getElementById("comingSoonPopup");
     const title = document.getElementById("comingSoonTitle");
@@ -27,44 +30,15 @@ function closeComingSoon() {
 }
 
 function closeAllPanels() {
-    closeComment();
-    closeCreatePost();
-    closeShareBox();
+    if (typeof closeComment === "function") closeComment();
+    if (typeof closeCreatePost === "function") closeCreatePost();
+    if (typeof closeShareBox === "function") closeShareBox();
 
     if (typeof closeNotificationPanels === "function") {
         closeNotificationPanels();
     }
 }
 
-function toggleSettingsMenu() {
-    document.getElementById("settingsMenu")?.classList.toggle("show");
-}
-
-function setThemeMode(mode) {
-    document.body.classList.remove("theme-light", "theme-dark");
-
-    if (mode === "dark") {
-        document.body.classList.add("theme-dark");
-    } else {
-        document.body.classList.add("theme-light");
-    }
-
-    localStorage.setItem("acki-theme", mode);
-}
-
-function toggleSceneBackground() {
-    document.body.classList.toggle("scene-off");
-
-    const isOff = document.body.classList.contains("scene-off");
-    localStorage.setItem("acki-scene-off", isOff ? "true" : "false");
-}
-
-function toggleWeather() {
-    document.body.classList.toggle("weather-off");
-
-    const isOff = document.body.classList.contains("weather-off");
-    localStorage.setItem("acki-weather-off", isOff ? "true" : "false");
-}
 function openRule() {
     document.getElementById("ruleModal")?.classList.add("show");
 }

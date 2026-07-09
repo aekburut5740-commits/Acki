@@ -225,10 +225,46 @@ const WEATHER_CHANCE = 0.85;    // โอกาสเกิด weather ในร
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        if (WEATHER_TEST_MODE) {
-            startWeather(TEST_WEATHER);
-        } else {
-            startNormalWeatherSystem();
+        const isWeatherOff = localStorage.getItem("acki-weather-off") === "true";
+
+        if (isWeatherOff) {
+            document.body.classList.add("weather-off");
+            clearWeather();
+            return;
         }
+
+        triggerWeatherEvent();
     });
+    window.addEventListener("acki-weather-change", (event) => {
+        const isOff = event.detail.isOff;
+
+        if (isOff) {
+            clearWeather();
+            return;
+        }
+
+        clearWeather();
+        triggerWeatherEvent();
+    });
+    function applyWeatherSettingNow() {
+    const isOff = localStorage.getItem("acki-weather-off") === "true";
+
+    document.body.classList.toggle("weather-off", isOff);
+
+    if (isOff) {
+        clearWeather();
+        return;
+    }
+
+    clearWeather();
+
+    if (typeof triggerWeatherEvent === "function") {
+        triggerWeatherEvent();
+    }
+}
+
+window.addEventListener("acki-weather-change", applyWeatherSettingNow);
+
+document.addEventListener("DOMContentLoaded", applyWeatherSettingNow);
 })();
+
