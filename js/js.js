@@ -11,7 +11,8 @@ function showComingSoon(featureName) {
     const featureNames = {
         "Notification": { en: "Notification", th: "การแจ้งเตือน" },
         "Edit Post": { en: "Edit Post", th: "แก้ไขโพสต์" },
-        "Delete Post": { en: "Delete Post", th: "ลบโพสต์" }
+        "Delete Post": { en: "Delete Post", th: "ลบโพสต์" },
+        "Save": { en: "Save", th: "บันทึกโพสต์" }
     };
 
     const translatedFeature = featureNames[featureName]?.[lang] || featureName;

@@ -182,7 +182,7 @@ function createPostElement(postData) {
                 <span class="comment-count">${postData.comments ? postData.comments.length : 0}</span>
             </button>
 
-            <button type="button" class="ti ti-bookmark btn-save" onclick="toggleSave(this)"></button>
+            <button type="button" class="ti ti-bookmark btn-save notification-disabled" onclick="toggleSave(this)"></button>
 
             <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
                 <span class="share-count">${postData.shares || 0}</span>
@@ -329,40 +329,8 @@ async function toggleLike(button) {
     }
 }
 
-async function toggleSave(button) {
-    try {
-        const post = button.closest(".post");
-        const postId = post.dataset.postId;
-
-        const savedKey = `acki-saved-${postId}`;
-        const isSaved = localStorage.getItem(savedKey) === "true";
-        const change = isSaved ? -1 : 1;
-
-        const response = await fetch(`${API_URL}/posts/${postId}/save`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ change })
-        });
-
-        if (!response.ok) {
-            throw new Error("Cannot update save");
-        }
-
-        if (isSaved) {
-            localStorage.removeItem(savedKey);
-            button.classList.remove("saved", "ti-bookmark-filled");
-            button.classList.add("ti-bookmark");
-        } else {
-            localStorage.setItem(savedKey, "true");
-            button.classList.add("saved", "ti-bookmark-filled");
-            button.classList.remove("ti-bookmark");
-        }
-    } catch (error) {
-        console.error("Save error:", error);
-        alert(typeof t === "function" ? t("Cannot bookmark this post. Please check the backend or /save route.", "กด Bookmark ไม่ได้ เช็กว่า backend มี route /save หรือยัง") : "กด Bookmark ไม่ได้ เช็กว่า backend มี route /save หรือยัง");
-    }
+function toggleSave() {
+    showComingSoon("Save");
 }
 
 function togglePostMenu(button) {
