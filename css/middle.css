@@ -226,21 +226,26 @@ html, body {
     cursor: pointer;
 }
 .notification-disabled {
-    color: #888;
     position: relative;
-    opacity: 0.65;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .notification-disabled::after {
     content: "";
     position: absolute;
-    left: -4px;
-    top: 50%;
-    width: 28px;
+    width: 26px;
     height: 2px;
     background: #ff4b4b;
-    transform: rotate(-35deg);
+    border-radius: 2px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%) rotate(-38deg);
     transform-origin: center;
+    pointer-events: none;
 }
 .settings-wrap {
     position: relative;
@@ -374,4 +379,31 @@ body.theme-dark input,
 body.theme-dark textarea {
     background: #fff;
     color: #111;
+}
+@media (max-width: 600px) {
+    .edge-tab {
+        height: 64px;
+        padding: 0 14px;
+        gap: 14px;
+        justify-content: space-between;
+    }
+
+    .edge-tab i {
+        font-size: 23px;
+        flex-shrink: 0;
+    }
+
+    .notification-disabled::after {
+        width: 22px;
+    }
+
+    .settings-wrap {
+        flex-shrink: 0;
+    }
+
+    .lang-toggle {
+        flex-shrink: 0;
+        min-width: 54px;
+        padding: 9px 12px;
+    }
 }

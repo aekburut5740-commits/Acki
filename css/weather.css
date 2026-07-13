@@ -224,3 +224,11 @@ body.bg-midnight {
     50%  { transform: translateX(6px) translateY(3px); }
     100% { transform: translateX(-6px) translateY(0); }
 }
+
+.acki-scene,
+#weatherEvents,
+.edge-tab,
+.edge-top,
+.content {
+    max-width: 100%;
+}

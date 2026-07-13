@@ -760,3 +760,10 @@ body::after {
     opacity: .8;
     margin: 0;
 }
+.acki-scene,
+#weatherEvents,
+.edge-tab,
+.edge-top,
+.content {
+    max-width: 100%;
+}
