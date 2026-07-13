@@ -488,23 +488,32 @@ async function copyShareLink() {
     const shareBox = document.getElementById("shareBox");
     if (!input || !shareBox) return;
 
-    input.select();
-    await navigator.clipboard.writeText(input.value);
+    try {
+        await navigator.clipboard.writeText(input.value);
 
-    const post = shareBox.closest(".post");
-    if (!post) return;
+        const postId = shareBox.dataset.postId;
+        if (!postId) return;
 
-    const postId = post.dataset.postId;
-    const countSpan = post.querySelector(".share-count");
+        const post = document.querySelector(`.post[data-post-id="${postId}"]`);
+        const countSpan = post?.querySelector(".share-count");
 
-    const response = await fetch(`${API_URL}/posts/${postId}/share`, {
-        method: "PATCH"
-    });
+        const response = await fetch(`${API_URL}/posts/${postId}/share`, {
+            method: "PATCH"
+        });
 
-    const updatedPost = await response.json();
+        if (!response.ok) {
+            throw new Error("Cannot update share count");
+        }
 
-    if (countSpan) {
-        countSpan.textContent = updatedPost.shares || 0;
+        const updatedPost = await response.json();
+
+        if (countSpan) {
+            countSpan.textContent = updatedPost.shares || 0;
+        }
+
+        closeShareBox();
+    } catch (error) {
+        console.error("Copy link error:", error);
     }
 }
 
