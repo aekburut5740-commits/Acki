@@ -7,6 +7,10 @@ body {
     overflow-x: hidden;
 }
 
+body.theme-light .server-offline{
+    color:#222;
+}
+
 body::before {
     content: "";
     position: fixed;
@@ -454,7 +458,7 @@ body::after {
 .share-overlay {
     position: fixed;
     inset: 0;
-    z-index: 1004;
+    z-index: 1002;
     background: transparent;
     opacity: 0;
     visibility: hidden;
@@ -468,17 +472,17 @@ body::after {
 }
 
 .share-box {
-    position: fixed;
+    position:absolute;
     width: 320px;
-    max-width: 90vw;
+    max-width: calc(100vw - 30px);
     background: #ffffffe8;
     border-radius: 16px;
     padding: 16px 20px 20px;
-    z-index: 1002;
+    z-index: 1005;
     box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
     opacity: 0;
     visibility: hidden;
-    transform: translateX(30px) scale(.96);
+    transform: translateX(10px) scale(.96);
     transition: .25s;
 }
 
@@ -721,4 +725,38 @@ body::after {
     to {
         left: calc(100vw + 120px);
     }
+}
+
+.server-offline {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    text-align: center;
+
+    z-index: 5;
+    pointer-events: none;
+
+    color: #ffffff;
+}
+
+.server-offline.show {
+    display: flex;
+}
+
+.server-offline h2 {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 0;
+    margin-bottom: 12px;
+}
+
+.server-offline p {
+    font-size: 20px;
+    opacity: .8;
+    margin: 0;
 }

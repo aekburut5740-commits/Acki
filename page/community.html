@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acki-community</title>
+
+    <link rel="icon" type="image/png" href="../pic/logo1.png">
     <link rel="stylesheet" href="../css/community.css">
     <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/weather.css">
@@ -43,14 +45,23 @@
                 onclick="toggleSettingsMenu()"></i>
 
             <div class="settings-menu" id="settingsMenu">
-                <button type="button" onclick="setThemeMode('auto')" data-theme-option="auto" data-en="Default Theme" data-th="ธีมปกติ">Default Theme</button>
-                <button type="button" onclick="setThemeMode('light')" data-theme-option="light" data-en="Light Theme" data-th="ธีมสว่าง">Light Theme</button>
-                <button type="button" onclick="setThemeMode('dark')" data-theme-option="dark" data-en="Dark Theme" data-th="ธีมมืด">Dark Theme</button>
+                <button type="button" onclick="setThemeMode('auto')" data-theme-option="auto" data-en="Default Theme"
+                    data-th="ธีมปกติ">Default Theme</button>
+                <button type="button" onclick="setThemeMode('light')" data-theme-option="light" data-en="Light Theme"
+                    data-th="ธีมสว่าง">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')" data-theme-option="dark" data-en="Dark Theme"
+                    data-th="ธีมมืด">Dark Theme</button>
 
                 <hr>
 
-                <button type="button" onclick="toggleSceneBackground()" data-en-html="Stage Background <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>On</span>" data-th-html="พื้นหลังเวที <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>เปิด</span>">Stage Background <span class="setting-state" data-setting-state="scene">On</span></button>
-                <button type="button" onclick="toggleWeather()" data-en-html="Weather Effects <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>On</span>" data-th-html="สภาพอากาศ <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>เปิด</span>">Weather Effects <span class="setting-state" data-setting-state="weather">On</span></button>
+                <button type="button" onclick="toggleSceneBackground()"
+                    data-en-html="Stage Background <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>On</span>"
+                    data-th-html="พื้นหลังเวที <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>เปิด</span>">Stage
+                    Background <span class="setting-state" data-setting-state="scene">On</span></button>
+                <button type="button" onclick="toggleWeather()"
+                    data-en-html="Weather Effects <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>On</span>"
+                    data-th-html="สภาพอากาศ <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>เปิด</span>">Weather
+                    Effects <span class="setting-state" data-setting-state="weather">On</span></button>
             </div>
         </div>
         <button type="button" class="lang-toggle" onclick="toggleLanguage()">TH</button>
@@ -144,6 +155,14 @@
                 feature is not available yet.</p>
             <button type="button" onclick="closeComingSoon()" data-en="OK" data-th="ตกลง">OK</button>
         </div>
+    </div>
+
+    <div id="serverOffline" class="server-offline">
+        <h2 id="serverTitle">Community is sleeping...</h2>
+
+        <p id="serverText">
+            Nobody is here yet.
+        </p>
     </div>
 
     <script src="../js/navigation.js"></script>

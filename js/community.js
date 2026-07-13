@@ -261,25 +261,60 @@ async function createNewPost() {
 }
 
 async function loadPostsFromBackend() {
+
     const content = document.querySelector(".content");
+    const offline = document.getElementById("serverOffline");
+
     if (!content) return;
 
-    const response = await fetch(`${API_URL}/posts`);
-    const posts = await response.json();
+    try {
 
-    posts.forEach((postData) => {
-        const alreadyExists = document.querySelector(`.post[data-post-id="${postData.id}"]`);
-        if (alreadyExists) return;
+        const response = await fetch(`${API_URL}/posts`);
 
-        const postElement = createPostElement(postData);
-        const firstPost = document.querySelector(".post");
-        content.insertBefore(postElement, firstPost);
+        if (!response.ok) {
+            throw new Error("Server Error");
+        }
 
-        if (!commentsData[postData.id]) commentsData[postData.id] = [];
-    });
+        const posts = await response.json();
 
-    if (typeof applyLanguage === "function") applyLanguage();
-    updatePostTimes();
+        // ซ่อนข้อความ Server Offline
+        offline?.classList.remove("show");
+
+        posts.forEach((postData) => {
+
+            const alreadyExists = document.querySelector(
+                `.post[data-post-id="${postData.id}"]`
+            );
+
+            if (alreadyExists) return;
+
+            const postElement = createPostElement(postData);
+            const firstPost = document.querySelector(".post");
+
+            content.insertBefore(postElement, firstPost);
+
+            if (!commentsData[postData.id]) {
+                commentsData[postData.id] = [];
+            }
+
+        });
+
+        if (typeof applyLanguage === "function") {
+            applyLanguage();
+        }
+
+        updatePostTimes();
+
+    } catch (error) {
+
+        console.error("Backend Offline:", error);
+
+        // ลบโพสต์ทั้งหมดออก
+        content.innerHTML = "";
+
+        // แสดงข้อความตรงกลาง
+        offline?.classList.add("show");
+    }
 }
 
 function autoResizePost(textarea) {
@@ -385,37 +420,67 @@ function updatePostTimes() {
 function sharePost(button) {
     const shareBox = document.getElementById("shareBox");
     const shareOverlay = document.getElementById("shareOverlay");
+
     if (!shareBox || !shareOverlay) return;
 
     const post = button.closest(".post");
+    if (!post) return;
+
     const postId = post.dataset.postId;
 
-    const isOpen = shareBox.classList.contains("show");
-    const currentPost = shareBox.closest(".post");
-
     closeAllPanels();
+
     post.classList.add("share-active");
 
-    if (isOpen && currentPost === post) return;
+    const link =
+        `${window.location.origin}${window.location.pathname}?post=${postId}`;
 
-    if (typeof addNotification === "function") {
-        addNotification("share", "Your post was shared.", postId);
+    const input = document.getElementById("shareLink");
+
+    if (input) {
+        input.value = link;
     }
 
-    const link = `${window.location.origin}${window.location.pathname}?post=${postId}`;
-    const input = document.getElementById("shareLink");
-    if (input) input.value = link;
+    // จำว่า Share Box นี้เป็นของโพสต์ไหน
+    shareBox.dataset.postId = postId;
 
-    post.appendChild(shareBox);
+    // สำคัญ: ให้กล่องอยู่ใต้ body ไม่อยู่ใน post
+    document.body.appendChild(shareBox);
 
-    const postRect = post.getBoundingClientRect();
-    const btnRect = button.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
 
-    shareBox.style.left = (btnRect.left - postRect.left + 40) + "px";
-    shareBox.style.top = (btnRect.top - postRect.top - 20) + "px";
-
+    // ต้องแสดงกล่องก่อน เพื่อวัดขนาดจริง
     shareBox.classList.add("show");
     shareOverlay.classList.add("show");
+
+    const boxRect = shareBox.getBoundingClientRect();
+    const space = 12;
+
+    let left = buttonRect.right - boxRect.width;
+    let top = buttonRect.bottom + space;
+
+    // กันหลุดขอบขวา
+    if (left + boxRect.width > window.innerWidth - space) {
+        left = window.innerWidth - boxRect.width - space;
+    }
+
+    // กันหลุดขอบซ้าย
+    if (left < space) {
+        left = space;
+    }
+
+    // ถ้าด้านล่างไม่พอ ให้เปิดขึ้นด้านบน
+    if (top + boxRect.height > window.innerHeight - space) {
+        top = buttonRect.top - boxRect.height - space;
+    }
+
+    // กันหลุดด้านบน
+    if (top < space) {
+        top = space;
+    }
+
+    shareBox.style.left = `${left}px`;
+    shareBox.style.top = `${top}px`;
 }
 
 async function copyShareLink() {
