@@ -530,20 +530,27 @@ function openPostFromUrl() {
     setTimeout(() => {
         const params = new URLSearchParams(window.location.search);
         const postId = params.get("post");
-        if (!postId) return;
 
-        const post = document.querySelector(`.post[data-post-id="${postId}"]`);
-        if (!post) return;
+        if (postId) {
+            const post = document.querySelector(
+                `.post[data-post-id="${postId}"]`
+            );
 
-        post.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
+            if (post) {
+                setTimeout(() => {
+                    post.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
 
-        setTimeout(() => {
-            const commentBtn = post.querySelector(".btn-comment");
-            if (commentBtn) openComment(commentBtn);
-        }, 500);
+                    post.classList.add("shared-post-focus");
+
+                    setTimeout(() => {
+                        post.classList.remove("shared-post-focus");
+                    }, 3500);
+                }, 200);
+            }
+        }
     }, 300);
 }
 

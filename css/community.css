@@ -851,3 +851,36 @@ body::after {
         display: none;
     }
 }
+.shared-post-focus {
+    animation: sharedPostFocus 1.1s ease-in-out 3;
+}
+
+@keyframes sharedPostFocus {
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 5px 30px rgba(0, 0, 0, 1);
+    }
+
+    50% {
+        transform: scale(1.015);
+        box-shadow:
+            0 0 0 4px rgba(255, 255, 255, 0.8),
+            0 8px 40px rgba(0, 0, 0, 0.8);
+    }
+}
+@media (max-width: 640px) {
+    @keyframes sharedPostFocus {
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.005);
+            box-shadow:
+                0 0 0 3px rgba(255, 255, 255, 0.75),
+                0 8px 32px rgba(0, 0, 0, 0.7);
+        }
+    }
+}
