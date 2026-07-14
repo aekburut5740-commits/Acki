@@ -1,5 +1,5 @@
 // Community feed: posts, comments, likes, saves, share links.
-const API_URL = "http://172.16.111.244:3000";
+const API_URL = "https://acki-zq9m.onrender.com";
 
 let activePost = null;
 let activePostId = null;
