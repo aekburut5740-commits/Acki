@@ -1,10 +1,21 @@
+html,
 body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 100vh;
     margin: 0;
+    padding: 0;
+    overflow-x: hidden !important;
+    overflow-y: visible;
+    position: relative;
+    overscroll-behavior-x: none;
+}
+
+body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
-    overflow-x: hidden;
 }
 
 body.theme-light .server-offline{
@@ -224,6 +235,30 @@ body::after {
     transition: .25s;
 }
 
+.comment-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .06);
+    color: #333;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+}
+
+.comment-close-btn:hover {
+    background: rgba(0, 0, 0, .12);
+}
+
+.comment-panel .comment-title-wrapper {
+    position: relative;
+}
+
 .comment-panel.show {
     opacity: 1;
     visibility: visible;
@@ -365,7 +400,8 @@ body::after {
     transition: all .1s ease-in-out;
 }
 
-.create-post-tab:hover {
+.create-post-tab:hover,
+.create-post-tab:active {
     background: #212121;
     transform: translateX(-50%) translateY(15px);
 }

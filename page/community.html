@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Acki-community</title>
 
     <link rel="icon" type="image/png" href="../pic/logo1.png">
@@ -99,6 +99,7 @@
     <div class="focus-overlay" id="focusOverlay" onclick="closeComment()"></div>
 
     <div class="comment-panel" id="commentPanel">
+        <button type="button" class="comment-close-btn" onclick="closeComment()" aria-label="Close comments">×</button>
         <h3 id="commentTitle" data-en="Comments" data-th="ความคิดเห็น">Comments</h3>
         <div id="commentList"></div>
 
