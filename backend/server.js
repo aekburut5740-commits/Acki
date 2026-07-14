@@ -98,8 +98,8 @@ app.patch("/posts/:id/share", (req, res) => {
   res.json(post);
 });
 
-app.listen(PORT, () => {
-  console.log(`Acki backend running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Acki backend running on port ${PORT}`);
 });
 
 app.post("/posts/:id/comments", (req, res) => {
