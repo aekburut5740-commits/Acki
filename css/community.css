@@ -600,6 +600,12 @@ body::after {
     filter: drop-shadow(0 0 18px rgba(0, 0, 0, 100));
 }
 
+/* Tree vertical offset: positive value moves trees downward (closer to viewport bottom).
+   Tweak --tree-offset to adjust all trees at once. Uses max() to avoid overflowing below viewport. */
+.acki-scene {
+    --tree-offset: 30px;
+}
+
 .scene-sky-object {
     position: absolute;
     width: 90px;
@@ -689,7 +695,7 @@ body::after {
 
 .walking-tree {
     position: fixed;
-    bottom: 95px;
+    bottom: max(0px, calc(95px - var(--tree-offset)));
     left: -120px;
     width: 55px;
     height: 95px;
@@ -729,28 +735,28 @@ body::after {
     animation-delay: 5s;
     transform: scale(.75);
     opacity: .85;
-    bottom: 110px;
+    bottom: max(0px, calc(110px - var(--tree-offset)));
 }
 
 .tree-c {
     animation-delay: 12s;
     transform: scale(1.15);
     opacity: .95;
-    bottom: 80px;
+    bottom: max(0px, calc(80px - var(--tree-offset)));
 }
 
 .tree-d {
     animation-delay: 15s;
     transform: scale(.65);
     opacity: .95;
-    bottom: 110px;
+    bottom: max(0px, calc(110px - var(--tree-offset)));
 }
 
 .tree-e {
     animation-delay: 20s;
     transform: scale(1.50);
     opacity: .95;
-    bottom: 50px;
+    bottom: max(0px, calc(50px - var(--tree-offset)));
 }
 
 @keyframes walkTree {
