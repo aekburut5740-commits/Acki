@@ -36,5 +36,11 @@ function sendContactMail() {
         `?subject=${encodeURIComponent(subject)}` +
         `&body=${encodeURIComponent(body)}`;
 
-    window.location.href = mailtoUrl;
+    const gmailUrl =
+        `https://mail.google.com/mail/?view=cm&fs=1` +
+        `&to=aekburut5740@gmail.com` +
+        `&su=${encodeURIComponent(subject)}` +
+        `&body=${encodeURIComponent(body)}`;
+
+    window.open(gmailUrl, "_blank");
 }
