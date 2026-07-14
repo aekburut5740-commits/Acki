@@ -1,7 +1,7 @@
 // Contact page mailto form.
 
 function sendContactMail() {
-    const email = document.getElementById("contactEmail")?.value.trim() || "";
+    const name = document.getElementById("contactName")?.value.trim() || "";
     const subject = document.getElementById("contactSubject")?.value || "Other";
     const message = document.getElementById("contactMessage")?.value.trim() || "";
 
