@@ -1,8 +1,12 @@
 // Community feed: posts, comments, likes, saves, share links.
-const API_URL = "https://acki-zq9m.onrender.com";
+const API_URL = ACKI_API_URL;
 
 let activePost = null;
 let activePostId = null;
+let editingPostId = null;
+let editingPostElement = null;
+let deletingPostId = null;
+let deletingPostElement = null;
 let nextPostId = 4;
 
 const commentsData = {
@@ -133,17 +137,63 @@ async function sendComment() {
 }
 
 function toggleCreatePost() {
-    const createPost = document.getElementById("createPost");
+    const createPost =
+        document.getElementById("createPost");
+
     if (!createPost) return;
 
-    const isOpen = createPost.classList.contains("show");
+    const isOpen =
+        createPost.classList.contains("show");
+
     closeAllPanels();
 
-    if (!isOpen) createPost.classList.add("show");
+    if (!isOpen) {
+        resetCreatePostMode();
+        createPost.classList.add("show");
+    }
+}
+
+function resetCreatePostMode() {
+    editingPostId = null;
+    editingPostElement = null;
+
+    const textarea =
+        document.getElementById("createText");
+
+    const title =
+        document.getElementById("createPostTitle");
+
+    const submitButton =
+        document.getElementById(
+            "createPostSubmitButton"
+        );
+
+    if (textarea) {
+        textarea.value = "";
+        textarea.style.height = "auto";
+    }
+
+    if (title) {
+        title.textContent =
+            typeof t === "function"
+                ? t("Create Post", "สร้างโพสต์")
+                : "Create Post";
+    }
+
+    if (submitButton) {
+        submitButton.textContent =
+            typeof t === "function"
+                ? t("Post", "โพสต์")
+                : "Post";
+    }
 }
 
 function closeCreatePost() {
-    document.getElementById("createPost")?.classList.remove("show");
+    document
+        .getElementById("createPost")
+        ?.classList.remove("show");
+
+    resetCreatePostMode();
 }
 
 function createPostElement(postData) {
@@ -152,21 +202,69 @@ function createPostElement(postData) {
     post.dataset.postId = postData.id;
     post.dataset.createdAt = new Date(postData.createdAt).getTime();
 
+    const currentAccount = getStoredAccount();
+    const postAccount = postData.account || {};
+
+    const isOwner =
+        currentAccount &&
+        String(currentAccount.id) === String(postAccount.id);
+
+    const displayName =
+        postAccount.displayName ||
+        postAccount.username ||
+        "Unknown";
+
+    const avatarUrl =
+        postAccount.avatarUrl ||
+        "../pic/visitor.jpg";
+
+    const ownerMenu = isOwner
+        ? `
+            <button
+                type="button"
+                class="post-menu-btn"
+                onclick="togglePostMenu(this)"
+            >
+                ⋮
+            </button>
+
+            <div class="post-menu">
+                <button
+                    type="button"
+                    onclick="editPost(this)"
+                    data-en="Edit Post"
+                    data-th="แก้ไขโพสต์"
+                >
+                    Edit Post
+                </button>
+
+                <button
+                    type="button"
+                    onclick="deletePost(this)"
+                    data-en="Delete Post"
+                    data-th="ลบโพสต์"
+                >
+                    Delete Post
+                </button>
+            </div>
+        `
+        : "";
+
     post.innerHTML = `
         <div class="post-header">
-            <img src="../pic/visitor.jpg" class="post-avatar" alt="Visitor">
+            <img
+                src="${avatarUrl}"
+                class="post-avatar"
+                alt="${displayName}"
+                onerror="this.src='../pic/visitor.jpg'"
+            >
 
             <div>
-                <p class="post-name">${postData.username || "Visitor"}</p>
+                <p class="post-name">${displayName}</p>
                 <p class="post-time">just now</p>
             </div>
 
-            <button type="button" class="post-menu-btn" onclick="togglePostMenu(this)">⋮</button>
-
-            <div class="post-menu">
-                <button type="button" onclick="showComingSoon('Edit Post')" data-en="Edit Post" data-th="แก้ไขโพสต์">Edit Post</button>
-                <button type="button" onclick="showComingSoon('Delete Post')" data-en="Delete Post" data-th="ลบโพสต์">Delete Post</button>
-            </div>
+            ${ownerMenu}
         </div>
 
         <div class="post-body">
@@ -174,23 +272,42 @@ function createPostElement(postData) {
         </div>
 
         <div class="post-active">
-            <button type="button" class="ti ti-heart btn-like" onclick="toggleLike(this)">
+            <button
+                type="button"
+                class="ti ti-heart btn-like"
+                onclick="toggleLike(this)"
+            >
                 <span class="like-count">${postData.likes || 0}</span>
             </button>
 
-            <button type="button" class="ti ti-message-circle btn-comment" onclick="openComment(this)">
-                <span class="comment-count">${postData.comments ? postData.comments.length : 0}</span>
+            <button
+                type="button"
+                class="ti ti-message-circle btn-comment"
+                onclick="openComment(this)"
+            >
+                <span class="comment-count">
+                    ${postData.comments ? postData.comments.length : 0}
+                </span>
             </button>
 
-            <button type="button" class="ti ti-bookmark btn-save notification-disabled" onclick="toggleSave(this)"></button>
+            <button
+                type="button"
+                class="ti ti-bookmark btn-save notification-disabled"
+                onclick="toggleSave(this)"
+            ></button>
 
-            <button type="button" class="ti ti-share-3 btn-share" onclick="sharePost(this)">
+            <button
+                type="button"
+                class="ti ti-share-3 btn-share"
+                onclick="sharePost(this)"
+            >
                 <span class="share-count">${postData.shares || 0}</span>
             </button>
         </div>
     `;
 
-    post.querySelector(".post-body p").textContent = postData.content;
+    post.querySelector(".post-body p").textContent =
+        postData.content;
 
     const likedKey = `acki-liked-${postData.id}`;
     const likeButton = post.querySelector(".btn-like");
@@ -204,59 +321,230 @@ function createPostElement(postData) {
     const saveButton = post.querySelector(".btn-save");
 
     if (localStorage.getItem(savedKey) === "true") {
-        saveButton.classList.add("saved", "ti-bookmark-filled");
+        saveButton.classList.add(
+            "saved",
+            "ti-bookmark-filled"
+        );
+
         saveButton.classList.remove("ti-bookmark");
     }
 
-    commentsData[postData.id] = postData.comments || [];
+    commentsData[postData.id] =
+        postData.comments || [];
 
     return post;
 }
 
 async function createNewPost() {
+    const textarea =
+        document.getElementById("createText");
+
+    const contentBox =
+        document.querySelector(".content");
+
+    const submitButton =
+        document.getElementById(
+            "createPostSubmitButton"
+        );
+
+    if (!textarea || !contentBox) return;
+
+    const text = textarea.value.trim();
+
+    if (!text) return;
+
+    const token = getToken();
+
+    if (!token) {
+        alert(
+            typeof t === "function"
+                ? t(
+                    "Please login before creating a post.",
+                    "กรุณาเข้าสู่ระบบก่อนสร้างโพสต์"
+                )
+                : "กรุณาเข้าสู่ระบบก่อนสร้างโพสต์"
+        );
+
+        window.location.href = "./login.html";
+        return;
+    }
+
+    const isEditing = Boolean(editingPostId);
+
+    if (submitButton) {
+        submitButton.disabled = true;
+
+        submitButton.textContent =
+            isEditing
+                ? (
+                    typeof t === "function"
+                        ? t("Saving...", "กำลังบันทึก...")
+                        : "Saving..."
+                )
+                : (
+                    typeof t === "function"
+                        ? t("Posting...", "กำลังโพสต์...")
+                        : "Posting..."
+                );
+    }
+
     try {
-        const textarea = document.getElementById("createText");
-        const contentBox = document.querySelector(".content");
-        if (!textarea || !contentBox) return;
+        if (isEditing) {
+            const response = await fetch(
+                `${API_URL}/posts/${editingPostId}`,
+                {
+                    method: "PATCH",
 
-        const text = textarea.value.trim();
-        if (text === "") return;
+                    headers: {
+                        "Content-Type":
+                            "application/json",
 
-        const response = await fetch(`${API_URL}/posts`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: "Visitor",
-                content: text
-            })
-        });
+                        Authorization:
+                            `Bearer ${token}`
+                    },
 
-        if (!response.ok) {
-            throw new Error("Cannot create post");
-        }
+                    body: JSON.stringify({
+                        content: text
+                    })
+                }
+            );
 
-        const newPost = await response.json();
-        const postElement = createPostElement(newPost);
-        const firstPost = document.querySelector(".post");
+            const data = await response.json();
 
-        if (firstPost) {
-            contentBox.insertBefore(postElement, firstPost);
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    "Cannot edit post"
+                );
+            }
+
+            const contentElement =
+                editingPostElement?.querySelector(
+                    ".post-body p"
+                );
+
+            if (contentElement) {
+                contentElement.textContent =
+                    data.post.content;
+            }
+
+            if (editingPostElement) {
+                editingPostElement.dataset.updatedAt =
+                    new Date(
+                        data.post.updatedAt
+                    ).getTime();
+
+                editingPostElement.classList.add(
+                    "post-edited"
+                );
+
+                const timeElement =
+                    editingPostElement.querySelector(
+                        ".post-time"
+                    );
+
+                if (timeElement) {
+                    timeElement.textContent =
+                        typeof t === "function"
+                            ? t(
+                                "edited just now",
+                                "แก้ไขเมื่อกี้"
+                            )
+                            : "edited just now";
+                }
+            }
         } else {
-            contentBox.appendChild(postElement);
+            const response = await fetch(
+                `${API_URL}/posts`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        Authorization:
+                            `Bearer ${token}`
+                    },
+
+                    body: JSON.stringify({
+                        content: text
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    "Cannot create post"
+                );
+            }
+
+            const postElement =
+                createPostElement(data);
+
+            const firstPost =
+                document.querySelector(".post");
+
+            if (firstPost) {
+                contentBox.insertBefore(
+                    postElement,
+                    firstPost
+                );
+            } else {
+                contentBox.appendChild(
+                    postElement
+                );
+            }
+
+            commentsData[data.id] = [];
+
+            if (
+                typeof applyLanguage === "function"
+            ) {
+                applyLanguage();
+            }
+
+            updatePostTimes();
         }
 
-        if (typeof applyLanguage === "function") applyLanguage();
-
-        commentsData[newPost.id] = [];
-
-        textarea.value = "";
         closeCreatePost();
-        updatePostTimes();
     } catch (error) {
-        console.error("Create post error:", error);
-        alert(typeof t === "function" ? t("Cannot create post. Please check if the backend is running.", "สร้างโพสต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง") : "สร้างโพสต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
+        console.error(
+            isEditing
+                ? "Edit post error:"
+                : "Create post error:",
+            error
+        );
+
+        alert(error.message);
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+        }
+
+        if (
+            document
+                .getElementById("createPost")
+                ?.classList.contains("show")
+        ) {
+            if (submitButton) {
+                submitButton.textContent =
+                    isEditing
+                        ? (
+                            typeof t === "function"
+                                ? t("Save", "บันทึก")
+                                : "Save"
+                        )
+                        : (
+                            typeof t === "function"
+                                ? t("Post", "โพสต์")
+                                : "Post"
+                        );
+            }
+        }
     }
 }
 
@@ -377,6 +665,172 @@ function togglePostMenu(button) {
     });
 
     menu.classList.toggle("show");
+}
+
+async function editPost(button) {
+    const post = button.closest(".post");
+
+    if (!post) return;
+
+    const postId = post.dataset.postId;
+
+    const contentElement =
+        post.querySelector(".post-body p");
+
+    const textarea =
+        document.getElementById("createText");
+
+    const createPost =
+        document.getElementById("createPost");
+
+    const title =
+        document.getElementById("createPostTitle");
+
+    const submitButton =
+        document.getElementById(
+            "createPostSubmitButton"
+        );
+
+    if (
+        !contentElement ||
+        !textarea ||
+        !createPost
+    ) {
+        return;
+    }
+
+    closeAllPanels();
+
+editingPostId = postId;
+editingPostElement = post;
+
+    textarea.value =
+        contentElement.textContent.trim();
+
+    autoResizePost(textarea);
+
+    if (title) {
+        title.textContent =
+            typeof t === "function"
+                ? t("Edit Post", "แก้ไขโพสต์")
+                : "Edit Post";
+    }
+
+    if (submitButton) {
+        submitButton.textContent =
+            typeof t === "function"
+                ? t("Save", "บันทึก")
+                : "Save";
+    }
+
+    createPost.classList.add("show");
+
+    textarea.focus();
+
+    const menu = post.querySelector(".post-menu");
+
+    menu?.classList.remove("show");
+}
+
+async function deletePost(button) {
+    const post = button.closest(".post");
+
+    if (!post) return;
+
+    deletingPostId = post.dataset.postId;
+    deletingPostElement = post;
+
+    post
+        .querySelector(".post-menu")
+        ?.classList.remove("show");
+
+    document
+        .getElementById("deletePostOverlay")
+        ?.classList.add("show");
+
+    document
+        .getElementById("deletePostModal")
+        ?.classList.add("show");
+}
+function closeDeletePostModal() {
+    document
+        .getElementById("deletePostOverlay")
+        ?.classList.remove("show");
+
+    document
+        .getElementById("deletePostModal")
+        ?.classList.remove("show");
+
+    deletingPostId = null;
+    deletingPostElement = null;
+}
+async function confirmDeletePost() {
+    if (!deletingPostId || !deletingPostElement) {
+        closeDeletePostModal();
+        return;
+    }
+
+    const token = getToken();
+
+    if (!token) {
+        closeDeletePostModal();
+        window.location.href = "./login.html";
+        return;
+    }
+
+    const confirmButton =
+        document.getElementById(
+            "confirmDeletePostButton"
+        );
+
+    if (confirmButton) {
+        confirmButton.disabled = true;
+
+        confirmButton.textContent =
+            typeof t === "function"
+                ? t("Deleting...", "กำลังลบ...")
+                : "Deleting...";
+    }
+
+    try {
+        const response = await fetch(
+            `${API_URL}/posts/${deletingPostId}`,
+            {
+                method: "DELETE",
+
+                headers: {
+                    Authorization:
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Cannot delete post"
+            );
+        }
+
+        delete commentsData[deletingPostId];
+
+        deletingPostElement.remove();
+
+        closeDeletePostModal();
+    } catch (error) {
+        console.error("Delete post error:", error);
+        alert(error.message);
+    } finally {
+        if (confirmButton) {
+            confirmButton.disabled = false;
+
+            confirmButton.textContent =
+                typeof t === "function"
+                    ? t("Delete", "ลบ")
+                    : "Delete";
+        }
+    }
 }
 
 function updateCommentCount(postId) {
@@ -627,6 +1081,12 @@ window.addEventListener("acki-language-change", () => {
                 ? t("Comments for Post #", "ความคิดเห็นของโพสต์ #") + activePostId
                 : "Comments for Post #" + activePostId;
         }
+    }
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        closeDeletePostModal();
     }
 });
 
