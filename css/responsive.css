@@ -82,7 +82,7 @@ select {
     min-width: 0;
 }
 
-.post-header > div:not(.post-menu) {
+.post-header>div:not(.post-menu) {
     min-width: 0;
 }
 
@@ -511,7 +511,7 @@ select {
         min-height: 145px;
     }
 
-    .contact-card > button:not(.back-btn) {
+    .contact-card>button:not(.back-btn) {
         width: 100%;
     }
 
@@ -522,7 +522,7 @@ select {
         padding: 24px 14px 38px;
     }
 
-    .frame > .lang-toggle {
+    .frame>.lang-toggle {
         position: absolute;
         top: 14px;
         right: 14px;
@@ -540,6 +540,7 @@ select {
 
 /* Very narrow phones */
 @media (max-width: 380px) {
+
     .edge-tab i,
     .nav-icon-wrap {
         width: 34px;
@@ -586,6 +587,7 @@ select {
 
 /* Touch devices: do not depend on hover feedback. */
 @media (hover: none) {
+
     .edge-tab i:hover,
     .post-active button:hover,
     .back-link:hover,
@@ -601,6 +603,7 @@ select {
 
 /* Respect accessibility preferences. */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -633,14 +636,17 @@ body {
 .edge-top {
     max-width: 100%;
 }
+
 /* ---------- Mobile browser cleanup ----------
    Keep vertical scrolling, but hide the bright native scrollbar track
    that appears at the right edge on some Android browsers / DevTools. */
 html,
 body {
     min-width: 0;
-    scrollbar-width: none;      /* Firefox */
-    -ms-overflow-style: none;   /* Legacy Edge */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* Legacy Edge */
 }
 
 html::-webkit-scrollbar,
@@ -660,6 +666,7 @@ body::-webkit-scrollbar {
 }
 
 @media (max-width: 640px) {
+
     /* Keep the disabled-notification slash centred on the bell. */
     .nav-icon-wrap .notification-disabled {
         width: 38px;
