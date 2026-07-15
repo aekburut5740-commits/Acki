@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | Acki</title>
+
+    <link rel="stylesheet" href="../css/account.css">
+</head>
+
+<body>
+    <main class="account-page">
+        <section class="account-card">
+            <a class="back-link" href="../index.html">← Back</a>
+
+            <h1>Create Account</h1>
+            <p class="account-description">
+                Create an account to become yourself on Acki.
+            </p>
+
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="display-name">Display name</label>
+
+                    <input id="display-name" name="displayName" type="text" maxlength="50" autocomplete="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+
+                    <input id="username" name="username" type="text" maxlength="30" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+
+                    <input id="email" name="email" type="email" autocomplete="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+
+                    <input id="password" name="password" type="password" minlength="4" autocomplete="new-password"
+                        required>
+                </div>
+
+                <button class="account-button" id="register-button" type="submit">
+                    Create account
+                </button>
+
+                <p id="register-message" class="form-message" aria-live="polite"></p>
+            </form>
+
+            <p class="account-switch">
+                Already have an account?
+                <a href="./login.html">Login</a>
+            </p>
+        </section>
+    </main>
+
+    <script src="../js/register.js"></script>
+</body>
+
+</html>

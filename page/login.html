@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Acki</title>
+
+    <link rel="stylesheet" href="../css/account.css">
+</head>
+
+<body>
+    <main class="account-page">
+        <section class="account-card">
+            <a class="back-link" href="../index.html">← Back</a>
+
+            <h1>Login</h1>
+
+            <p class="account-description">
+                Welcome back. Login to your Acki account.
+            </p>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+
+                    <input id="email" name="email" type="email" autocomplete="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+
+                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                </div>
+
+                <button class="account-button" id="login-button" type="submit">
+                    Login
+                </button>
+
+                <p id="login-message" class="form-message" aria-live="polite"></p>
+            </form>
+
+            <p class="account-switch">
+                Don't have an account?
+                <a href="./register.html">Create account</a>
+            </p>
+        </section>
+    </main>
+
+<script src="../js/auth.js"></script>
+<script src="../js/login.js"></script>
+</body>
+
+</html>

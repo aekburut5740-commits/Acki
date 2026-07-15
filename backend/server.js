@@ -1,128 +1,75 @@
 const express = require("express");
-const fs = require("fs");
 const cors = require("cors");
+const pool = require("./db");
+
+const authRoutes = require("./routes/auth");
+const accountRoutes = require("./routes/account");
+const postRoutes = require("./routes/posts");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(authRoutes);
+app.use(accountRoutes);
+app.use(postRoutes);
 
-function readPosts() {
-  return JSON.parse(fs.readFileSync("posts.json", "utf-8"));
+function requireAuth(req, res, next) {
+  const authorization = req.headers.authorization;
+
+  if (!authorization) {
+    return res.status(401).json({
+      message: "Please login first"
+    });
+  }
+
+  const parts = authorization.split(" ");
+
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
+    return res.status(401).json({
+      message: "Invalid authorization format"
+    });
+  }
+
+  const token = parts[1];
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    req.accountId = decoded.accountId;
+
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      message: "Token is invalid or expired"
+    });
+  }
 }
 
-function savePosts(posts) {
-  fs.writeFileSync("posts.json", JSON.stringify(posts, null, 2));
-}
+app.get("/database-test", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT NOW() AS database_time"
+    );
 
-app.get("/", (req, res) => {
-  res.send("Acki Backend is running");
-});
+    res.json({
+      message: "Connected to PostgreSQL",
+      databaseTime: result.rows[0].database_time
+    });
+  } catch (error) {
+    console.error("Database connection error:", error);
 
-app.get("/posts", (req, res) => {
-  res.json(readPosts());
-});
-
-app.post("/posts", (req, res) => {
-  const posts = readPosts();
-
-  const newPost = {
-    id: Date.now(),
-    username: req.body.username || "Visitor",
-    content: req.body.content || "",
-    createdAt: new Date().toISOString(),
-    likes: 0,
-    comments: [],
-    saves: 0,
-    shares: 0
-  };
-
-  posts.unshift(newPost);
-  savePosts(posts);
-
-  res.status(201).json(newPost);
-});
-
-app.patch("/posts/:id/like", (req, res) => {
-  const posts = readPosts();
-  const postId = Number(req.params.id);
-
-  const post = posts.find((p) => Number(p.id) === postId);
-
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" });
+    res.status(500).json({
+      message: "Cannot connect to PostgreSQL",
+      error: error.message
+    });
   }
-
-  post.likes = Number(post.likes || 0) + Number(req.body.change || 0);
-
-  if (post.likes < 0) post.likes = 0;
-
-  savePosts(posts);
-
-  res.json(post);
-});
-
-app.patch("/posts/:id/save", (req, res) => {
-  const posts = readPosts();
-  const postId = Number(req.params.id);
-
-  const post = posts.find((p) => Number(p.id) === postId);
-
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" });
-  }
-
-  post.saves = Number(post.saves || 0) + Number(req.body.change || 0);
-
-  if (post.saves < 0) post.saves = 0;
-
-  savePosts(posts);
-
-  res.json(post);
-});
-
-app.patch("/posts/:id/share", (req, res) => {
-  const posts = readPosts();
-  const postId = Number(req.params.id);
-
-  const post = posts.find((p) => Number(p.id) === postId);
-
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" });
-  }
-
-  post.shares = Number(post.shares || 0) + 1;
-
-  savePosts(posts);
-  res.json(post);
 });
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Acki backend running on port ${PORT}`);
-});
-
-app.post("/posts/:id/comments", (req, res) => {
-  const posts = readPosts();
-  const postId = Number(req.params.id);
-
-  const post = posts.find((p) => Number(p.id) === postId);
-
-  if (!post) {
-    return res.status(404).json({ message: "Post not found" });
-  }
-
-  const newComment = {
-    id: Date.now(),
-    user: req.body.user || "Visitor",
-    text: req.body.text || "",
-    createdAt: new Date().toISOString()
-  };
-
-  if (!post.comments) post.comments = [];
-
-  post.comments.push(newComment);
-  savePosts(posts);
-
-  res.status(201).json(newComment);
 });
