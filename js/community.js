@@ -9,11 +9,7 @@ let deletingPostId = null;
 let deletingPostElement = null;
 let nextPostId = 4;
 
-const commentsData = {
-    1: [{ user: "Visitor", text: "Nice first post!" }],
-    2: [{ user: "Visitor", text: "This second post looks good." }],
-    3: [{ user: "Visitor", text: "I like this one." }]
-};
+const commentsData = {};
 
 function openComment(button) {
     closeAllPanels();
@@ -25,13 +21,19 @@ function openComment(button) {
     activePostId = postId;
 
     const title = document.getElementById("commentTitle");
+    const postName = post.querySelector(".post-name")?.textContent.trim()
+        || "Unknown";
+
     if (title) {
         title.textContent = (typeof t === "function")
-            ? t("Comments for Post #", "ความคิดเห็นของโพสต์ #") + postId
-            : "Comments for Post #" + postId;
+            ? t(
+                `Comments on post by ${postName}`,
+                `ความคิดเห็นในโพสต์ของ ${postName}`
+            )
+            : `Comments on post by ${postName}`;
     }
 
-    renderComments(postId);
+    loadComments(postId);
 
     document.querySelectorAll(".post").forEach((p) => {
         if (p !== post) p.classList.add("dimmed");
@@ -44,34 +46,157 @@ function openComment(button) {
 }
 
 function renderComments(postId) {
-    const commentList = document.getElementById("commentList");
+    const commentList =
+        document.getElementById("commentList");
+
     if (!commentList) return;
 
     commentList.innerHTML = "";
-    const comments = commentsData[postId] || [];
+
+    const comments =
+        commentsData[postId] || [];
+
+    if (comments.length === 0) {
+        const emptyMessage =
+            document.createElement("p");
+
+        emptyMessage.className =
+            "comment-empty";
+
+        emptyMessage.textContent =
+            typeof t === "function"
+                ? t(
+                    "No comments yet.",
+                    "ยังไม่มีความคิดเห็น"
+                )
+                : "No comments yet.";
+
+        commentList.appendChild(emptyMessage);
+        return;
+    }
 
     comments.forEach((comment) => {
-        const item = document.createElement("div");
+        const item =
+            document.createElement("div");
+
         item.className = "comment-item";
 
-        const user = document.createElement("span");
+        const avatar =
+            document.createElement("img");
+
+        avatar.className = "comment-avatar";
+
+        avatar.src =
+            comment.account?.avatarUrl ||
+            "../pic/visitor.jpg";
+
+        avatar.alt =
+            comment.account?.displayName ||
+            "Account";
+
+        avatar.onerror = () => {
+            avatar.src = "../pic/visitor.jpg";
+        };
+
+        const contentWrapper =
+            document.createElement("div");
+
+        contentWrapper.className =
+            "comment-content";
+
+        const user =
+            document.createElement("span");
+
         user.className = "comment-user";
 
-        const message = document.createElement("span");
-        message.className = "comment-message";
+        user.textContent =
+            comment.account?.displayName ||
+            comment.account?.username ||
+            "Unknown";
 
-        if (typeof comment === "string") {
-            user.textContent = "Visitor:";
-            message.textContent = comment.replace("Visitor:", "").trim();
-        } else {
-            user.textContent = comment.user + ":";
-            message.textContent = comment.text;
-        }
+        const message =
+            document.createElement("span");
 
-        item.appendChild(user);
-        item.appendChild(message);
+        message.className =
+            "comment-message";
+
+        message.textContent =
+            comment.content || "";
+
+        const time =
+            document.createElement("span");
+
+        time.className =
+            "comment-time";
+
+        time.textContent = timeAgo(
+            new Date(comment.createdAt).getTime()
+        );
+
+        contentWrapper.appendChild(user);
+        contentWrapper.appendChild(message);
+        contentWrapper.appendChild(time);
+
+        item.appendChild(avatar);
+        item.appendChild(contentWrapper);
+
         commentList.appendChild(item);
     });
+}
+
+async function loadComments(postId) {
+    const commentList =
+        document.getElementById("commentList");
+
+    if (commentList) {
+        commentList.innerHTML = "";
+
+        const loading =
+            document.createElement("p");
+
+        loading.className =
+            "comment-loading";
+
+        loading.textContent =
+            typeof t === "function"
+                ? t(
+                    "Loading comments...",
+                    "กำลังโหลดความคิดเห็น..."
+                )
+                : "Loading comments...";
+
+        commentList.appendChild(loading);
+    }
+
+    try {
+        const response = await fetch(
+            `${API_URL}/posts/${postId}/comments`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message ||
+                "Cannot load comments"
+            );
+        }
+
+        commentsData[postId] = data;
+
+        renderComments(postId);
+        updateCommentCount(postId);
+    } catch (error) {
+        console.error(
+            "Load comments error:",
+            error
+        );
+
+        if (commentList) {
+            commentList.textContent =
+                error.message;
+        }
+    }
 }
 
 function commentEnter(event) {
@@ -95,44 +220,99 @@ function closeComment() {
 }
 
 async function sendComment() {
-    const input = document.getElementById("commentInput");
+    const input =
+        document.getElementById("commentInput");
+
+    const sendButton =
+        document.querySelector(".btn-send");
+
     if (!input) return;
 
-    const text = input.value.trim();
-    if (text === "" || !activePostId) return;
+    const content = input.value.trim();
+
+    if (!content || !activePostId) return;
+
+    const token = getToken();
+
+    if (!token) {
+        alert(
+            typeof t === "function"
+                ? t(
+                    "Please login before commenting.",
+                    "กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น"
+                )
+                : "กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น"
+        );
+
+        window.location.href = "./login.html";
+        return;
+    }
+
+    if (sendButton) {
+        sendButton.disabled = true;
+
+        sendButton.textContent =
+            typeof t === "function"
+                ? t("Sending...", "กำลังส่ง...")
+                : "Sending...";
+    }
 
     try {
-        const response = await fetch(`${API_URL}/posts/${activePostId}/comments`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                user: "Visitor",
-                text: text
-            })
-        });
+        const response = await fetch(
+            `${API_URL}/posts/${activePostId}/comments`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    Authorization:
+                        `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    content
+                })
+            }
+        );
+
+        const data = await response.json();
 
         if (!response.ok) {
-            throw new Error("Cannot send comment");
+            throw new Error(
+                data.message ||
+                "Cannot send comment"
+            );
         }
 
-        const newComment = await response.json();
+        if (!commentsData[activePostId]) {
+            commentsData[activePostId] = [];
+        }
 
-        if (!commentsData[activePostId]) commentsData[activePostId] = [];
-        commentsData[activePostId].push(newComment);
+        commentsData[activePostId].push(data);
 
         renderComments(activePostId);
         updateCommentCount(activePostId);
 
         input.value = "";
-
-        if (typeof addNotification === "function") {
-            addNotification("comment", "Visitor commented on your post.", activePostId);
-        }
+        input.focus();
     } catch (error) {
-        console.error("Comment error:", error);
-        alert(typeof t === "function" ? t("Cannot send comment. Please check if the backend is running.", "ส่งคอมเมนต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง") : "ส่งคอมเมนต์ไม่ได้ เช็กว่า backend เปิดอยู่หรือยัง");
+        console.error(
+            "Comment error:",
+            error
+        );
+
+        alert(error.message);
+    } finally {
+        if (sendButton) {
+            sendButton.disabled = false;
+
+            sendButton.textContent =
+                typeof t === "function"
+                    ? t("Send", "ส่ง")
+                    : "Send";
+        }
     }
 }
 
@@ -277,7 +457,7 @@ function createPostElement(postData) {
                 class="ti ti-heart btn-like"
                 onclick="toggleLike(this)"
             >
-                <span class="like-count">${postData.likes || 0}</span>
+                <span class="like-count">${postData.likeCount ?? 0}</span>
             </button>
 
             <button
@@ -286,8 +466,8 @@ function createPostElement(postData) {
                 onclick="openComment(this)"
             >
                 <span class="comment-count">
-                    ${postData.comments ? postData.comments.length : 0}
-                </span>
+    ${postData.commentCount ?? 0}
+</span>
             </button>
 
             <button
@@ -309,12 +489,18 @@ function createPostElement(postData) {
     post.querySelector(".post-body p").textContent =
         postData.content;
 
-    const likedKey = `acki-liked-${postData.id}`;
-    const likeButton = post.querySelector(".btn-like");
+    const likeButton =
+        post.querySelector(".btn-like");
 
-    if (localStorage.getItem(likedKey) === "true") {
-        likeButton.classList.add("liked", "ti-heart-filled");
-        likeButton.classList.remove("ti-heart");
+    if (postData.isLiked) {
+        likeButton.classList.add(
+            "liked",
+            "ti-heart-filled"
+        );
+
+        likeButton.classList.remove(
+            "ti-heart"
+        );
     }
 
     const savedKey = `acki-saved-${postData.id}`;
@@ -557,7 +743,20 @@ async function loadPostsFromBackend() {
 
     try {
 
-        const response = await fetch(`${API_URL}/posts`);
+        const token = getToken();
+
+        const headers = {};
+
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+
+        const response = await fetch(
+            `${API_URL}/posts`,
+            {
+                headers
+            }
+        );
 
         if (!response.ok) {
             throw new Error("Server Error");
@@ -611,44 +810,88 @@ function autoResizePost(textarea) {
 }
 
 async function toggleLike(button) {
+    const post = button.closest(".post");
+
+    if (!post) return;
+
+    const postId = post.dataset.postId;
+
+    const countSpan =
+        button.querySelector(".like-count");
+
+    const token = getToken();
+
+    if (!token) {
+        alert(
+            typeof t === "function"
+                ? t(
+                    "Please login before liking a post.",
+                    "กรุณาเข้าสู่ระบบก่อนกดถูกใจ"
+                )
+                : "กรุณาเข้าสู่ระบบก่อนกดถูกใจ"
+        );
+
+        window.location.href = "./login.html";
+        return;
+    }
+
+    button.disabled = true;
 
     try {
-        const post = button.closest(".post");
-        const postId = post.dataset.postId;
-        const countSpan = button.querySelector(".like-count");
+        const response = await fetch(
+            `${API_URL}/posts/${postId}/like`,
+            {
+                method: "POST",
 
-        const likedKey = `acki-liked-${postId}`;
-        const isLiked = localStorage.getItem(likedKey) === "true";
-        const change = isLiked ? -1 : 1;
+                headers: {
+                    Authorization:
+                        `Bearer ${token}`
+                }
+            }
+        );
 
-        const response = await fetch(`${API_URL}/posts/${postId}/like`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ change })
-        });
+        const data = await response.json();
 
         if (!response.ok) {
-            throw new Error("Cannot update like");
+            throw new Error(
+                data.message ||
+                "Cannot update like"
+            );
         }
 
-        const updatedPost = await response.json();
+        if (data.isLiked) {
+            button.classList.add(
+                "liked",
+                "ti-heart-filled"
+            );
 
-        if (isLiked) {
-            localStorage.removeItem(likedKey);
-            button.classList.remove("liked", "ti-heart-filled");
-            button.classList.add("ti-heart");
+            button.classList.remove(
+                "ti-heart"
+            );
         } else {
-            localStorage.setItem(likedKey, "true");
-            button.classList.add("liked", "ti-heart-filled");
-            button.classList.remove("ti-heart");
+            button.classList.remove(
+                "liked",
+                "ti-heart-filled"
+            );
+
+            button.classList.add(
+                "ti-heart"
+            );
         }
 
-        countSpan.textContent = updatedPost.likes;
+        if (countSpan) {
+            countSpan.textContent =
+                data.likeCount;
+        }
     } catch (error) {
-        console.error("Like error:", error);
-        alert(typeof t === "function" ? t("Cannot like this post. Please check the backend or /like route.", "กดหัวใจไม่ได้ เช็กว่า backend เปิดอยู่หรือมี route /like หรือยัง") : "กดหัวใจไม่ได้ เช็กว่า backend เปิดอยู่หรือมี route /like หรือยัง");
+        console.error(
+            "Like error:",
+            error
+        );
+
+        alert(error.message);
+    } finally {
+        button.disabled = false;
     }
 }
 
@@ -701,8 +944,8 @@ async function editPost(button) {
 
     closeAllPanels();
 
-editingPostId = postId;
-editingPostElement = post;
+    editingPostId = postId;
+    editingPostElement = post;
 
     textarea.value =
         contentElement.textContent.trim();

@@ -986,3 +986,52 @@ body::after {
     cursor: wait;
     opacity: 0.65;
 }
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.comment-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-content {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+}
+
+.comment-user {
+    font-weight: 700;
+}
+
+.comment-message {
+    margin-top: 2px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.comment-time {
+    margin-top: 4px;
+    color: #888888;
+    font-size: 12px;
+}
+
+.comment-empty,
+.comment-loading {
+    color: #777777;
+    text-align: center;
+}
+
+.btn-send:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
