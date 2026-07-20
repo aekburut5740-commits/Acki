@@ -3,17 +3,20 @@ const cors = require("cors");
 const pool = require("./db");
 
 const authRoutes = require("./routes/auth");
-const accountRoutes = require("./routes/account");
+const accountRoutes = require("./routes/accounts");
 const postRoutes = require("./routes/posts");
+const notificationRoutes = require("./routes/notifications");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
 app.use(authRoutes);
 app.use(accountRoutes);
 app.use(postRoutes);
+app.use(notificationRoutes);
 
 function requireAuth(req, res, next) {
   const authorization = req.headers.authorization;

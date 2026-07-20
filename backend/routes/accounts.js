@@ -114,51 +114,6 @@ router.patch("/me", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/profiles/:username", async (req, res) => {
-  try {
-    const username = req.params.username.trim();
-
-    const result = await pool.query(
-      `
-      SELECT
-        id,
-        username,
-        display_name,
-        bio,
-        avatar_url,
-        created_at
-      FROM accounts
-      WHERE LOWER(username) = LOWER($1)
-      `,
-      [username]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        message: "Profile not found"
-      });
-    }
-
-    const account = result.rows[0];
-
-    res.json({
-      id: account.id,
-      username: account.username,
-      displayName: account.display_name,
-      bio: account.bio,
-      avatarUrl: account.avatar_url,
-      createdAt: account.created_at
-    });
-  } catch (error) {
-    console.error("Get public profile error:", error);
-
-    res.status(500).json({
-      message: "Cannot get profile",
-      error: error.message
-    });
-  }
-});
-
 router.patch("/me/password", requireAuth, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -294,6 +249,166 @@ router.patch("/me/account", requireAuth, async (req, res) => {
 
     res.status(500).json({
       message: "Cannot update account information",
+      error: error.message
+    });
+  }
+});
+
+router.get("/accounts/:id", async (req, res) => {
+    try {
+        const accountId = Number(req.params.id);
+
+        if (!Number.isInteger(accountId) || accountId <= 0) {
+            return res.status(400).json({
+                message: "Invalid account ID"
+            });
+        }
+
+        const accountResult = await pool.query(
+            `
+            SELECT
+                accounts.id,
+                accounts.username,
+                accounts.display_name,
+                accounts.bio,
+                accounts.avatar_url,
+                accounts.created_at,
+                COUNT(posts.id)::INTEGER AS post_count
+            FROM accounts
+            LEFT JOIN posts
+                ON posts.account_id = accounts.id
+            WHERE accounts.id = $1
+            GROUP BY accounts.id
+            `,
+            [accountId]
+        );
+
+        if (accountResult.rows.length === 0) {
+            return res.status(404).json({
+                message: "Account not found"
+            });
+        }
+
+        const account = accountResult.rows[0];
+
+        res.json({
+            id: account.id,
+            username: account.username,
+            displayName: account.display_name,
+            bio: account.bio,
+            avatarUrl: account.avatar_url,
+            createdAt: account.created_at,
+            postCount: account.post_count
+        });
+    } catch (error) {
+        console.error("Get account profile error:", error);
+
+        res.status(500).json({
+            message: "Cannot get account profile",
+            error: error.message
+        });
+    }
+});
+
+router.get("/accounts/:id/posts", async (req, res) => {
+  try {
+    const accountId = Number(req.params.id);
+
+    if (!Number.isInteger(accountId) || accountId <= 0) {
+      return res.status(400).json({
+        message: "Invalid account ID"
+      });
+    }
+
+    const accountResult = await pool.query(
+      `
+      SELECT id
+      FROM accounts
+      WHERE id = $1
+      `,
+      [accountId]
+    );
+
+    if (accountResult.rows.length === 0) {
+      return res.status(404).json({
+        message: "Account not found"
+      });
+    }
+
+    const postsResult = await pool.query(
+      `
+      SELECT
+        posts.id,
+        posts.content,
+        posts.created_at,
+        posts.updated_at,
+
+        accounts.id AS account_id,
+        accounts.username,
+        accounts.display_name,
+        accounts.avatar_url,
+
+        COUNT(DISTINCT comments.id)::integer
+          AS comment_count,
+
+        COUNT(DISTINCT post_likes.account_id)::integer
+          AS like_count,
+
+        COUNT(DISTINCT post_saves.account_id)::integer
+          AS save_count
+
+      FROM posts
+
+      INNER JOIN accounts
+        ON posts.account_id = accounts.id
+
+      LEFT JOIN comments
+        ON comments.post_id = posts.id
+
+      LEFT JOIN post_likes
+        ON post_likes.post_id = posts.id
+
+      LEFT JOIN post_saves
+        ON post_saves.post_id = posts.id
+
+      WHERE posts.account_id = $1
+
+      GROUP BY
+        posts.id,
+        accounts.id,
+        accounts.username,
+        accounts.display_name,
+        accounts.avatar_url
+
+      ORDER BY posts.created_at DESC
+      `,
+      [accountId]
+    );
+
+    const posts = postsResult.rows.map((post) => ({
+      id: post.id,
+      content: post.content,
+      createdAt: post.created_at,
+      updatedAt: post.updated_at,
+
+      commentCount: post.comment_count,
+      likeCount: post.like_count,
+      saveCount: post.save_count,
+
+      account: {
+        id: post.account_id,
+        username: post.username,
+        displayName: post.display_name,
+        avatarUrl: post.avatar_url
+      }
+    }));
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Get account posts error:", error);
+
+    res.status(500).json({
+      message: "Cannot get account posts",
       error: error.message
     });
   }
