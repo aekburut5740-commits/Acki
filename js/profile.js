@@ -101,26 +101,86 @@ function displayAccount(account) {
 }
 
 async function loadProfile() {
-  if (!isLoggedIn()) {
-    window.location.href = "./login.html";
-    return;
-  }
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const profileAccountId =
+    Number(params.get("id"));
+
+  const currentAccount =
+    getStoredAccount();
+
+  const hasValidProfileId =
+    Number.isInteger(profileAccountId) &&
+    profileAccountId > 0;
+
+  const viewingOwnProfile =
+    !hasValidProfileId ||
+    (
+      currentAccount &&
+      String(currentAccount.id) ===
+      String(profileAccountId)
+    );
 
   try {
-    const account = await fetchCurrentAccount();
+    let account;
 
-    if (!account) {
-      window.location.href = "./login.html";
-      return;
+    if (viewingOwnProfile) {
+      if (!isLoggedIn()) {
+        window.location.href =
+          "./login.html";
+
+        return;
+      }
+
+      account =
+        await fetchCurrentAccount();
+    } else {
+      const response = await fetch(
+        `${ACKI_API_URL}/accounts/${profileAccountId}`
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+          "Cannot load profile"
+        );
+      }
+
+      account = data.account || data;
     }
 
     displayAccount(account);
 
+    setProfileMode(
+      viewingOwnProfile
+    );
+
     profileLoading.hidden = true;
     profileContent.hidden = false;
   } catch (error) {
-    profileLoading.textContent = error.message;
+    profileLoading.textContent =
+      error.message;
   }
+}
+
+function setProfileMode(
+  viewingOwnProfile
+) {
+  if (viewingOwnProfile) {
+    profileForm.hidden = false;
+    logoutButton.hidden = false;
+
+    return;
+  }
+
+  profileForm.hidden = true;
+  logoutButton.hidden = true;
 }
 
 profileForm.addEventListener("submit", async (event) => {

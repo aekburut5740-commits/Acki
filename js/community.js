@@ -951,7 +951,7 @@ function createPostElement(postData) {
 
             <button
                 type="button"
-                class="ti ti-bookmark btn-save notification-disabled"
+                class="ti ti-bookmark btn-save"
                 onclick="toggleSave(this)"
             ></button>
 
@@ -982,10 +982,9 @@ function createPostElement(postData) {
         );
     }
 
-    const savedKey = `acki-saved-${postData.id}`;
     const saveButton = post.querySelector(".btn-save");
 
-    if (localStorage.getItem(savedKey) === "true") {
+    if (postData.isSaved) {
         saveButton.classList.add(
             "saved",
             "ti-bookmark-filled"
@@ -1374,8 +1373,46 @@ async function toggleLike(button) {
     }
 }
 
-function toggleSave() {
-    showComingSoon("Save");
+async function toggleSave(button) {
+    const post = button.closest(".post");
+    if (!post) return;
+
+    const token = getToken();
+
+    if (!token) {
+        window.location.href = "./login.html";
+        return;
+    }
+
+    const postId = post.dataset.postId;
+    button.disabled = true;
+
+    try {
+        const response = await fetch(
+            `${API_URL}/posts/${postId}/save`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Cannot save this post");
+        }
+
+        button.classList.toggle("saved", data.isSaved);
+        button.classList.toggle("ti-bookmark-filled", data.isSaved);
+        button.classList.toggle("ti-bookmark", !data.isSaved);
+    } catch (error) {
+        console.error("Save error:", error);
+        alert(error.message);
+    } finally {
+        button.disabled = false;
+    }
 }
 
 function togglePostMenu(button) {

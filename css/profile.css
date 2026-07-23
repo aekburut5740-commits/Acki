@@ -6,7 +6,7 @@
 
 .profile-card {
   width: min(680px, 100%);
-  margin: 0 auto;
+  margin: 30px auto;
   padding: 32px;
   border: 1px solid #d7d7d7;
   border-radius: 16px;

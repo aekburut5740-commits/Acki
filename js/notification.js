@@ -1,63 +1,170 @@
-// Notification prototype: mini panel, full panel, and clickable post links.
+// Notifications loaded from the Acki backend.
 
-let notifications = [
-    { type: "comment", text: "Visitor commented on your post.", time: "just now", postId: "1" },
-    { type: "like", text: "Visitor liked your post.", time: "2 min ago", postId: "2" },
-    { type: "share", text: "Your post was shared.", time: "5 min ago", postId: "3" }
-];
-
+let notifications = [];
 let currentNotificationFilter = "all";
+let notificationPollTimer = null;
+
+function notificationTimeAgo(value) {
+    const time = new Date(value).getTime();
+    if (!Number.isFinite(time)) return "";
+
+    const diffSeconds = Math.max(0, Math.floor((Date.now() - time) / 1000));
+    const lang = typeof getCurrentLanguage === "function"
+        ? getCurrentLanguage()
+        : "en";
+
+    if (diffSeconds < 60) {
+        return lang === "th" ? "เมื่อกี้" : "just now";
+    }
+
+    const minutes = Math.floor(diffSeconds / 60);
+    if (minutes < 60) {
+        return lang === "th"
+            ? `${minutes} นาทีที่แล้ว`
+            : `${minutes} min ago`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return lang === "th"
+            ? `${hours} ชม.ที่แล้ว`
+            : `${hours} hr ago`;
+    }
+
+    const days = Math.floor(hours / 24);
+    return lang === "th"
+        ? `${days} วันที่แล้ว`
+        : `${days} day ago`;
+}
 
 function showNotificationDot() {
-    const dot = document.getElementById("notificationDot");
-    if (dot) dot.classList.add("show");
+    document.getElementById("notificationDot")?.classList.add("show");
 }
 
 function hideNotificationDot() {
-    const dot = document.getElementById("notificationDot");
-    if (dot) dot.classList.remove("show");
+    document.getElementById("notificationDot")?.classList.remove("show");
 }
 
-function addNotification(type, text, postId) {
-    notifications.unshift({
-        type,
-        text,
-        time: "just now",
-        postId
-    });
-
-    showNotificationDot();
-    renderNotificationMini();
-    renderNotificationFull();
+function updateNotificationDot() {
+    const hasUnread = notifications.some((notification) => !notification.isRead);
+    hasUnread ? showNotificationDot() : hideNotificationDot();
 }
 
-function closeNotificationPanels() {
-    const mini = document.getElementById("notificationMini");
-    const blur = document.getElementById("notificationBlur");
-    const full = document.getElementById("notificationFull");
+async function loadNotifications({ silent = false } = {}) {
+    const token = typeof getToken === "function" ? getToken() : null;
 
-    if (mini) mini.classList.remove("show");
-    if (blur) blur.classList.remove("show");
-    if (full) full.classList.remove("show");
-}
-
-function toggleNotificationMini() {
-    const mini = document.getElementById("notificationMini");
-    const full = document.getElementById("notificationFull");
-    const blur = document.getElementById("notificationBlur");
-
-    if (!mini) {
-        goCommunity();
+    if (!token) {
+        notifications = [];
+        updateNotificationDot();
+        renderNotificationMini();
+        renderNotificationFull();
         return;
     }
 
-    hideNotificationDot();
+    try {
+        const response = await fetch(`${ACKI_API_URL}/notifications`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
 
-    if (full) full.classList.remove("show");
-    if (blur) blur.classList.remove("show");
+        const data = await response.json();
 
-    renderNotificationMini();
+        if (!response.ok) {
+            throw new Error(data.message || "Cannot load notifications");
+        }
+
+        notifications = Array.isArray(data) ? data : [];
+        updateNotificationDot();
+        renderNotificationMini();
+        renderNotificationFull();
+    } catch (error) {
+        if (!silent) {
+            console.error("Load notifications error:", error);
+        }
+    }
+}
+
+async function markNotificationsAsRead() {
+    const token = typeof getToken === "function" ? getToken() : null;
+    if (!token || !notifications.some((notification) => !notification.isRead)) {
+        hideNotificationDot();
+        return;
+    }
+
+    try {
+        const response = await fetch(`${ACKI_API_URL}/notifications/read`, {
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Cannot mark notifications as read");
+        }
+
+        notifications = notifications.map((notification) => ({
+            ...notification,
+            isRead: true
+        }));
+
+        hideNotificationDot();
+        renderNotificationMini();
+        renderNotificationFull();
+    } catch (error) {
+        console.error("Mark notifications as read error:", error);
+    }
+}
+
+function closeNotificationPanels() {
+    document.getElementById("notificationMini")?.classList.remove("show");
+    document.getElementById("notificationBlur")?.classList.remove("show");
+    document.getElementById("notificationFull")?.classList.remove("show");
+}
+
+async function toggleNotificationMini() {
+    const mini = document.getElementById("notificationMini");
+
+    if (!mini) {
+        window.location.href = "/page/community.html";
+        return;
+    }
+
+    document.getElementById("notificationFull")?.classList.remove("show");
+    document.getElementById("notificationBlur")?.classList.remove("show");
+
+    await loadNotifications({ silent: true });
     mini.classList.toggle("show");
+
+    if (mini.classList.contains("show")) {
+        await markNotificationsAsRead();
+    }
+}
+
+function createNotificationItem(notification, className) {
+    const item = document.createElement("div");
+    item.className = className;
+
+    if (!notification.isRead) {
+        item.classList.add("unread");
+    }
+
+    const text = document.createElement("div");
+    text.className = "notification-text";
+    text.textContent = notification.text || "Notification";
+
+    const time = document.createElement("span");
+    time.textContent = notificationTimeAgo(notification.createdAt);
+
+    item.append(text, time);
+    item.addEventListener("click", () => {
+        openPostFromNotification(notification.postId);
+    });
+
+    return item;
 }
 
 function renderNotificationMini() {
@@ -66,49 +173,48 @@ function renderNotificationMini() {
 
     list.innerHTML = "";
 
-    notifications.slice(0, 3).forEach((noti) => {
-        const item = document.createElement("div");
-        item.className = "notification-item-mini";
-        item.innerHTML = `
-            ${noti.text}
-            <span>${noti.time}</span>
-        `;
+    const latest = notifications.slice(0, 3);
 
-        item.onclick = () => openPostFromNotification(noti.postId);
-        list.appendChild(item);
+    if (latest.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "notification-empty";
+        empty.textContent = typeof t === "function"
+            ? t("No notifications yet.", "ยังไม่มีการแจ้งเตือน")
+            : "No notifications yet.";
+        list.appendChild(empty);
+        return;
+    }
+
+    latest.forEach((notification) => {
+        list.appendChild(
+            createNotificationItem(notification, "notification-item-mini")
+        );
     });
 }
 
-function openNotificationFull() {
-    const mini = document.getElementById("notificationMini");
-    const blur = document.getElementById("notificationBlur");
-    const full = document.getElementById("notificationFull");
+async function openNotificationFull() {
+    document.getElementById("notificationMini")?.classList.remove("show");
+    document.getElementById("notificationBlur")?.classList.add("show");
+    document.getElementById("notificationFull")?.classList.add("show");
 
-    if (mini) mini.classList.remove("show");
-    if (blur) blur.classList.add("show");
-    if (full) full.classList.add("show");
-
+    await loadNotifications({ silent: true });
+    await markNotificationsAsRead();
     renderNotificationFull();
 }
 
 function closeNotificationFull() {
-    const blur = document.getElementById("notificationBlur");
-    const full = document.getElementById("notificationFull");
-
-    if (blur) blur.classList.remove("show");
-    if (full) full.classList.remove("show");
+    document.getElementById("notificationBlur")?.classList.remove("show");
+    document.getElementById("notificationFull")?.classList.remove("show");
 }
 
 function filterNotification(type, event) {
     currentNotificationFilter = type;
 
-    document.querySelectorAll(".notification-tabs button").forEach((btn) => {
-        btn.classList.remove("active");
+    document.querySelectorAll(".notification-tabs button").forEach((button) => {
+        button.classList.remove("active");
     });
 
-    const target = event?.target || window.event?.target;
-    if (target) target.classList.add("active");
-
+    event?.currentTarget?.classList.add("active");
     renderNotificationFull();
 }
 
@@ -120,27 +226,34 @@ function renderNotificationFull() {
 
     const filtered = currentNotificationFilter === "all"
         ? notifications
-        : notifications.filter((noti) => noti.type === currentNotificationFilter);
+        : notifications.filter(
+            (notification) => notification.type === currentNotificationFilter
+        );
 
-    filtered.forEach((noti) => {
-        const item = document.createElement("div");
-        item.className = "notification-item-full";
-        item.innerHTML = `
-            ${noti.text}
-            <span>${noti.time}</span>
-        `;
+    if (filtered.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "notification-empty";
+        empty.textContent = typeof t === "function"
+            ? t("No notifications in this category.", "ไม่มีการแจ้งเตือนในหมวดนี้")
+            : "No notifications in this category.";
+        list.appendChild(empty);
+        return;
+    }
 
-        item.onclick = () => openPostFromNotification(noti.postId);
-        list.appendChild(item);
+    filtered.forEach((notification) => {
+        list.appendChild(
+            createNotificationItem(notification, "notification-item-full")
+        );
     });
 }
 
 function openPostFromNotification(postId) {
     closeNotificationPanels();
 
+    if (!postId) return;
+
     const post = document.querySelector(`.post[data-post-id="${postId}"]`);
 
-    // If the user clicks a notification from Contact/About, jump to Community.
     if (!post) {
         window.location.href = `/page/community.html?post=${postId}`;
         return;
@@ -152,14 +265,22 @@ function openPostFromNotification(postId) {
     });
 
     setTimeout(() => {
-        const commentBtn = post.querySelector(".btn-comment");
-        if (commentBtn && typeof openComment === "function") {
-            openComment(commentBtn);
+        const commentButton = post.querySelector(".btn-comment");
+        if (commentButton && typeof openComment === "function") {
+            openComment(commentButton);
         }
     }, 500);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadNotifications();
+
+    notificationPollTimer = window.setInterval(() => {
+        loadNotifications({ silent: true });
+    }, 10000);
+});
+
+window.addEventListener("acki-language-change", () => {
     renderNotificationMini();
     renderNotificationFull();
 });

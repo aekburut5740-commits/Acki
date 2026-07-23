@@ -30,7 +30,9 @@
     </div>
 
     <div class="edge-tab edge-top">
-        <a href="./profile.html">My Profile</a>
+        <a href="./profile.html" title="My Profile" class="my-profile-link">
+            <i class="ti ti-user-circle"></i>
+        </a>
         <i class="ti ti-home" data-en-title="Home" data-th-title="หน้าแรก" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
             <i class="ti ti-bell" data-en-title="Notification" data-th-title="การแจ้งเตือน" title="Notification"
@@ -146,7 +148,6 @@
             <button onclick="filterNotification('like', event)" data-en="Like" data-th="ถูกใจ">Like</button>
             <button onclick="filterNotification('comment', event)" data-en="Comment"
                 data-th="ความคิดเห็น">Comment</button>
-            <button onclick="filterNotification('share', event)" data-en="Share" data-th="แชร์">Share</button>
         </div>
 
         <div id="notificationFullList"></div>

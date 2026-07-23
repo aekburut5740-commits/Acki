@@ -17,15 +17,20 @@
 
 <body>
     <div class="edge-tab edge-top">
+        <a href="./profile.html" title="My Profile" class="my-profile-link">
+            <i class="ti ti-user-circle"></i>
+        </a>
         <i class="ti ti-home" data-en-title="Home" data-th-title="หน้าแรก" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
-            <i class="ti ti-bell notification-disabled" data-en-title="Notification coming soon"
-                data-th-title="การแจ้งเตือนยังไม่เปิดใช้งาน" title="Notification coming soon"
-                onclick="showComingSoon('Notification')"></i>
+            <i class="ti ti-bell" data-en-title="Notification" data-th-title="การแจ้งเตือน" title="Notification"
+                onclick="toggleNotificationMini()"></i>
+
             <span class="notification-dot" id="notificationDot"></span>
         </div>
         <i class="ti ti-mail" data-en-title="Contact" data-th-title="ติดต่อ" title="Contact" onclick="goContact()"></i>
-        <i class="ti ti-info-hexagon" data-en-title="About" data-th-title="เกี่ยวกับ" title="About"></i>
+        <i class="ti ti-info-hexagon" data-en-title="About" data-th-title="เกี่ยวกับ" title="About"
+            onclick="goAbout()"></i>
+
         <div class="settings-wrap">
             <i class="ti ti-dots-vertical" data-en-title="Settings" data-th-title="ตั้งค่า" title="Settings"
                 onclick="toggleSettingsMenu()"></i>
