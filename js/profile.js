@@ -1,33 +1,12 @@
 const profileLoading = document.getElementById("profile-loading");
 const profileContent = document.getElementById("profile-content");
 
-const profileForm = document.getElementById("profile-form");
-const profileMessage = document.getElementById("profile-message");
-const saveProfileButton = document.getElementById(
-  "save-profile-button"
-);
-
-const displayNameInput = document.getElementById("display-name");
-const usernameInput = document.getElementById("username");
-const emailInput = document.getElementById("email");
-const bioInput = document.getElementById("bio");
-const avatarUrlInput = document.getElementById("avatar-url");
-
-const profileDisplayName = document.getElementById(
-  "profile-display-name"
-);
+const profileDisplayName = document.getElementById("profile-display-name");
 const profileUsername = document.getElementById("profile-username");
-const profileCreatedAt = document.getElementById(
-  "profile-created-at"
-);
+const profileCreatedAt = document.getElementById("profile-created-at");
 
 const avatarPreview = document.getElementById("avatar-preview");
-const avatarPlaceholder = document.getElementById(
-  "avatar-placeholder"
-);
-
-const bioCounter = document.getElementById("bio-counter");
-const logoutButton = document.getElementById("logout-button");
+const avatarPlaceholder = document.getElementById("avatar-placeholder");
 
 function formatJoinedDate(dateValue) {
   if (!dateValue) {
@@ -43,15 +22,10 @@ function formatJoinedDate(dateValue) {
   })}`;
 }
 
-function updateBioCounter() {
-  const bioLength = bioInput.value.length;
-  bioCounter.textContent = `${bioLength} / 300`;
-}
-
-function showAvatar(avatarUrl, displayName) {
+function showAvatar(avatarUrl, displayName, username) {
   const firstCharacter =
     displayName?.trim().charAt(0) ||
-    usernameInput.value.trim().charAt(0) ||
+    username?.trim().charAt(0) ||
     "?";
 
   avatarPlaceholder.textContent = firstCharacter;
@@ -77,40 +51,23 @@ function showAvatar(avatarUrl, displayName) {
 }
 
 function displayAccount(account) {
-  displayNameInput.value = account.displayName || "";
-  usernameInput.value = account.username || "";
-  emailInput.value = account.email || "";
-  bioInput.value = account.bio || "";
-  avatarUrlInput.value = account.avatarUrl || "";
-
   profileDisplayName.textContent =
     account.displayName || account.username || "Unknown";
 
   profileUsername.textContent = `@${account.username || "unknown"}`;
-
-  profileCreatedAt.textContent = formatJoinedDate(
-    account.createdAt
-  );
-
-  updateBioCounter();
+  profileCreatedAt.textContent = formatJoinedDate(account.createdAt);
 
   showAvatar(
     account.avatarUrl,
-    account.displayName
+    account.displayName,
+    account.username
   );
 }
 
 async function loadProfile() {
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-  const profileAccountId =
-    Number(params.get("id"));
-
-  const currentAccount =
-    getStoredAccount();
+  const params = new URLSearchParams(window.location.search);
+  const profileAccountId = Number(params.get("id"));
+  const currentAccount = getStoredAccount();
 
   const hasValidProfileId =
     Number.isInteger(profileAccountId) &&
@@ -120,8 +77,7 @@ async function loadProfile() {
     !hasValidProfileId ||
     (
       currentAccount &&
-      String(currentAccount.id) ===
-      String(profileAccountId)
+      String(currentAccount.id) === String(profileAccountId)
     );
 
   try {
@@ -129,27 +85,20 @@ async function loadProfile() {
 
     if (viewingOwnProfile) {
       if (!isLoggedIn()) {
-        window.location.href =
-          "./login.html";
-
+        window.location.href = "./login.html";
         return;
       }
 
-      account =
-        await fetchCurrentAccount();
+      account = await fetchCurrentAccount();
     } else {
       const response = await fetch(
         `${ACKI_API_URL}/accounts/${profileAccountId}`
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message ||
-          "Cannot load profile"
-        );
+        throw new Error(data.message || "Cannot load profile");
       }
 
       account = data.account || data;
@@ -157,127 +106,64 @@ async function loadProfile() {
 
     displayAccount(account);
 
-    setProfileMode(
-      viewingOwnProfile
-    );
-
     profileLoading.hidden = true;
     profileContent.hidden = false;
   } catch (error) {
-    profileLoading.textContent =
-      error.message;
+    profileLoading.textContent = error.message;
   }
 }
 
-function setProfileMode(
-  viewingOwnProfile
-) {
-  if (viewingOwnProfile) {
-    profileForm.hidden = false;
-    logoutButton.hidden = false;
+let currentProfileTab = "posts";
 
-    return;
-  }
+function switchProfileTab(tab, button) {
+    currentProfileTab = tab;
 
-  profileForm.hidden = true;
-  logoutButton.hidden = true;
+    document
+        .querySelectorAll(".profile-tab")
+        .forEach((tabButton) => {
+            tabButton.classList.remove("active");
+        });
+
+    button.classList.add("active");
+
+    renderProfileTab(tab);
 }
 
-profileForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
+function renderProfileTab(tab) {
+    const content =
+        document.getElementById(
+            "profileTabContent"
+        );
 
-  const token = getToken();
+    if (!content) return;
 
-  if (!token) {
-    window.location.href = "./login.html";
-    return;
-  }
+    const emptyStates = {
+        posts: {
+            icon: "ti-notes",
+            text: "No posts yet."
+        },
 
-  const displayName = displayNameInput.value.trim();
-  const bio = bioInput.value.trim();
-  const avatarUrl = avatarUrlInput.value.trim();
+        likes: {
+            icon: "ti-heart",
+            text: "No liked posts yet."
+        },
 
-  profileMessage.textContent = "";
-  profileMessage.className = "form-message";
+        saved: {
+            icon: "ti-bookmark",
+            text: "No saved posts yet."
+        }
+    };
 
-  if (displayName.length < 2) {
-    profileMessage.textContent =
-      "Display name must be at least 2 characters";
+    const state =
+        emptyStates[tab] ||
+        emptyStates.posts;
 
-    profileMessage.classList.add("error");
-    return;
-  }
-
-  saveProfileButton.disabled = true;
-  saveProfileButton.textContent = "Saving...";
-
-  try {
-    const response = await fetch(`${ACKI_API_URL}/me`, {
-      method: "PATCH",
-
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-
-      body: JSON.stringify({
-        displayName,
-        bio,
-        avatarUrl
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Cannot update profile"
-      );
-    }
-
-    localStorage.setItem(
-      ACKI_ACCOUNT_KEY,
-      JSON.stringify(data.account)
-    );
-
-    displayAccount(data.account);
-
-    profileMessage.textContent =
-      "Profile updated successfully";
-
-    profileMessage.classList.add("success");
-  } catch (error) {
-    profileMessage.textContent = error.message;
-    profileMessage.classList.add("error");
-  } finally {
-    saveProfileButton.disabled = false;
-    saveProfileButton.textContent = "Save profile";
-  }
-});
-
-bioInput.addEventListener("input", updateBioCounter);
-
-avatarUrlInput.addEventListener("input", () => {
-  showAvatar(
-    avatarUrlInput.value.trim(),
-    displayNameInput.value
-  );
-});
-
-displayNameInput.addEventListener("input", () => {
-  profileDisplayName.textContent =
-    displayNameInput.value.trim() ||
-    usernameInput.value ||
-    "Unknown";
-
-  showAvatar(
-    avatarUrlInput.value.trim(),
-    displayNameInput.value
-  );
-});
-
-logoutButton.addEventListener("click", () => {
-  logout();
-});
+    content.innerHTML = `
+        <div class="profile-empty-state">
+            <i class="ti ${state.icon}"></i>
+            <p>${state.text}</p>
+        </div>
+    `;
+}
 
 loadProfile();
