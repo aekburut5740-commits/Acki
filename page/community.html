@@ -84,15 +84,24 @@
     <div class="content">
         <div class="create-post" id="createPost">
 
-            <h2 id="createPostTitle" data-en="Create Post" data-th="สร้างโพสต์">
-                Create Post
-            </h2>
+            <div class="create-post-title-row">
+                <h2 id="createPostTitle" data-en="Create Post" data-th="สร้างโพสต์">
+                    Create Post
+                </h2>
+
+                <button type="button" class="create-post-close" onclick="toggleCreatePost()"
+                    aria-label="Close create post">
+                    <i class="ti ti-x"></i>
+                </button>
+            </div>
 
             <div class="create-header">
                 <img src="../pic/visitor.jpg" class="create-avatar" alt="Visitor">
 
                 <div class="create-user">
-                    <p class="create-username">Visitor</p>
+                    <p class="create-username">
+                        Visitor
+                    </p>
 
                     <span class="create-status" data-en="What's on your mind today?"
                         data-th="วันนี้อยากแบ่งปันอะไรดีครับ?">
@@ -182,12 +191,12 @@
         </p>
     </div>
 
-    <div id="deleteCommentOverlay" class="delete-post-overlay" onclick="closeDeleteCommentModal()"></div>
+    <div id="deletePostOverlay" class="delete-post-overlay" onclick="closeDeletePostModal()"></div>
 
-    <section id="deleteCommentModal" class="delete-post-modal" role="dialog" aria-modal="true"
-        aria-labelledby="deleteCommentTitle">
-        <h2 id="deleteCommentTitle" data-en="Delete this comment?" data-th="ลบความคิดเห็นนี้หรือไม่?">
-            Delete this comment?
+    <section id="deletePostModal" class="delete-post-modal" role="dialog" aria-modal="true"
+        aria-labelledby="deletePostTitle">
+        <h2 id="deletePostTitle" data-en="Delete this post?" data-th="ลบโพสต์นี้หรือไม่?">
+            Delete this post?
         </h2>
 
         <p data-en="Are you sure? This action cannot be undone." data-th="แน่ใจหรือไม่? การลบนี้ไม่สามารถย้อนกลับได้">
@@ -195,13 +204,13 @@
         </p>
 
         <div class="delete-post-actions">
-            <button type="button" class="delete-post-cancel" onclick="closeDeleteCommentModal()" data-en="Cancel"
+            <button type="button" class="delete-post-cancel" onclick="closeDeletePostModal()" data-en="Cancel"
                 data-th="ยกเลิก">
                 Cancel
             </button>
 
-            <button id="confirmDeleteCommentButton" type="button" class="delete-post-confirm"
-                onclick="confirmDeleteComment()" data-en="Delete" data-th="ลบ">
+            <button id="confirmDeletePostButton" type="button" class="delete-post-confirm" onclick="confirmDeletePost()"
+                data-en="Delete" data-th="ลบ">
                 Delete
             </button>
         </div>

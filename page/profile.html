@@ -17,97 +17,85 @@
         <a href="./profile.html" title="My Profile" class="my-profile-link">
             <i class="ti ti-user-circle"></i>
         </a>
-        <i class="ti ti-home" data-en-title="Home" data-th-title="หน้าแรก" title="Home" onclick="goHome()"></i>
+        <i class="ti ti-home" title="Home" onclick="goHome()"></i>
         <div class="nav-icon-wrap">
-            <i class="ti ti-bell" data-en-title="Notification" data-th-title="การแจ้งเตือน" title="Notification"
-                onclick="toggleNotificationMini()"></i>
+            <i class="ti ti-bell" title="Notification" onclick="toggleNotificationMini()"></i>
             <span class="notification-dot" id="notificationDot"></span>
         </div>
-        <i class="ti ti-mail" data-en-title="Contact" data-th-title="ติดต่อ" title="Contact" onclick="goContact()"></i>
-        <i class="ti ti-info-hexagon" data-en-title="About" data-th-title="เกี่ยวกับ" title="About"
-            onclick="goAbout()"></i>
+        <i class="ti ti-mail" title="Contact" onclick="goContact()"></i>
+        <i class="ti ti-info-hexagon" title="About" onclick="goAbout()"></i>
 
         <div class="settings-wrap">
-            <i class="ti ti-dots-vertical" data-en-title="Settings" data-th-title="ตั้งค่า" title="Settings"
-                onclick="toggleSettingsMenu()"></i>
-
+            <i class="ti ti-dots-vertical" title="Settings" onclick="toggleSettingsMenu()"></i>
             <div class="settings-menu" id="settingsMenu">
-                <button type="button" onclick="setThemeMode('auto')" data-theme-option="auto" data-en="Default Theme"
-                    data-th="ธีมปกติ">Default Theme</button>
-                <button type="button" onclick="setThemeMode('light')" data-theme-option="light" data-en="Light Theme"
-                    data-th="ธีมสว่าง">Light Theme</button>
-                <button type="button" onclick="setThemeMode('dark')" data-theme-option="dark" data-en="Dark Theme"
-                    data-th="ธีมมืด">Dark Theme</button>
-
+                <button type="button" onclick="setThemeMode('auto')" data-theme-option="auto">Default Theme</button>
+                <button type="button" onclick="setThemeMode('light')" data-theme-option="light">Light Theme</button>
+                <button type="button" onclick="setThemeMode('dark')" data-theme-option="dark">Dark Theme</button>
                 <hr>
-
-                <button type="button" onclick="toggleSceneBackground()"
-                    data-en-html="Stage Background <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>On</span>"
-                    data-th-html="พื้นหลังเวที <span class=&quot;setting-state&quot; data-setting-state=&quot;scene&quot;>เปิด</span>">Stage
-                    Background <span class="setting-state" data-setting-state="scene">On</span></button>
-                <button type="button" onclick="toggleWeather()"
-                    data-en-html="Weather Effects <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>On</span>"
-                    data-th-html="สภาพอากาศ <span class=&quot;setting-state&quot; data-setting-state=&quot;weather&quot;>เปิด</span>">Weather
-                    Effects <span class="setting-state" data-setting-state="weather">On</span></button>
+                <button type="button" onclick="toggleSceneBackground()">Stage Background <span class="setting-state" data-setting-state="scene">On</span></button>
+                <button type="button" onclick="toggleWeather()">Weather Effects <span class="setting-state" data-setting-state="weather">On</span></button>
             </div>
         </div>
         <button type="button" class="lang-toggle" onclick="toggleLanguage()">TH</button>
     </div>
 
+    <button id="profileCreatePostButton" type="button" class="profile-create-post-button" onclick="openProfileComposer()" hidden>
+        <i class="ti ti-plus"></i>
+        <span>Create Post</span>
+    </button>
+
+    <section id="profileComposer" class="profile-composer" aria-hidden="true">
+        <div class="profile-composer-inner">
+            <div class="profile-composer-head">
+                <h2 id="profileComposerTitle">Create Post</h2>
+                <button type="button" class="profile-composer-close" onclick="closeProfileComposer()" aria-label="Close">×</button>
+            </div>
+            <textarea id="profileComposerText" maxlength="2000" placeholder="Share something..."></textarea>
+            <div class="profile-composer-actions">
+                <button type="button" class="profile-composer-cancel" onclick="closeProfileComposer()">Cancel</button>
+                <button id="profileComposerSubmit" type="button" class="profile-composer-submit" onclick="submitProfilePost()">Post</button>
+            </div>
+        </div>
+    </section>
+
     <main class="profile-page">
+        <p id="profileLoading" class="profile-loading">Loading profile...</p>
 
-        <section class="profile-header">
-
-            <div class="profile-main">
-
-                <div class="profile-avatar" id="profileAvatar">
-                    A
+        <div id="profileContent" hidden>
+            <section class="profile-header">
+                <div class="profile-main">
+                    <div class="profile-avatar" id="profileAvatar">A</div>
+                    <div class="profile-info">
+                        <h1 id="profileDisplayName">Display name</h1>
+                        <p id="profileUsername" class="profile-username">@username</p>
+                        <p id="profileJoined" class="profile-joined">Joined</p>
+                    </div>
                 </div>
 
-                <div class="profile-info">
-                    <h1 id="profileDisplayName">
-                        Display name
-                    </h1>
+                <button type="button" class="profile-menu-button" aria-label="Profile menu">
+                    <i class="ti ti-dots"></i>
+                </button>
+            </section>
 
-                    <p id="profileUsername" class="profile-username">
-                        @username
-                    </p>
+            <nav class="profile-tabs">
+                <button type="button" class="profile-tab active" data-tab="posts" onclick="switchProfileTab('posts', this)">Posts</button>
+                <button type="button" class="profile-tab" data-tab="likes" onclick="switchProfileTab('likes', this)">Likes</button>
+                <button type="button" class="profile-tab" data-tab="saved" onclick="switchProfileTab('saved', this)">Saved</button>
+            </nav>
 
-                    <p id="profileJoined" class="profile-joined">
-                        Joined
-                    </p>
-                </div>
-
-            </div>
-
-            <button type="button" class="profile-menu-button" aria-label="Profile menu">
-                <i class="ti ti-dots"></i>
-            </button>
-
-        </section>
-
-        <nav class="profile-tabs">
-            <button type="button" class="profile-tab active" data-tab="posts" onclick="switchProfileTab('posts', this)">
-                Posts
-            </button>
-
-            <button type="button" class="profile-tab" data-tab="likes" onclick="switchProfileTab('likes', this)">
-                Likes
-            </button>
-
-            <button type="button" class="profile-tab" data-tab="saved" onclick="switchProfileTab('saved', this)">
-                Saved
-            </button>
-        </nav>
-
-        <section class="profile-tab-content" id="profileTabContent">
-            <div class="profile-empty-state">
-                <i class="ti ti-notes"></i>
-                <p>No posts yet.</p>
-            </div>
-        </section>
-
+            <section class="profile-tab-content" id="profileTabContent"></section>
+        </div>
     </main>
+
+    <div id="profileDeleteOverlay" class="profile-modal-overlay" onclick="closeProfileDeleteModal()"></div>
+    <section id="profileDeleteModal" class="profile-delete-modal" role="dialog" aria-modal="true">
+        <h2>Delete this post?</h2>
+        <p>This action cannot be undone.</p>
+        <div class="profile-delete-actions">
+            <button type="button" onclick="closeProfileDeleteModal()">Cancel</button>
+            <button type="button" class="danger" onclick="confirmProfileDelete()">Delete</button>
+        </div>
+    </section>
 
     <script src="../js/auth.js"></script>
     <script src="../js/navigation.js"></script>

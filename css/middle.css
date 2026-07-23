@@ -415,6 +415,35 @@ body.theme-dark textarea {
     background: #fff;
     color: #111;
 }
+body.theme-dark .delete-post-modal {
+    background: #f7f7f7;
+    color: #111111;
+}
+
+body.theme-dark .delete-post-modal h2 {
+    color: #111111;
+}
+
+body.theme-dark .delete-post-modal p {
+    color: #555555;
+}
+.delete-post-modal {
+    background: #ffffff;
+    color: #111111;
+}
+
+.delete-post-modal h2 {
+    color: #111111;
+}
+
+.delete-post-modal p {
+    color: #555555;
+}
+
+body.theme-dark .delete-post-modal {
+    background: #f7f7f7;
+    color: #111111;
+}
 
 @media (max-width: 600px) {
     .edge-tab {
