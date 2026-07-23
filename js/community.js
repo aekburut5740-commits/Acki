@@ -7,6 +7,8 @@ let editingPostId = null;
 let editingPostElement = null;
 let deletingPostId = null;
 let deletingPostElement = null;
+let deletingCommentId = null;
+let deletingCommentPostId = null;
 let nextPostId = 4;
 
 const commentsData = {};
@@ -45,103 +47,575 @@ function openComment(button) {
     document.getElementById("commentPanel")?.classList.add("show");
 }
 
+function groupComments(comments) {
+    const topLevelComments = [];
+    const repliesByParentId = {};
+
+    comments.forEach((comment) => {
+        if (comment.parentCommentId == null) {
+            topLevelComments.push(comment);
+            return;
+        }
+
+        const parentId = String(comment.parentCommentId);
+
+        if (!repliesByParentId[parentId]) {
+            repliesByParentId[parentId] = [];
+        }
+
+        repliesByParentId[parentId].push(comment);
+    });
+
+    return { topLevelComments, repliesByParentId };
+}
+
+function createCommentElement(commentData, options = {}) {
+    const {
+        isReply = false,
+        postOwnerId = null
+    } = options;
+
+    const item = document.createElement("div");
+    item.className = isReply
+        ? "comment-item comment-reply"
+        : "comment-item";
+    item.dataset.commentId = commentData.id;
+
+    const account = commentData.account || {};
+    const accountId = account.id;
+    const displayName =
+        account.displayName ||
+        account.username ||
+        "Unknown";
+
+    const currentAccount = getStoredAccount();
+    const isCommentOwner =
+        currentAccount &&
+        String(currentAccount.id) === String(accountId);
+    const isPostOwner =
+        currentAccount &&
+        String(currentAccount.id) === String(postOwnerId);
+    const canDelete = isCommentOwner || isPostOwner;
+
+    const avatar = document.createElement("img");
+    avatar.className = "comment-avatar profile-link";
+    avatar.dataset.accountId = accountId || "";
+    avatar.src = account.avatarUrl || "../pic/visitor.jpg";
+    avatar.alt = displayName;
+    avatar.onerror = () => {
+        avatar.src = "../pic/visitor.jpg";
+    };
+
+    const contentWrapper = document.createElement("div");
+    contentWrapper.className = "comment-content";
+
+    const header = document.createElement("div");
+    header.className = "comment-header";
+
+    const user = document.createElement("span");
+    user.className = "comment-user profile-link";
+    user.dataset.accountId = accountId || "";
+    user.textContent = displayName;
+    header.appendChild(user);
+
+    if (canDelete) {
+        const menuButton = document.createElement("button");
+        menuButton.type = "button";
+        menuButton.className = "comment-menu-button";
+        menuButton.textContent = "⋮";
+        menuButton.setAttribute("aria-label", "Comment menu");
+        menuButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleCommentMenu(menuButton);
+        });
+
+        const menu = document.createElement("div");
+        menu.className = "comment-menu";
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "delete-comment-button";
+        deleteButton.textContent =
+            typeof t === "function"
+                ? t("Delete Comment", "ลบความคิดเห็น")
+                : "Delete Comment";
+        deleteButton.addEventListener("click", () => {
+            deleteComment(deleteButton);
+        });
+
+        menu.appendChild(deleteButton);
+        header.appendChild(menuButton);
+        header.appendChild(menu);
+    }
+
+    const message = document.createElement("span");
+    message.className = "comment-message";
+    message.textContent = commentData.content || "";
+
+    const footer = document.createElement("div");
+    footer.className = "comment-footer";
+
+    const time = document.createElement("span");
+    time.className = "comment-time";
+    time.textContent = timeAgo(
+        new Date(commentData.createdAt).getTime()
+    );
+    footer.appendChild(time);
+
+    if (!isReply) {
+        const replyButton = document.createElement("button");
+        replyButton.type = "button";
+        replyButton.className = "comment-reply-button";
+        replyButton.textContent =
+            typeof t === "function"
+                ? t("Reply", "ตอบกลับ")
+                : "Reply";
+        replyButton.addEventListener("click", () => {
+            startReply(item, displayName);
+        });
+        footer.appendChild(replyButton);
+    }
+
+    contentWrapper.appendChild(header);
+    contentWrapper.appendChild(message);
+    contentWrapper.appendChild(footer);
+
+    if (!isReply) {
+        const replyFormContainer = document.createElement("div");
+        replyFormContainer.className = "reply-form-container";
+        replyFormContainer.hidden = true;
+
+        const repliesContainer = document.createElement("div");
+        repliesContainer.className = "comment-replies";
+
+        contentWrapper.appendChild(replyFormContainer);
+        contentWrapper.appendChild(repliesContainer);
+    }
+
+    item.appendChild(avatar);
+    item.appendChild(contentWrapper);
+
+    return item;
+}
+
 function renderComments(postId) {
-    const commentList =
-        document.getElementById("commentList");
+    const commentList = document.getElementById("commentList");
 
     if (!commentList) return;
 
     commentList.innerHTML = "";
 
-    const comments =
-        commentsData[postId] || [];
+    const comments = commentsData[postId] || [];
 
     if (comments.length === 0) {
-        const emptyMessage =
-            document.createElement("p");
-
-        emptyMessage.className =
-            "comment-empty";
-
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "comment-empty";
         emptyMessage.textContent =
             typeof t === "function"
-                ? t(
-                    "No comments yet.",
-                    "ยังไม่มีความคิดเห็น"
-                )
+                ? t("No comments yet.", "ยังไม่มีความคิดเห็น")
                 : "No comments yet.";
-
         commentList.appendChild(emptyMessage);
         return;
     }
 
-    comments.forEach((comment) => {
-        const item =
-            document.createElement("div");
+    const { topLevelComments, repliesByParentId } =
+        groupComments(comments);
+    const postOwnerId = activePost?.dataset.accountId || null;
 
-        item.className = "comment-item";
+    topLevelComments.forEach((comment) => {
+        const item = createCommentElement(comment, {
+            isReply: false,
+            postOwnerId
+        });
 
-        const avatar =
-            document.createElement("img");
+        const repliesContainer =
+            item.querySelector(".comment-replies");
+        const replies =
+            repliesByParentId[String(comment.id)] || [];
 
-        avatar.className = "comment-avatar";
+        replies.forEach((reply) => {
+            repliesContainer.appendChild(
+                createCommentElement(reply, {
+                    isReply: true,
+                    postOwnerId
+                })
+            );
+        });
 
-        avatar.src =
-            comment.account?.avatarUrl ||
-            "../pic/visitor.jpg";
+        if (replies.length > 0) {
+            const footer =
+                item.querySelector(
+                    ".comment-footer"
+                );
 
-        avatar.alt =
-            comment.account?.displayName ||
-            "Account";
+            const toggleButton =
+                document.createElement("button");
 
-        avatar.onerror = () => {
-            avatar.src = "../pic/visitor.jpg";
-        };
+            toggleButton.type = "button";
 
-        const contentWrapper =
-            document.createElement("div");
+            toggleButton.className =
+                "comment-replies-toggle";
 
-        contentWrapper.className =
-            "comment-content";
+            toggleButton.textContent =
+                typeof t === "function"
+                    ? t(
+                        `Hide ${replies.length} replies`,
+                        `ซ่อน ${replies.length} ข้อความตอบกลับ`
+                    )
+                    : `Hide ${replies.length} replies`;
 
-        const user =
-            document.createElement("span");
+            toggleButton.addEventListener(
+                "click",
+                () => {
+                    toggleReplies(
+                        item,
+                        toggleButton,
+                        replies.length
+                    );
+                }
+            );
 
-        user.className = "comment-user";
-
-        user.textContent =
-            comment.account?.displayName ||
-            comment.account?.username ||
-            "Unknown";
-
-        const message =
-            document.createElement("span");
-
-        message.className =
-            "comment-message";
-
-        message.textContent =
-            comment.content || "";
-
-        const time =
-            document.createElement("span");
-
-        time.className =
-            "comment-time";
-
-        time.textContent = timeAgo(
-            new Date(comment.createdAt).getTime()
-        );
-
-        contentWrapper.appendChild(user);
-        contentWrapper.appendChild(message);
-        contentWrapper.appendChild(time);
-
-        item.appendChild(avatar);
-        item.appendChild(contentWrapper);
+            footer?.appendChild(toggleButton);
+        }
 
         commentList.appendChild(item);
     });
+}
+
+function toggleReplies(
+    commentElement,
+    button,
+    replyCount
+) {
+    const repliesContainer =
+        commentElement.querySelector(
+            ".comment-replies"
+        );
+
+    if (!repliesContainer) return;
+
+    const willHide =
+        !repliesContainer.hidden;
+
+    repliesContainer.hidden =
+        willHide;
+
+    if (willHide) {
+        button.textContent =
+            typeof t === "function"
+                ? t(
+                    `Show ${replyCount} replies`,
+                    `แสดง ${replyCount} ข้อความตอบกลับ`
+                )
+                : `Show ${replyCount} replies`;
+
+        button.classList.add(
+            "replies-hidden"
+        );
+    } else {
+        button.textContent =
+            typeof t === "function"
+                ? t(
+                    `Hide ${replyCount} replies`,
+                    `ซ่อน ${replyCount} ข้อความตอบกลับ`
+                )
+                : `Hide ${replyCount} replies`;
+
+        button.classList.remove(
+            "replies-hidden"
+        );
+    }
+}
+
+function startReply(commentElement, displayName) {
+    const token = getToken();
+
+    if (!token) {
+        alert(
+            typeof t === "function"
+                ? t(
+                    "Please login before replying.",
+                    "กรุณาเข้าสู่ระบบก่อนตอบกลับ"
+                )
+                : "กรุณาเข้าสู่ระบบก่อนตอบกลับ"
+        );
+        window.location.href = "./login.html";
+        return;
+    }
+
+    const container = commentElement.querySelector(
+        ".reply-form-container"
+    );
+
+    if (!container) return;
+
+    document.querySelectorAll(".reply-form-container").forEach((form) => {
+        if (form !== container) form.hidden = true;
+    });
+
+    if (!container.querySelector(".reply-form")) {
+        const form = document.createElement("form");
+        form.className = "reply-form";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "reply-input";
+        input.placeholder =
+            typeof t === "function"
+                ? t(
+                    `Reply to ${displayName}...`,
+                    `ตอบกลับ ${displayName}...`
+                )
+                : `Reply to ${displayName}...`;
+
+        const actions = document.createElement("div");
+        actions.className = "reply-form-actions";
+
+        const cancelButton = document.createElement("button");
+        cancelButton.type = "button";
+        cancelButton.className = "reply-cancel-button";
+        cancelButton.textContent =
+            typeof t === "function"
+                ? t("Cancel", "ยกเลิก")
+                : "Cancel";
+        cancelButton.addEventListener("click", () => {
+            container.hidden = true;
+        });
+
+        const submitButton = document.createElement("button");
+        submitButton.type = "submit";
+        submitButton.className = "reply-submit-button";
+        submitButton.textContent =
+            typeof t === "function"
+                ? t("Reply", "ตอบกลับ")
+                : "Reply";
+
+        actions.appendChild(cancelButton);
+        actions.appendChild(submitButton);
+        form.appendChild(input);
+        form.appendChild(actions);
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            submitReply(
+                commentElement.dataset.commentId,
+                input,
+                submitButton,
+                container
+            );
+        });
+
+        container.appendChild(form);
+    }
+
+    container.hidden = false;
+    container.querySelector(".reply-input")?.focus();
+}
+
+async function submitReply(
+    parentCommentId,
+    input,
+    submitButton,
+    container
+) {
+    const content = input.value.trim();
+    const token = getToken();
+
+    if (!content || !activePostId || !token) return;
+
+    submitButton.disabled = true;
+
+    try {
+        const response = await fetch(
+            `${API_URL}/posts/${activePostId}/comments`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    content,
+                    parentCommentId: Number(parentCommentId)
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Cannot create reply");
+        }
+
+        if (!commentsData[activePostId]) {
+            commentsData[activePostId] = [];
+        }
+
+        commentsData[activePostId].push(data);
+        renderComments(activePostId);
+        updateCommentCount(activePostId);
+        input.value = "";
+        container.hidden = true;
+    } catch (error) {
+        console.error("Create reply error:", error);
+        alert(error.message);
+    } finally {
+        submitButton.disabled = false;
+    }
+}
+
+function toggleCommentMenu(button) {
+    const header = button.closest(".comment-header");
+    const menu = header?.querySelector(".comment-menu");
+
+    if (!menu) return;
+
+    document.querySelectorAll(".comment-menu.show").forEach((openMenu) => {
+        if (openMenu !== menu) openMenu.classList.remove("show");
+    });
+
+    menu.classList.toggle("show");
+}
+
+function deleteComment(button) {
+    const item =
+        button.closest(".comment-item");
+
+    if (!item || !activePostId) return;
+
+    deletingCommentId =
+        Number(item.dataset.commentId);
+
+    deletingCommentPostId =
+        String(activePostId);
+
+    item
+        .querySelector(".comment-menu")
+        ?.classList.remove("show");
+
+    document
+        .getElementById("deleteCommentOverlay")
+        ?.classList.add("show");
+
+    document
+        .getElementById("deleteCommentModal")
+        ?.classList.add("show");
+}
+
+function closeDeleteCommentModal() {
+    document
+        .getElementById("deleteCommentOverlay")
+        ?.classList.remove("show");
+
+    document
+        .getElementById("deleteCommentModal")
+        ?.classList.remove("show");
+
+    deletingCommentId = null;
+    deletingCommentPostId = null;
+}
+
+async function confirmDeleteComment() {
+    if (
+        !deletingCommentId ||
+        !deletingCommentPostId
+    ) {
+        closeDeleteCommentModal();
+        return;
+    }
+
+    const token = getToken();
+
+    if (!token) {
+        closeDeleteCommentModal();
+        window.location.href = "./login.html";
+        return;
+    }
+
+    const commentId =
+        deletingCommentId;
+
+    const postId =
+        deletingCommentPostId;
+
+    const confirmButton =
+        document.getElementById(
+            "confirmDeleteCommentButton"
+        );
+
+    if (confirmButton) {
+        confirmButton.disabled = true;
+
+        confirmButton.textContent =
+            typeof t === "function"
+                ? t(
+                    "Deleting...",
+                    "กำลังลบ..."
+                )
+                : "Deleting...";
+    }
+
+    try {
+        const response = await fetch(
+            `${API_URL}/comments/${commentId}`,
+            {
+                method: "DELETE",
+
+                headers: {
+                    Authorization:
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message ||
+                "Cannot delete comment"
+            );
+        }
+
+        const deletedIds =
+            new Set(
+                (
+                    data.deletedCommentIds ||
+                    [commentId]
+                ).map(String)
+            );
+
+        commentsData[postId] =
+            (
+                commentsData[postId] || []
+            ).filter((comment) => {
+                return !deletedIds.has(
+                    String(comment.id)
+                );
+            });
+
+        closeDeleteCommentModal();
+
+        renderComments(postId);
+        updateCommentCount(postId);
+    } catch (error) {
+        console.error(
+            "Delete comment error:",
+            error
+        );
+
+        alert(error.message);
+    } finally {
+        if (confirmButton) {
+            confirmButton.disabled = false;
+
+            confirmButton.textContent =
+                typeof t === "function"
+                    ? t("Delete", "ลบ")
+                    : "Delete";
+        }
+    }
 }
 
 async function loadComments(postId) {
@@ -384,6 +858,7 @@ function createPostElement(postData) {
 
     const currentAccount = getStoredAccount();
     const postAccount = postData.account || {};
+    post.dataset.accountId = postAccount.id || "";
 
     const isOwner =
         currentAccount &&
@@ -434,13 +909,17 @@ function createPostElement(postData) {
         <div class="post-header">
             <img
                 src="${avatarUrl}"
-                class="post-avatar"
+                class="post-avatar profile-link"
+                data-account-id="${postAccount.id || ""}"
                 alt="${displayName}"
                 onerror="this.src='../pic/visitor.jpg'"
             >
 
             <div>
-                <p class="post-name">${displayName}</p>
+                <p
+                    class="post-name profile-link"
+                    data-account-id="${postAccount.id || ""}"
+                >${displayName}</p>
                 <p class="post-time">just now</p>
             </div>
 
@@ -1330,6 +1809,7 @@ window.addEventListener("acki-language-change", () => {
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         closeDeletePostModal();
+        closeDeleteCommentModal();
     }
 });
 
@@ -1343,4 +1823,30 @@ document.addEventListener("DOMContentLoaded", () => {
     updatePostTimes();
     setInterval(updatePostTimes, 30000);
     openPostFromUrl();
+});
+
+
+function openProfile(accountId) {
+    const id = Number(accountId);
+
+    if (!Number.isInteger(id) || id <= 0) return;
+
+    window.location.href = `./profile.html?id=${id}`;
+}
+
+document.addEventListener("click", (event) => {
+    const profileLink = event.target.closest(".profile-link");
+
+    if (profileLink) {
+        event.preventDefault();
+        event.stopPropagation();
+        openProfile(profileLink.dataset.accountId);
+        return;
+    }
+
+    if (!event.target.closest(".comment-header")) {
+        document.querySelectorAll(".comment-menu.show").forEach((menu) => {
+            menu.classList.remove("show");
+        });
+    }
 });
