@@ -17,6 +17,11 @@ app.listen(PORT, "0.0.0.0", () => {
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "Acki API is running"
+  });
+});
 app.use(authRoutes);
 app.use(accountRoutes);
 app.use(postRoutes);
