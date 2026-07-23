@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pool = require("../db");
+const ACKI_API_URL = "https://acki-zq9m.onrender.com";
 
 const router = express.Router();
 
