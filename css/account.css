@@ -114,3 +114,47 @@ body {
   cursor: wait;
   opacity: 0.6;
 }
+
+/* Phone-sized account screens: keep fields generous enough to tap while
+   preserving the compact card layout. */
+@media (max-width: 480px) {
+  .account-page {
+    align-items: flex-start;
+    padding: max(16px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom));
+  }
+
+  .account-card {
+    width: 100%;
+    margin: 0;
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .account-card h1 {
+    margin-top: 20px;
+    font-size: 26px;
+  }
+
+  .account-description {
+    margin-bottom: 22px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group input,
+  #register-button,
+  #login-button,
+  .account-button {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .account-switch {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+}

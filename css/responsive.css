@@ -536,6 +536,110 @@ select {
         max-height: calc(100dvh - 24px);
         overflow-y: auto;
     }
+
+    /* Profile */
+    .profile-page {
+        width: calc(100% - 24px);
+        padding-top: calc(var(--acki-topbar-height) + 48px);
+    }
+
+    .profile-header {
+        padding: 18px 0;
+    }
+
+    .profile-header-top,
+    .profile-main {
+        min-width: 0;
+    }
+
+    .profile-info {
+        min-width: 0;
+    }
+
+    .profile-info h1,
+    .profile-username,
+    .profile-joined {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .profile-tabs {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .profile-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .profile-tab {
+        min-width: 92px;
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+
+    .profile-bio-section {
+        padding: 12px 0 0;
+    }
+
+    .profile-tab-content {
+        min-height: 220px;
+        padding: 20px 0 56px;
+    }
+
+    .profile-post-grid {
+        gap: 12px;
+    }
+
+    .profile-post-card {
+        min-height: 230px;
+        padding: 14px;
+    }
+
+    .profile-create-post-button {
+        top: calc(var(--acki-topbar-height) + 8px);
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+
+    .profile-composer {
+        top: var(--acki-topbar-height);
+    }
+
+    .profile-composer-inner {
+        width: calc(100% - 20px);
+        max-height: calc(100dvh - var(--acki-topbar-height) - 10px);
+        overflow-y: auto;
+        padding: 16px;
+    }
+
+    .profile-composer textarea {
+        min-height: 130px;
+        max-height: 42dvh;
+    }
+
+    .profile-edit-modal,
+    .profile-delete-modal {
+        width: calc(100% - 24px);
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+        padding: 18px;
+    }
+
+    .profile-avatar-preview {
+        width: 90px;
+        height: 90px;
+    }
+
+    .profile-delete-actions {
+        flex-wrap: wrap;
+    }
+
+    .profile-delete-actions button {
+        flex: 1 1 120px;
+        min-height: 42px;
+    }
 }
 
 /* Very narrow phones */
