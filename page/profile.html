@@ -147,9 +147,16 @@
             <textarea id="editProfileBio" maxlength="200" placeholder="Tell us about yourself..."></textarea>
         </div>
 
-        <div class="edit-profile-field">
-            <label for="editProfileAvatarUrl">Avatar URL</label>
-            <input type="text" id="editProfileAvatarUrl" placeholder="https://...">
+        <div class="profile-avatar-upload">
+
+            <img id="avatarPreview" class="profile-avatar-preview" src="../pic/visitor.jpg" alt="Avatar">
+
+            <input type="file" id="avatarInput" accept="image/*" hidden>
+
+            <button type="button" class="change-avatar-btn" onclick="document.getElementById('avatarInput').click()">
+                Change Photo
+            </button>
+
         </div>
 
         <p id="editProfileError" class="edit-profile-error" hidden></p>

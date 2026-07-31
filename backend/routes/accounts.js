@@ -3,8 +3,35 @@ const bcrypt = require("bcrypt");
 const pool = require("../db");
 const requireAuth = require("../middleware/requireAuth");
 const optionalAuth = require("../middleware/optionalAuth");
+const multer = require("multer");
+const path = require("path");
 
 const router = express.Router();
+
+const storage = multer.diskStorage({
+
+    destination(req,file,cb){
+
+        cb(null,"uploads");
+
+    },
+
+    filename(req,file,cb){
+
+        const extension =
+        path.extname(file.originalname);
+
+        cb(
+            null,
+            `avatar-${Date.now()}${extension}`
+        );
+
+    }
+
+});
+
+const upload =
+multer({storage});
 
 router.get("/me", requireAuth, async (req, res) => {
   try {
@@ -114,6 +141,84 @@ router.patch("/me", requireAuth, async (req, res) => {
     });
   }
 });
+
+router.post(
+    "/me/avatar",
+    requireAuth,
+    upload.single("avatar"),
+    async(req,res)=>{
+
+        try{
+
+            if(!req.file){
+
+                return res
+                .status(400)
+                .json({
+                    message:"No image"
+                });
+
+            }
+
+            const avatarUrl =
+            `/uploads/${req.file.filename}`;
+
+            const result =
+            await pool.query(
+
+                `
+                UPDATE accounts
+
+                SET avatar_url = $1
+
+                WHERE id = $2
+
+                RETURNING id, username, display_name, email, bio, avatar_url, created_at, updated_at
+                `,
+
+                [
+
+                    avatarUrl,
+
+                    req.accountId
+
+                ]
+
+            );
+
+            const account = result.rows[0];
+
+            res.json({
+
+                account: {
+                    id: account.id,
+                    username: account.username,
+                    displayName: account.display_name,
+                    email: account.email,
+                    bio: account.bio,
+                    avatarUrl: account.avatar_url,
+                    createdAt: account.created_at,
+                    updatedAt: account.updated_at
+                }
+
+            });
+
+        }
+
+        catch(error){
+
+            console.error(error);
+
+            res.status(500).json({
+
+                message:"Upload failed"
+
+            });
+
+        }
+
+    }
+);
 
 router.patch("/me/password", requireAuth, async (req, res) => {
   try {

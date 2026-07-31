@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db");
+const multer = require("multer");
+const path = require("path");
 
 const authRoutes = require("./routes/auth");
 const accountRoutes = require("./routes/accounts");
@@ -12,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 app.use(authRoutes);
 app.use(accountRoutes);
@@ -71,6 +74,34 @@ app.get("/database-test", async (req, res) => {
       error: error.message
     });
   }
+});
+
+const storage = multer.diskStorage({
+
+    destination(req, file, cb) {
+
+        cb(null, "uploads");
+
+    },
+
+    filename(req, file, cb) {
+
+        const extension =
+            path.extname(file.originalname);
+
+        cb(
+            null,
+            `avatar-${Date.now()}${extension}`
+        );
+
+    }
+
+});
+
+const upload = multer({
+
+    storage
+
 });
 
 app.listen(PORT, "0.0.0.0", () => {

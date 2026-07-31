@@ -18,6 +18,7 @@ let profileLikes = null;   // เพิ่ม — null = ยังไม่เ�
 let profileSaved = null;   // เพิ่ม
 let editingPostId = null;
 let deletingPostId = null;
+let selectedAvatarFile = null;
 
 function formatJoinedDate(dateValue) {
     if (!dateValue) return "Joined date unavailable";
@@ -48,14 +49,37 @@ function setAvatar(element, account) {
     element.innerHTML = "";
 
     if (account?.avatarUrl) {
+
         const image = document.createElement("img");
-        image.src = account.avatarUrl;
-        image.alt = account.displayName || account.username || "Profile";
+
+        let avatar =
+            account.avatarUrl;
+
+        if (
+            avatar &&
+            avatar.startsWith("/")
+        ) {
+
+            avatar =
+                ACKI_API_URL +
+                avatar;
+
+        }
+
+        image.src = avatarUrl;
+
+        image.alt =
+            account.displayName ||
+            account.username ||
+            "Profile";
+
         image.onerror = () => {
             element.innerHTML = "";
             element.textContent = initial.toUpperCase();
         };
+
         element.appendChild(image);
+
         return;
     }
 
@@ -166,7 +190,7 @@ function shareProfileLink() {
     const link = `${window.location.origin}${window.location.pathname}?id=${viewedAccount.id}`;
 
     if (navigator.share) {
-        navigator.share({ title: viewedAccount.displayName || viewedAccount.username, url: link }).catch(() => {});
+        navigator.share({ title: viewedAccount.displayName || viewedAccount.username, url: link }).catch(() => { });
         return;
     }
 
@@ -182,8 +206,12 @@ function openEditProfileModal() {
     document.getElementById("editProfileDisplayName").value = viewedAccount.displayName || "";
     document.getElementById("editProfileUsername").value = viewedAccount.username || "";
     document.getElementById("editProfileBio").value = viewedAccount.bio || "";
-    document.getElementById("editProfileAvatarUrl").value = viewedAccount.avatarUrl || "";
     document.getElementById("editProfileError").hidden = true;
+
+    const avatarPreview = document.getElementById("avatarPreview");
+    if (avatarPreview) {
+        avatarPreview.src = viewedAccount.avatarUrl || "../pic/visitor.jpg";
+    }
 
     document.getElementById("profileEditOverlay").classList.add("show");
     document.getElementById("editProfileModal").classList.add("show");
@@ -201,7 +229,6 @@ async function submitEditProfile() {
     const displayName = document.getElementById("editProfileDisplayName").value.trim();
     const username = document.getElementById("editProfileUsername").value.trim();
     const bio = document.getElementById("editProfileBio").value.trim();
-    const avatarUrl = document.getElementById("editProfileAvatarUrl").value.trim();
     const errorBox = document.getElementById("editProfileError");
     const submitButton = document.getElementById("editProfileSubmit");
 
@@ -215,7 +242,10 @@ async function submitEditProfile() {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({ displayName, bio, avatarUrl })
+            body: JSON.stringify({
+                displayName,
+                bio
+            })
         });
 
         const data = await response.json();
@@ -241,10 +271,74 @@ async function submitEditProfile() {
 
         viewedAccount = updatedAccount;
         currentAccount = updatedAccount;
+        if (selectedAvatarFile) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+
+                "avatar",
+
+                selectedAvatarFile
+
+            );
+
+            const uploadResponse =
+                await fetch(
+
+                    `${ACKI_API_URL}/me/avatar`,
+
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            Authorization:
+
+                                `Bearer ${token}`
+
+                        },
+
+                        body: formData
+
+                    }
+
+                );
+
+            const uploadData =
+                await uploadResponse.json();
+
+            if (!uploadResponse.ok) {
+
+                throw new Error(
+
+                    uploadData.message
+
+                );
+
+            }
+
+            updatedAccount =
+                uploadData.account;
+
+        }
+
+        viewedAccount = updatedAccount;
+        currentAccount = updatedAccount;
         localStorage.setItem(ACKI_ACCOUNT_KEY, JSON.stringify(updatedAccount));
 
         displayAccount(viewedAccount);
         closeEditProfileModal();
+        selectedAvatarFile = null;
+
+        const avatarInput =
+            document.getElementById("avatarInput");
+
+        if (avatarInput) {
+            avatarInput.value = "";
+        }
     } catch (error) {
         errorBox.textContent = error.message;
         errorBox.hidden = false;
@@ -495,8 +589,23 @@ async function confirmProfileDelete() {
     }
 }
 
-document.addEventListener("click", () => {
-    document.querySelectorAll(".profile-card-menu.show").forEach((menu) => menu.classList.remove("show"));
-});
+document.addEventListener("DOMContentLoaded", async () => {
 
-loadProfile();
+    loadProfile();
+
+    loadPosts();
+
+    const avatarInput = document.getElementById("avatarInput");
+    const avatarPreview = document.getElementById("avatarPreview");
+
+    avatarInput?.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        selectedAvatarFile = file;
+
+        avatarPreview.src = URL.createObjectURL(file);
+    });
+
+});
