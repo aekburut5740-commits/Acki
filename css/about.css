@@ -39,6 +39,11 @@ body {
     gap: 24px;
 }
 
+.about-grid2 {
+    display: grid;
+    margin: 0 0 67px 0;
+}
+
 .about-box {
     background: #ffffff;
     color: #111;

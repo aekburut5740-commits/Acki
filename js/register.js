@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000";
+const API_URL = "https://acki-zq9m.onrender.com";
 
 const registerForm = document.getElementById("register-form");
 const registerButton = document.getElementById("register-button");
