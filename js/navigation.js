@@ -2,7 +2,7 @@
 // Absolute paths keep links working from index.html and /page/*.html.
 
 function goHome() {
-    window.location.href = "/index.html";
+    window.location.href = "/page/community.html";
 }
 
 function goAbout() {
@@ -15,6 +15,14 @@ function goContact() {
 
 function goCommunity() {
     window.location.href = "/page/community.html";
+}
+
+function goLogin() {
+    window.location.href = "/page/login.html";
+}
+
+function goRegister() {
+    window.location.href = "/page/register.html";
 }
 
 function goGoogle() {

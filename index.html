@@ -20,21 +20,31 @@
     <div class="modal" id="ruleModal">
         <div class="modal-box font1">
             <button class="close-btn" onclick="closeRule()">✕</button>
-            <h2 id="box1" data-en="A small note" data-th="แจ้งให้ทราบนิดนึง">A small note</h2>
+            <h2 id="box1" data-en="Welcome!" data-th="ยินดีต้อนรับ">
+                Welcome!
+            </h2>
 
-            <p id="box2" data-en="Acki is still a prototype." data-th="Acki ยังเป็นเว็บต้นแบบอยู่นะครับ">Acki is still a prototype.</p>
-
-            <p id="box3"
-                data-en="If you find a bug or something feels strange, sorry about that. You can contact me from the Contact page."
-                data-th="ถ้าเจอบั๊กหรือมีอะไรแปลก ๆ ต้องขอโทษด้วยนะครับ สามารถติดต่อผมได้ที่หน้า Contact เลยครับ">
-                If you find a bug or something feels strange, sorry about that. You can contact me from the Contact page.
+            <p id="box2" data-en="Choose how you want to continue." data-th="เลือกวิธีการเข้าใช้งาน">
+                Choose how you want to continue.
             </p>
 
-            <p id="box4" data-en="Ready to continue?" data-th="พร้อมไปต่อไหมครับ?">Ready to continue?</p>
+            <p id="box3" data-en="You can log in to your existing account or create a new one."
+                data-th="คุณสามารถเข้าสู่ระบบ หรือสร้างบัญชีใหม่ได้">
+                You can log in to your existing account or create a new one.
+            </p>
+
+            <p id="box4" data-en="What would you like to do?" data-th="คุณต้องการทำอะไร">
+                What would you like to do?
+            </p>
 
             <div class="modal-buttons">
-                <button id="btnnah" class="button3 font4" onclick="goGoogle()" data-en="Nah ?" data-th="ไม่ ?">Nah ?</button>
-                <button id="btnunderstand" class="button4 font4" onclick="goCommunity()" data-en="Understand !" data-th="เข้าใจแล้ว !">Understand !</button>
+                <button id="btnnah" class="button3 font4" onclick="goLogin()" data-en="Log In" data-th="เข้าสู่ระบบ">
+                    Log In
+                </button>
+                <button id="btnunderstand" class="button4 font4" onclick="goRegister()" data-en="Create Account"
+                    data-th="สร้างบัญชี">
+                    Create Account
+                </button>
             </div>
         </div>
     </div>
@@ -67,18 +77,28 @@
                 <button id="btnno" class="button1 font4" data-en="No ?" data-th="ไม่ ?">No ?</button>
             </a>
 
-            <button id="btngotit" class="button2 font4" onclick="openRule()" data-en="Got It !" data-th="รับทราบ !">Got It !</button>
+            <button id="btngotit" class="button2 font4" onclick="openRule()" data-en="Got It !" data-th="รับทราบ !">Got
+                It !</button>
         </div>
 
         <div class="align-center text3 font1 about-text">
             <p id="abouttext"
                 data-en="| Welcome to Acki. This website was created with one simple idea: everyone has something worth sharing. Acki is a place where people can freely post their ideas, thoughts, stories, artwork, questions, or anything that comes to mind. There is no need to be perfect, and there is no pressure to impress anyone. Sometimes even a small thought can become the beginning of an interesting conversation. Since this is only the first version of Acki, the community is still small and simple. You will not find countless features or complicated menus here yet. Instead, Acki focuses on sharing ideas and enjoying what other people create. As Acki grows, more features and improvements will be added over time. But for now, this is where the journey begins. Take your time, explore the community, and maybe leave behind an idea that someone else will remember. |"
                 data-th="| ยินดีต้อนรับสู่ Acki เว็บนี้ถูกสร้างขึ้นจากแนวคิดง่าย ๆ ว่า ทุกคนมีบางอย่างที่มีคุณค่าให้แบ่งปัน Acki คือพื้นที่ที่คุณสามารถโพสต์ไอเดีย ความคิด เรื่องราว งานศิลปะ คำถาม หรืออะไรก็ตามที่อยู่ในใจได้อย่างอิสระ ไม่จำเป็นต้องสมบูรณ์แบบ และไม่ต้องกดดันว่าจะต้องทำให้ใครประทับใจ บางครั้งความคิดเล็ก ๆ เพียงอย่างเดียว ก็อาจกลายเป็นจุดเริ่มต้นของบทสนทนาที่น่าสนใจได้ เพราะตอนนี้ Acki ยังเป็นเพียงเวอร์ชันแรก ชุมชนจึงยังเล็กและเรียบง่าย คุณอาจยังไม่เห็นฟีเจอร์มากมายหรือเมนูซับซ้อน แต่สิ่งที่สำคัญที่สุดคือการแบ่งปันไอเดีย และสนุกกับสิ่งที่คนอื่นสร้างขึ้น เมื่อ Acki เติบโตขึ้น จะมีฟีเจอร์และการปรับปรุงเพิ่มเข้ามาเรื่อย ๆ แต่ตอนนี้คือจุดเริ่มต้นของการเดินทาง ลองใช้เวลาสำรวจชุมชน และอาจฝากไอเดียสักอย่างไว้ให้ใครบางคนจดจำก็ได้ครับ |">
-                | Welcome to Acki. This website was created with one simple idea: everyone has something worth sharing. Acki is a place where people can freely post their ideas, thoughts, stories, artwork, questions, or anything that comes to mind. There is no need to be perfect, and there is no pressure to impress anyone. Sometimes even a small thought can become the beginning of an interesting conversation. Since this is only the first version of Acki, the community is still small and simple. You will not find countless features or complicated menus here yet. Instead, Acki focuses on sharing ideas and enjoying what other people create. As Acki grows, more features and improvements will be added over time. But for now, this is where the journey begins. Take your time, explore the community, and maybe leave behind an idea that someone else will remember. |
+                | Welcome to Acki. This website was created with one simple idea: everyone has something worth sharing.
+                Acki is a place where people can freely post their ideas, thoughts, stories, artwork, questions, or
+                anything that comes to mind. There is no need to be perfect, and there is no pressure to impress anyone.
+                Sometimes even a small thought can become the beginning of an interesting conversation. Since this is
+                only the first version of Acki, the community is still small and simple. You will not find countless
+                features or complicated menus here yet. Instead, Acki focuses on sharing ideas and enjoying what other
+                people create. As Acki grows, more features and improvements will be added over time. But for now, this
+                is where the journey begins. Take your time, explore the community, and maybe leave behind an idea that
+                someone else will remember. |
             </p>
         </div>
         <footer class="footer">
-            <p id="footertext1" class="text4" data-en="© 2026 Acki. All rights reserved." data-th="© 2026 Acki. สงวนลิขสิทธิ์ทั้งหมด">© 2026 Acki. All rights reserved.</p>
+            <p id="footertext1" class="text4" data-en="© 2026 Acki. All rights reserved."
+                data-th="© 2026 Acki. สงวนลิขสิทธิ์ทั้งหมด">© 2026 Acki. All rights reserved.</p>
             <p id="footertext2" data-en="| not at all." data-th="| ก็ไม่ได้ขนาดนั้นหรอก">| not at all.</p>
         </footer>
     </div>

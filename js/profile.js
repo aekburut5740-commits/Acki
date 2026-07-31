@@ -6,12 +6,16 @@ const profileJoined = document.getElementById("profileJoined");
 const profileAvatar = document.getElementById("profileAvatar");
 const profileTabContent = document.getElementById("profileTabContent");
 const profileCreatePostButton = document.getElementById("profileCreatePostButton");
+const profileBioSection = document.getElementById("profileBioSection");
+const profileBioInline = document.getElementById("profileBioInline");
 
 let currentProfileTab = "posts";
 let viewedAccount = null;
 let currentAccount = null;
 let viewingOwnProfile = false;
 let profilePosts = [];
+let profileLikes = null;   // เพิ่ม — null = ยังไม่เคยโหลด
+let profileSaved = null;   // เพิ่ม
 let editingPostId = null;
 let deletingPostId = null;
 
@@ -63,6 +67,10 @@ function displayAccount(account) {
     profileUsername.textContent = `@${account.username || "unknown"}`;
     profileJoined.textContent = formatJoinedDate(account.createdAt);
     setAvatar(profileAvatar, account);
+
+    const hasBio = Boolean(account.bio && account.bio.trim());
+    profileBioSection.hidden = !hasBio;
+    profileBioInline.textContent = hasBio ? account.bio.trim() : "";
 }
 
 async function fetchProfileAccount(accountId) {
@@ -108,6 +116,8 @@ async function loadProfile() {
 
         displayAccount(viewedAccount);
         profileCreatePostButton.hidden = !viewingOwnProfile;
+        document.getElementById("profileMenuWrap").hidden = !viewingOwnProfile;
+        document.querySelector('.profile-tab[data-tab="saved"]').hidden = !viewingOwnProfile;
         profileLoading.hidden = true;
         profileContent.hidden = false;
 
@@ -117,31 +127,170 @@ async function loadProfile() {
     }
 }
 
-function switchProfileTab(tab, button) {
+async function switchProfileTab(tab, button) {
     currentProfileTab = tab;
     document.querySelectorAll(".profile-tab").forEach((tabButton) => {
         tabButton.classList.remove("active");
     });
     button.classList.add("active");
-    renderProfileTab(tab);
+    await renderProfileTab(tab);
 }
 
-function renderProfileTab(tab) {
+function renderPostList(posts, emptyIcon, emptyText) {
+    profileTabContent.innerHTML = "";
+
+    if (!posts || posts.length === 0) {
+        profileTabContent.innerHTML = `
+            <div class="profile-empty-state">
+                <i class="ti ${emptyIcon}"></i>
+                <p>${emptyText}</p>
+            </div>
+        `;
+        return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "profile-post-grid";
+    posts.forEach((post) => grid.appendChild(createProfilePostCard(post)));
+    profileTabContent.appendChild(grid);
+}
+
+function toggleProfileHeaderMenu(event) {
+    event.stopPropagation();
+    document.getElementById("profileHeaderMenu").classList.toggle("show");
+}
+
+function shareProfileLink() {
+    document.getElementById("profileHeaderMenu")?.classList.remove("show");
+
+    const link = `${window.location.origin}${window.location.pathname}?id=${viewedAccount.id}`;
+
+    if (navigator.share) {
+        navigator.share({ title: viewedAccount.displayName || viewedAccount.username, url: link }).catch(() => {});
+        return;
+    }
+
+    navigator.clipboard.writeText(link)
+        .then(() => alert("Profile link copied!"))
+        .catch(() => prompt("Copy this link:", link));
+}
+
+function openEditProfileModal() {
+    document.getElementById("profileHeaderMenu")?.classList.remove("show");
+    if (!viewingOwnProfile) return;
+
+    document.getElementById("editProfileDisplayName").value = viewedAccount.displayName || "";
+    document.getElementById("editProfileUsername").value = viewedAccount.username || "";
+    document.getElementById("editProfileBio").value = viewedAccount.bio || "";
+    document.getElementById("editProfileAvatarUrl").value = viewedAccount.avatarUrl || "";
+    document.getElementById("editProfileError").hidden = true;
+
+    document.getElementById("profileEditOverlay").classList.add("show");
+    document.getElementById("editProfileModal").classList.add("show");
+}
+
+function closeEditProfileModal() {
+    document.getElementById("profileEditOverlay").classList.remove("show");
+    document.getElementById("editProfileModal").classList.remove("show");
+}
+
+async function submitEditProfile() {
+    const token = getToken();
+    if (!token) return;
+
+    const displayName = document.getElementById("editProfileDisplayName").value.trim();
+    const username = document.getElementById("editProfileUsername").value.trim();
+    const bio = document.getElementById("editProfileBio").value.trim();
+    const avatarUrl = document.getElementById("editProfileAvatarUrl").value.trim();
+    const errorBox = document.getElementById("editProfileError");
+    const submitButton = document.getElementById("editProfileSubmit");
+
+    errorBox.hidden = true;
+    submitButton.disabled = true;
+
+    try {
+        const response = await fetch(`${ACKI_API_URL}/me`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ displayName, bio, avatarUrl })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Cannot update profile");
+
+        let updatedAccount = data.account;
+
+        if (username && username !== viewedAccount.username) {
+            const accountResponse = await fetch(`${ACKI_API_URL}/me/account`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ username })
+            });
+
+            const accountData = await accountResponse.json();
+            if (!accountResponse.ok) throw new Error(accountData.message || "Cannot update username");
+
+            updatedAccount = accountData.account;
+        }
+
+        viewedAccount = updatedAccount;
+        currentAccount = updatedAccount;
+        localStorage.setItem(ACKI_ACCOUNT_KEY, JSON.stringify(updatedAccount));
+
+        displayAccount(viewedAccount);
+        closeEditProfileModal();
+    } catch (error) {
+        errorBox.textContent = error.message;
+        errorBox.hidden = false;
+    } finally {
+        submitButton.disabled = false;
+    }
+}
+
+async function renderProfileTab(tab) {
     if (tab === "posts") {
         renderPostsTab();
         return;
     }
 
-    const state = tab === "likes"
-        ? { icon: "ti-heart", text: "Liked posts will appear here." }
-        : { icon: "ti-bookmark", text: "Saved posts will appear here." };
+    profileTabContent.innerHTML = `<p class="profile-loading">Loading...</p>`;
 
-    profileTabContent.innerHTML = `
-        <div class="profile-empty-state">
-            <i class="ti ${state.icon}"></i>
-            <p>${state.text}</p>
-        </div>
-    `;
+    try {
+        if (tab === "likes") {
+            if (profileLikes === null) {
+                const response = await fetch(`${ACKI_API_URL}/accounts/${viewedAccount.id}/likes`, {
+                    headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {}
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || "Cannot load liked posts");
+                profileLikes = Array.isArray(data) ? data : [];
+            }
+            renderPostList(profileLikes, "ti-heart", "Liked posts will appear here.");
+        } else if (tab === "saved") {
+            if (profileSaved === null) {
+                const response = await fetch(`${ACKI_API_URL}/accounts/${viewedAccount.id}/saved`, {
+                    headers: { Authorization: `Bearer ${getToken()}` }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || "Cannot load saved posts");
+                profileSaved = Array.isArray(data) ? data : [];
+            }
+            renderPostList(profileSaved, "ti-bookmark", "Saved posts will appear here.");
+        }
+    } catch (error) {
+        profileTabContent.innerHTML = `
+            <div class="profile-empty-state">
+                <i class="ti ti-alert-circle"></i>
+                <p>${error.message}</p>
+            </div>
+        `;
+    }
 }
 
 function createOwnerButton(post) {

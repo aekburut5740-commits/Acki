@@ -216,6 +216,31 @@
         </div>
     </section>
 
+    <div id="deleteCommentOverlay" class="delete-post-overlay" onclick="closeDeleteCommentModal()"></div>
+
+    <section id="deleteCommentModal" class="delete-post-modal" role="dialog" aria-modal="true"
+        aria-labelledby="deleteCommentTitle">
+        <h2 id="deleteCommentTitle" data-en="Delete this comment?" data-th="ลบความคิดเห็นนี้หรือไม่?">
+            Delete this comment?
+        </h2>
+
+        <p data-en="Are you sure? This action cannot be undone." data-th="แน่ใจหรือไม่? การลบนี้ไม่สามารถย้อนกลับได้">
+            Are you sure? This action cannot be undone.
+        </p>
+
+        <div class="delete-post-actions">
+            <button type="button" class="delete-post-cancel" onclick="closeDeleteCommentModal()" data-en="Cancel"
+                data-th="ยกเลิก">
+                Cancel
+            </button>
+
+            <button id="confirmDeleteCommentButton" type="button" class="delete-post-confirm" onclick="confirmDeleteComment()"
+                data-en="Delete" data-th="ลบ">
+                Delete
+            </button>
+        </div>
+    </section>
+
     <script src="../js/auth.js"></script>
     <script src="../js/navigation.js"></script>
     <script src="../js/language.js"></script>

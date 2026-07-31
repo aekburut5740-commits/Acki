@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const pool = require("../db");
 const requireAuth = require("../middleware/requireAuth");
+const optionalAuth = require("../middleware/optionalAuth");
 
 const router = express.Router();
 
@@ -411,6 +412,158 @@ router.get("/accounts/:id/posts", async (req, res) => {
       message: "Cannot get account posts",
       error: error.message
     });
+  }
+});
+router.get("/accounts/:id/likes", optionalAuth, async (req, res) => {
+  try {
+    const accountId = Number(req.params.id);
+
+    if (!Number.isInteger(accountId) || accountId <= 0) {
+      return res.status(400).json({ message: "Invalid account ID" });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        posts.id,
+        posts.content,
+        posts.created_at,
+        posts.updated_at,
+
+        accounts.id AS account_id,
+        accounts.username,
+        accounts.display_name,
+        accounts.avatar_url,
+
+        COUNT(DISTINCT comments.id)::integer AS comment_count,
+        COUNT(DISTINCT all_likes.account_id)::integer AS like_count,
+        COUNT(DISTINCT all_saves.account_id)::integer AS save_count,
+
+        CASE
+          WHEN $2::bigint IS NULL THEN false
+          ELSE EXISTS (
+            SELECT 1 FROM post_likes viewer_like
+            WHERE viewer_like.post_id = posts.id AND viewer_like.account_id = $2
+          )
+        END AS is_liked,
+
+        CASE
+          WHEN $2::bigint IS NULL THEN false
+          ELSE EXISTS (
+            SELECT 1 FROM post_saves viewer_save
+            WHERE viewer_save.post_id = posts.id AND viewer_save.account_id = $2
+          )
+        END AS is_saved
+
+      FROM post_likes liked_by
+      INNER JOIN posts ON posts.id = liked_by.post_id
+      INNER JOIN accounts ON posts.account_id = accounts.id
+      LEFT JOIN comments ON comments.post_id = posts.id
+      LEFT JOIN post_likes all_likes ON all_likes.post_id = posts.id
+      LEFT JOIN post_saves all_saves ON all_saves.post_id = posts.id
+
+      WHERE liked_by.account_id = $1
+
+      GROUP BY posts.id, accounts.id, accounts.username, accounts.display_name, accounts.avatar_url
+      ORDER BY posts.created_at DESC
+      `,
+      [accountId, req.accountId]
+    );
+
+    res.json(result.rows.map((post) => ({
+      id: post.id,
+      content: post.content,
+      createdAt: post.created_at,
+      updatedAt: post.updated_at,
+      commentCount: post.comment_count,
+      likeCount: post.like_count,
+      saveCount: post.save_count,
+      isLiked: post.is_liked,
+      isSaved: post.is_saved,
+      account: {
+        id: post.account_id,
+        username: post.username,
+        displayName: post.display_name,
+        avatarUrl: post.avatar_url
+      }
+    })));
+  } catch (error) {
+    console.error("Get liked posts error:", error);
+    res.status(500).json({ message: "Cannot load liked posts", error: error.message });
+  }
+});
+
+router.get("/accounts/:id/saved", requireAuth, async (req, res) => {
+  try {
+    const accountId = Number(req.params.id);
+
+    if (!Number.isInteger(accountId) || accountId <= 0) {
+      return res.status(400).json({ message: "Invalid account ID" });
+    }
+
+    // Saved list เป็นข้อมูลส่วนตัว ดูได้เฉพาะเจ้าของ
+    if (String(accountId) !== String(req.accountId)) {
+      return res.status(403).json({ message: "You cannot view another account's saved posts" });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        posts.id,
+        posts.content,
+        posts.created_at,
+        posts.updated_at,
+
+        accounts.id AS account_id,
+        accounts.username,
+        accounts.display_name,
+        accounts.avatar_url,
+
+        COUNT(DISTINCT comments.id)::integer AS comment_count,
+        COUNT(DISTINCT all_likes.account_id)::integer AS like_count,
+        COUNT(DISTINCT all_saves.account_id)::integer AS save_count,
+
+        EXISTS (
+          SELECT 1 FROM post_likes viewer_like
+          WHERE viewer_like.post_id = posts.id AND viewer_like.account_id = $1
+        ) AS is_liked,
+        true AS is_saved
+
+      FROM post_saves saved_by
+      INNER JOIN posts ON posts.id = saved_by.post_id
+      INNER JOIN accounts ON posts.account_id = accounts.id
+      LEFT JOIN comments ON comments.post_id = posts.id
+      LEFT JOIN post_likes all_likes ON all_likes.post_id = posts.id
+      LEFT JOIN post_saves all_saves ON all_saves.post_id = posts.id
+
+      WHERE saved_by.account_id = $1
+
+      GROUP BY posts.id, accounts.id, accounts.username, accounts.display_name, accounts.avatar_url
+      ORDER BY posts.created_at DESC
+      `,
+      [accountId]
+    );
+
+    res.json(result.rows.map((post) => ({
+      id: post.id,
+      content: post.content,
+      createdAt: post.created_at,
+      updatedAt: post.updated_at,
+      commentCount: post.comment_count,
+      likeCount: post.like_count,
+      saveCount: post.save_count,
+      isLiked: post.is_liked,
+      isSaved: post.is_saved,
+      account: {
+        id: post.account_id,
+        username: post.username,
+        displayName: post.display_name,
+        avatarUrl: post.avatar_url
+      }
+    })));
+  } catch (error) {
+    console.error("Get saved posts error:", error);
+    res.status(500).json({ message: "Cannot load saved posts", error: error.message });
   }
 });
 

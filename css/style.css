@@ -235,7 +235,7 @@ body {
 .modal-box {
     position: relative;
     z-index: 10000;
-    background: rgba(255, 127, 29, 0.92);
+    background: rgba(83, 131, 83, 0.92);
     color: rgb(255, 255, 255);
     width: 80%;
     max-width: 600px;

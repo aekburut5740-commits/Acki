@@ -23,6 +23,7 @@ router.get(
         posts.content,
         posts.created_at,
         posts.updated_at,
+        posts.shares,
 
         accounts.id AS account_id,
         accounts.username,
@@ -92,6 +93,7 @@ router.get(
                 isLiked: post.is_liked,
                 saveCount: post.save_count,
                 isSaved: post.is_saved,
+                shares: post.shares,
 
                 account: {
                     id: post.account_id,
@@ -179,6 +181,7 @@ router.post("/posts", requireAuth, async (req, res) => {
             likeCount: 0,
             isLiked: false,
             isSaved: false,
+            shares: 0,
 
             account: {
                 id: account.id,
@@ -409,6 +412,41 @@ router.post(
         }
     }
 );
+
+router.patch("/posts/:id/share", async (req, res) => {
+    try {
+        const postId = Number(req.params.id);
+
+        if (!Number.isInteger(postId) || postId <= 0) {
+            return res.status(400).json({ message: "Invalid post ID" });
+        }
+
+        const result = await pool.query(
+            `
+            UPDATE posts
+            SET shares = shares + 1
+            WHERE id = $1
+            RETURNING id, shares
+            `,
+            [postId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        res.json({
+            id: result.rows[0].id,
+            shares: result.rows[0].shares
+        });
+    } catch (error) {
+        console.error("Update share count error:", error);
+        res.status(500).json({
+            message: "Cannot update share count",
+            error: error.message
+        });
+    }
+});
 
 router.post(
     "/posts/:id/like",

@@ -72,9 +72,26 @@
                     </div>
                 </div>
 
-                <button type="button" class="profile-menu-button" aria-label="Profile menu">
-                    <i class="ti ti-dots"></i>
-                </button>
+                </div>
+
+                <div class="profile-bio-section" id="profileBioSection" hidden>
+                    <span class="profile-bio-divider">|</span>
+                    <p class="profile-bio-text" id="profileBioInline"></p>
+                </div>
+
+                <div class="profile-card-menu-wrap" id="profileMenuWrap" hidden>
+
+                <div class="profile-card-menu-wrap" id="profileMenuWrap" hidden>
+                    <button type="button" class="profile-menu-button" aria-label="Profile menu" onclick="toggleProfileHeaderMenu(event)">
+                        <i class="ti ti-dots"></i>
+                    </button>
+
+                    <div class="profile-card-menu" id="profileHeaderMenu">
+                        <button type="button" onclick="openEditProfileModal()"><i class="ti ti-pencil"></i> Edit Profile</button>
+                        <button type="button" onclick="shareProfileLink()"><i class="ti ti-share-3"></i> Share Profile</button>
+                        <button type="button" class="danger" onclick="logout()"><i class="ti ti-logout"></i> Logout</button>
+                    </div>
+                </div>
             </section>
 
             <nav class="profile-tabs">
@@ -94,6 +111,42 @@
         <div class="profile-delete-actions">
             <button type="button" onclick="closeProfileDeleteModal()">Cancel</button>
             <button type="button" class="danger" onclick="confirmProfileDelete()">Delete</button>
+        </div>
+    </section>
+
+    <div id="profileEditOverlay" class="profile-modal-overlay" onclick="closeEditProfileModal()"></div>
+
+    <section id="editProfileModal" class="profile-edit-modal" role="dialog" aria-modal="true">
+        <div class="profile-edit-head">
+            <h2>Edit Profile</h2>
+            <button type="button" class="profile-edit-close" onclick="closeEditProfileModal()" aria-label="Close">×</button>
+        </div>
+
+        <div class="edit-profile-field">
+            <label for="editProfileDisplayName">Display Name</label>
+            <input type="text" id="editProfileDisplayName" maxlength="50" placeholder="Display name">
+        </div>
+
+        <div class="edit-profile-field">
+            <label for="editProfileUsername">Username</label>
+            <input type="text" id="editProfileUsername" maxlength="30" placeholder="username">
+        </div>
+
+        <div class="edit-profile-field">
+            <label for="editProfileBio">Bio</label>
+            <textarea id="editProfileBio" maxlength="200" placeholder="Tell us about yourself..."></textarea>
+        </div>
+
+        <div class="edit-profile-field">
+            <label for="editProfileAvatarUrl">Avatar URL</label>
+            <input type="text" id="editProfileAvatarUrl" placeholder="https://...">
+        </div>
+
+        <p id="editProfileError" class="edit-profile-error" hidden></p>
+
+        <div class="profile-delete-actions">
+            <button type="button" onclick="closeEditProfileModal()">Cancel</button>
+            <button id="editProfileSubmit" type="button" class="profile-edit-save" onclick="submitEditProfile()">Save</button>
         </div>
     </section>
 

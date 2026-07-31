@@ -46,8 +46,16 @@ function applyLanguage() {
     });
 
     document.querySelectorAll(".lang-toggle").forEach((btn) => {
-        btn.textContent = lang === "en" ? "TH" : "EN";
-        btn.setAttribute("aria-label", lang === "en" ? "Switch to Thai" : "เปลี่ยนเป็นภาษาอังกฤษ");
+        // แสดงภาษาปัจจุบัน
+        btn.textContent = lang === "en" ? "EN" : "TH";
+
+        // Tooltip บอกว่าตอนนี้กำลังใช้ภาษาอะไร
+        btn.setAttribute(
+            "aria-label",
+            lang === "en"
+                ? "Current language: English"
+                : "ภาษาปัจจุบัน: ไทย"
+        );
     });
 }
 

@@ -475,6 +475,16 @@ body::after {
     align-items: center;
     gap: 6px;
 }
+.btn-share {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.share-count {
+    font-size: 14px;
+    font-family: 'Noto Sans Thai', sans-serif;
+}
 
 .btn-like.liked {
     color: #ff4b4b;
