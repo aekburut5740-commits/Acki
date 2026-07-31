@@ -32,14 +32,17 @@
                 <button type="button" onclick="setThemeMode('light')" data-theme-option="light">Light Theme</button>
                 <button type="button" onclick="setThemeMode('dark')" data-theme-option="dark">Dark Theme</button>
                 <hr>
-                <button type="button" onclick="toggleSceneBackground()">Stage Background <span class="setting-state" data-setting-state="scene">On</span></button>
-                <button type="button" onclick="toggleWeather()">Weather Effects <span class="setting-state" data-setting-state="weather">On</span></button>
+                <button type="button" onclick="toggleSceneBackground()">Stage Background <span class="setting-state"
+                        data-setting-state="scene">On</span></button>
+                <button type="button" onclick="toggleWeather()">Weather Effects <span class="setting-state"
+                        data-setting-state="weather">On</span></button>
             </div>
         </div>
         <button type="button" class="lang-toggle" onclick="toggleLanguage()">TH</button>
     </div>
 
-    <button id="profileCreatePostButton" type="button" class="profile-create-post-button" onclick="openProfileComposer()" hidden>
+    <button id="profileCreatePostButton" type="button" class="profile-create-post-button"
+        onclick="openProfileComposer()" hidden>
         <i class="ti ti-plus"></i>
         <span>Create Post</span>
     </button>
@@ -48,12 +51,14 @@
         <div class="profile-composer-inner">
             <div class="profile-composer-head">
                 <h2 id="profileComposerTitle">Create Post</h2>
-                <button type="button" class="profile-composer-close" onclick="closeProfileComposer()" aria-label="Close">×</button>
+                <button type="button" class="profile-composer-close" onclick="closeProfileComposer()"
+                    aria-label="Close">×</button>
             </div>
             <textarea id="profileComposerText" maxlength="2000" placeholder="Share something..."></textarea>
             <div class="profile-composer-actions">
                 <button type="button" class="profile-composer-cancel" onclick="closeProfileComposer()">Cancel</button>
-                <button id="profileComposerSubmit" type="button" class="profile-composer-submit" onclick="submitProfilePost()">Post</button>
+                <button id="profileComposerSubmit" type="button" class="profile-composer-submit"
+                    onclick="submitProfilePost()">Post</button>
             </div>
         </div>
     </section>
@@ -63,41 +68,45 @@
 
         <div id="profileContent" hidden>
             <section class="profile-header">
-                <div class="profile-main">
-                    <div class="profile-avatar" id="profileAvatar">A</div>
-                    <div class="profile-info">
-                        <h1 id="profileDisplayName">Display name</h1>
-                        <p id="profileUsername" class="profile-username">@username</p>
-                        <p id="profileJoined" class="profile-joined">Joined</p>
+                <div class="profile-header-top">
+                    <div class="profile-main">
+                        <div class="profile-avatar" id="profileAvatar">A</div>
+                        <div class="profile-info">
+                            <h1 id="profileDisplayName">Display name</h1>
+                            <p id="profileUsername" class="profile-username">@username</p>
+                            <p id="profileJoined" class="profile-joined">Joined</p>
+                        </div>
                     </div>
-                </div>
 
+                    <div class="profile-card-menu-wrap" id="profileMenuWrap" hidden>
+                        <button type="button" class="profile-menu-button" aria-label="Profile menu"
+                            onclick="toggleProfileHeaderMenu(event)">
+                            <i class="ti ti-dots"></i>
+                        </button>
+
+                        <div class="profile-card-menu" id="profileHeaderMenu">
+                            <button type="button" onclick="openEditProfileModal()"><i class="ti ti-pencil"></i> Edit
+                                Profile</button>
+                            <button type="button" onclick="shareProfileLink()"><i class="ti ti-share-3"></i> Share
+                                Profile</button>
+                            <button type="button" class="danger" onclick="logout()"><i class="ti ti-logout"></i>
+                                Logout</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="profile-bio-section" id="profileBioSection" hidden>
-                    <span class="profile-bio-divider">|</span>
                     <p class="profile-bio-text" id="profileBioInline"></p>
-                </div>
-
-                <div class="profile-card-menu-wrap" id="profileMenuWrap" hidden>
-
-                <div class="profile-card-menu-wrap" id="profileMenuWrap" hidden>
-                    <button type="button" class="profile-menu-button" aria-label="Profile menu" onclick="toggleProfileHeaderMenu(event)">
-                        <i class="ti ti-dots"></i>
-                    </button>
-
-                    <div class="profile-card-menu" id="profileHeaderMenu">
-                        <button type="button" onclick="openEditProfileModal()"><i class="ti ti-pencil"></i> Edit Profile</button>
-                        <button type="button" onclick="shareProfileLink()"><i class="ti ti-share-3"></i> Share Profile</button>
-                        <button type="button" class="danger" onclick="logout()"><i class="ti ti-logout"></i> Logout</button>
-                    </div>
                 </div>
             </section>
 
             <nav class="profile-tabs">
-                <button type="button" class="profile-tab active" data-tab="posts" onclick="switchProfileTab('posts', this)">Posts</button>
-                <button type="button" class="profile-tab" data-tab="likes" onclick="switchProfileTab('likes', this)">Likes</button>
-                <button type="button" class="profile-tab" data-tab="saved" onclick="switchProfileTab('saved', this)">Saved</button>
+                <button type="button" class="profile-tab active" data-tab="posts"
+                    onclick="switchProfileTab('posts', this)">Posts</button>
+                <button type="button" class="profile-tab" data-tab="likes"
+                    onclick="switchProfileTab('likes', this)">Likes</button>
+                <button type="button" class="profile-tab" data-tab="saved"
+                    onclick="switchProfileTab('saved', this)">Saved</button>
             </nav>
 
             <section class="profile-tab-content" id="profileTabContent"></section>
@@ -119,7 +128,8 @@
     <section id="editProfileModal" class="profile-edit-modal" role="dialog" aria-modal="true">
         <div class="profile-edit-head">
             <h2>Edit Profile</h2>
-            <button type="button" class="profile-edit-close" onclick="closeEditProfileModal()" aria-label="Close">×</button>
+            <button type="button" class="profile-edit-close" onclick="closeEditProfileModal()"
+                aria-label="Close">×</button>
         </div>
 
         <div class="edit-profile-field">
@@ -146,7 +156,8 @@
 
         <div class="profile-delete-actions">
             <button type="button" onclick="closeEditProfileModal()">Cancel</button>
-            <button id="editProfileSubmit" type="button" class="profile-edit-save" onclick="submitEditProfile()">Save</button>
+            <button id="editProfileSubmit" type="button" class="profile-edit-save"
+                onclick="submitEditProfile()">Save</button>
         </div>
     </section>
 
