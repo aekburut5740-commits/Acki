@@ -44,48 +44,6 @@ function formatPostTime(dateValue) {
     });
 }
 
-function setAvatar(element, account) {
-    const initial = account?.displayName?.trim()?.charAt(0) || account?.username?.trim()?.charAt(0) || "?";
-    element.innerHTML = "";
-
-    if (account?.avatarUrl) {
-
-        const image = document.createElement("img");
-
-        let avatar =
-            account.avatarUrl;
-
-        if (
-            avatar &&
-            avatar.startsWith("/")
-        ) {
-
-            avatar =
-                ACKI_API_URL +
-                avatar;
-
-        }
-
-        image.src = avatarUrl;
-
-        image.alt =
-            account.displayName ||
-            account.username ||
-            "Profile";
-
-        image.onerror = () => {
-            element.innerHTML = "";
-            element.textContent = initial.toUpperCase();
-        };
-
-        element.appendChild(image);
-
-        return;
-    }
-
-    element.textContent = initial.toUpperCase();
-}
-
 function displayAccount(account) {
     profileDisplayName.textContent = account.displayName || account.username || "Unknown";
     profileUsername.textContent = `@${account.username || "unknown"}`;
@@ -209,9 +167,21 @@ function openEditProfileModal() {
     document.getElementById("editProfileError").hidden = true;
 
     const avatarPreview = document.getElementById("avatarPreview");
-    if (avatarPreview) {
-        avatarPreview.src = viewedAccount.avatarUrl || "../pic/visitor.jpg";
+    let avatar =
+        viewedAccount.avatarUrl;
+
+    if (
+        avatar &&
+        avatar.startsWith("/")
+    ) {
+        avatar =
+            ACKI_API_URL +
+            avatar;
     }
+
+    avatarPreview.src =
+        avatar ||
+        "../pic/startpfp.jpg";
 
     document.getElementById("profileEditOverlay").classList.add("show");
     document.getElementById("editProfileModal").classList.add("show");
@@ -330,8 +300,10 @@ async function submitEditProfile() {
         localStorage.setItem(ACKI_ACCOUNT_KEY, JSON.stringify(updatedAccount));
 
         displayAccount(viewedAccount);
-        closeEditProfileModal();
         selectedAvatarFile = null;
+        document.getElementById("avatarInput").value = "";
+
+        closeEditProfileModal();
 
         const avatarInput =
             document.getElementById("avatarInput");
@@ -593,10 +565,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     loadProfile();
 
-    loadPosts();
-
     const avatarInput = document.getElementById("avatarInput");
     const avatarPreview = document.getElementById("avatarPreview");
+
+    console.log(avatarInput);
+    console.log(avatarPreview);
 
     avatarInput?.addEventListener("change", (event) => {
         const file = event.target.files[0];

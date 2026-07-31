@@ -96,12 +96,16 @@
             </div>
 
             <div class="create-header">
-                <img src="../pic/visitor.jpg" class="create-avatar" alt="Visitor">
+                <div class="create-avatar" id="createAvatar">
+                </div>
 
                 <div class="create-user">
-                    <p class="create-username">
-                        Visitor
+                    <p class="create-username" id="createUsername">
                     </p>
+                </div>
+
+                <div class="create-user-info">
+                    <p class="create-username" id="createUsername"></p>
 
                     <span class="create-status" data-en="What's on your mind today?"
                         data-th="วันนี้อยากแบ่งปันอะไรดีครับ?">
@@ -234,8 +238,8 @@
                 Cancel
             </button>
 
-            <button id="confirmDeleteCommentButton" type="button" class="delete-post-confirm" onclick="confirmDeleteComment()"
-                data-en="Delete" data-th="ลบ">
+            <button id="confirmDeleteCommentButton" type="button" class="delete-post-confirm"
+                onclick="confirmDeleteComment()" data-en="Delete" data-th="ลบ">
                 Delete
             </button>
         </div>
@@ -246,6 +250,7 @@
     <script src="../js/language.js"></script>
     <script src="../js/appearance.js"></script>
     <script src="../js/notification.js"></script>
+    <script src="../js/avatar.js"></script>
     <script src="../js/community.js"></script>
     <script src="../js/theme.js"></script>
     <script src="../js/weather.js"></script>

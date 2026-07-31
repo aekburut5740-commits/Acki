@@ -97,14 +97,16 @@ function createCommentElement(commentData, options = {}) {
         String(currentAccount.id) === String(postOwnerId);
     const canDelete = isCommentOwner || isPostOwner;
 
-    const avatar = document.createElement("img");
-    avatar.className = "comment-avatar profile-link";
-    avatar.dataset.accountId = accountId || "";
-    avatar.src = account.avatarUrl || "../pic/visitor.jpg";
-    avatar.alt = displayName;
-    avatar.onerror = () => {
-        avatar.src = "../pic/visitor.jpg";
-    };
+    const avatar =
+        document.createElement("div");
+
+    avatar.className =
+        "comment-avatar profile-link";
+
+    setAvatar(
+        avatar,
+        account
+    );
 
     const contentWrapper = document.createElement("div");
     contentWrapper.className = "comment-content";
@@ -196,6 +198,46 @@ function createCommentElement(commentData, options = {}) {
     item.appendChild(contentWrapper);
 
     return item;
+}
+
+function updateCreatePostProfile(account) {
+
+    const avatar =
+        document.getElementById("createAvatar");
+
+    const username =
+        document.getElementById("createUsername");
+
+
+    if (!account) {
+        avatar.src = "../pic/visitor.jpg";
+        username.textContent = "Visitor";
+        return;
+    }
+
+
+    let avatarUrl =
+        account.avatarUrl;
+
+
+    if (
+        avatarUrl &&
+        avatarUrl.startsWith("/")
+    ) {
+        avatarUrl =
+            ACKI_API_URL + avatarUrl;
+    }
+
+
+    avatar.src =
+        avatarUrl || "../pic/visitor.jpg";
+
+
+    username.textContent =
+        account.displayName ||
+        account.username ||
+        "Unknown";
+
 }
 
 function renderComments(postId) {
@@ -790,7 +832,7 @@ async function sendComment() {
     }
 }
 
-function toggleCreatePost() {
+async function toggleCreatePost() {
     const createPost =
         document.getElementById("createPost");
 
@@ -804,6 +846,17 @@ function toggleCreatePost() {
     if (!isOpen) {
         resetCreatePostMode();
         createPost.classList.add("show");
+        const account = await fetchCurrentAccount();
+
+        setAvatar(
+            document.getElementById("createAvatar"),
+            account
+        );
+
+        document.getElementById("createUsername").textContent =
+            account.displayName ||
+            account.username ||
+            "Unknown";
     }
 }
 
@@ -869,10 +922,6 @@ function createPostElement(postData) {
         postAccount.username ||
         "Unknown";
 
-    const avatarUrl =
-        postAccount.avatarUrl ||
-        "../pic/visitor.jpg";
-
     const ownerMenu = isOwner
         ? `
             <button
@@ -907,13 +956,11 @@ function createPostElement(postData) {
 
     post.innerHTML = `
         <div class="post-header">
-            <img
-                src="${avatarUrl}"
-                class="post-avatar profile-link"
-                data-account-id="${postAccount.id || ""}"
-                alt="${displayName}"
-                onerror="this.src='../pic/visitor.jpg'"
-            >
+            <div
+    class="post-avatar profile-link"
+    data-account-id="${postAccount.id || ""}"
+>
+</div>
 
             <div>
                 <p
@@ -964,6 +1011,14 @@ function createPostElement(postData) {
             </button>
         </div>
     `;
+
+    const avatarElement =
+        post.querySelector(".post-avatar");
+
+    setAvatar(
+        avatarElement,
+        postAccount
+    );
 
     post.querySelector(".post-body p").textContent =
         postData.content;
@@ -1809,6 +1864,36 @@ function updateAckiScene() {
     }
 }
 
+function loadCreatePostProfile() {
+    const avatar =
+        document.getElementById("createAvatar");
+
+    const username =
+        document.getElementById("createUsername");
+
+
+    const account =
+        JSON.parse(localStorage.getItem("account"));
+
+
+    if (!account) return;
+
+
+    if (avatar) {
+        avatar.src =
+            account.avatarUrl ||
+            "../pic/visitor.jpg";
+    }
+
+
+    if (username) {
+        username.textContent =
+            account.displayName ||
+            account.username ||
+            "Visitor";
+    }
+}
+
 document.addEventListener("copy", (event) => {
     const selection = window.getSelection();
     if (!selection || selection.toString().trim() === "") return;
@@ -1857,6 +1942,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!post.dataset.createdAt) post.dataset.createdAt = Date.now();
     });
 
+    const account = getStoredAccount();
+
+    updateCreatePostProfile(account);
+
     updatePostTimes();
     setInterval(updatePostTimes, 30000);
     openPostFromUrl();
@@ -1887,3 +1976,5 @@ document.addEventListener("click", (event) => {
         });
     }
 });
+
+loadCreatePostProfile();
