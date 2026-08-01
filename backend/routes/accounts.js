@@ -5,29 +5,24 @@ const requireAuth = require("../middleware/requireAuth");
 const optionalAuth = require("../middleware/optionalAuth");
 const multer = require("multer");
 const path = require("path");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-
-  destination(req, file, cb) {
-
-    cb(null, "uploads");
-
-  },
-
-  filename(req, file, cb) {
-
-    const extension =
-      path.extname(file.originalname);
-
-    cb(
-      null,
-      `avatar-${Date.now()}${extension}`
-    );
-
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "acki-avatars",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    public_id: (req, file) => `avatar-${req.accountId}-${Date.now()}`
   }
-
 });
 
 const upload =
@@ -178,8 +173,7 @@ router.post(
 
       }
 
-      const avatarUrl =
-        `/uploads/${req.file.filename}`;
+      const avatarUrl = req.file.path;
 
       const result =
         await pool.query(
