@@ -48,6 +48,9 @@ function setAvatar(element, account) {
         account?.avatarUrl?.trim();
 
 
+    console.log("Avatar from database:", avatar);
+
+
     // ถ้าไม่มี avatar หรือเป็น null
     if (!avatar) {
 

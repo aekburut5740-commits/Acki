@@ -10,28 +10,28 @@ const router = express.Router();
 
 const storage = multer.diskStorage({
 
-    destination(req,file,cb){
+  destination(req, file, cb) {
 
-        cb(null,"uploads");
+    cb(null, "uploads");
 
-    },
+  },
 
-    filename(req,file,cb){
+  filename(req, file, cb) {
 
-        const extension =
-        path.extname(file.originalname);
+    const extension =
+      path.extname(file.originalname);
 
-        cb(
-            null,
-            `avatar-${Date.now()}${extension}`
-        );
+    cb(
+      null,
+      `avatar-${Date.now()}${extension}`
+    );
 
-    }
+  }
 
 });
 
 const upload =
-multer({storage});
+  multer({ storage });
 
 router.get("/me", requireAuth, async (req, res) => {
   try {
@@ -82,7 +82,7 @@ router.get("/me", requireAuth, async (req, res) => {
 
 router.patch("/me", requireAuth, async (req, res) => {
   try {
-    const { displayName, bio, avatarUrl } = req.body;
+    const { displayName, bio } = req.body;
 
     const result = await pool.query(
       `
@@ -90,7 +90,6 @@ router.patch("/me", requireAuth, async (req, res) => {
       SET
         display_name = COALESCE($1, display_name),
         bio = COALESCE($2, bio),
-        avatar_url = COALESCE($3, avatar_url),
         updated_at = CURRENT_TIMESTAMP
       WHERE id = $4
       RETURNING
@@ -106,7 +105,6 @@ router.patch("/me", requireAuth, async (req, res) => {
       [
         displayName ?? null,
         bio ?? null,
-        avatarUrl ?? null,
         req.accountId
       ]
     );
@@ -143,30 +141,30 @@ router.patch("/me", requireAuth, async (req, res) => {
 });
 
 router.post(
-    "/me/avatar",
-    requireAuth,
-    upload.single("avatar"),
-    async(req,res)=>{
+  "/me/avatar",
+  requireAuth,
+  upload.single("avatar"),
+  async (req, res) => {
 
-        try{
+    try {
 
-            if(!req.file){
+      if (!req.file) {
 
-                return res
-                .status(400)
-                .json({
-                    message:"No image"
-                });
+        return res
+          .status(400)
+          .json({
+            message: "No image"
+          });
 
-            }
+      }
 
-            const avatarUrl =
-            `/uploads/${req.file.filename}`;
+      const avatarUrl =
+        `/uploads/${req.file.filename}`;
 
-            const result =
-            await pool.query(
+      const result =
+        await pool.query(
 
-                `
+          `
                 UPDATE accounts
 
                 SET avatar_url = $1
@@ -176,48 +174,48 @@ router.post(
                 RETURNING id, username, display_name, email, bio, avatar_url, created_at, updated_at
                 `,
 
-                [
+          [
 
-                    avatarUrl,
+            avatarUrl,
 
-                    req.accountId
+            req.accountId
 
-                ]
+          ]
 
-            );
+        );
 
-            const account = result.rows[0];
+      const account = result.rows[0];
 
-            res.json({
+      res.json({
 
-                account: {
-                    id: account.id,
-                    username: account.username,
-                    displayName: account.display_name,
-                    email: account.email,
-                    bio: account.bio,
-                    avatarUrl: account.avatar_url,
-                    createdAt: account.created_at,
-                    updatedAt: account.updated_at
-                }
-
-            });
-
+        account: {
+          id: account.id,
+          username: account.username,
+          displayName: account.display_name,
+          email: account.email,
+          bio: account.bio,
+          avatarUrl: account.avatar_url,
+          createdAt: account.created_at,
+          updatedAt: account.updated_at
         }
 
-        catch(error){
-
-            console.error(error);
-
-            res.status(500).json({
-
-                message:"Upload failed"
-
-            });
-
-        }
+      });
 
     }
+
+    catch (error) {
+
+      console.error(error);
+
+      res.status(500).json({
+
+        message: "Upload failed"
+
+      });
+
+    }
+
+  }
 );
 
 router.patch("/me/password", requireAuth, async (req, res) => {
@@ -361,17 +359,17 @@ router.patch("/me/account", requireAuth, async (req, res) => {
 });
 
 router.get("/accounts/:id", async (req, res) => {
-    try {
-        const accountId = Number(req.params.id);
+  try {
+    const accountId = Number(req.params.id);
 
-        if (!Number.isInteger(accountId) || accountId <= 0) {
-            return res.status(400).json({
-                message: "Invalid account ID"
-            });
-        }
+    if (!Number.isInteger(accountId) || accountId <= 0) {
+      return res.status(400).json({
+        message: "Invalid account ID"
+      });
+    }
 
-        const accountResult = await pool.query(
-            `
+    const accountResult = await pool.query(
+      `
             SELECT
                 accounts.id,
                 accounts.username,
@@ -386,34 +384,34 @@ router.get("/accounts/:id", async (req, res) => {
             WHERE accounts.id = $1
             GROUP BY accounts.id
             `,
-            [accountId]
-        );
+      [accountId]
+    );
 
-        if (accountResult.rows.length === 0) {
-            return res.status(404).json({
-                message: "Account not found"
-            });
-        }
-
-        const account = accountResult.rows[0];
-
-        res.json({
-            id: account.id,
-            username: account.username,
-            displayName: account.display_name,
-            bio: account.bio,
-            avatarUrl: account.avatar_url,
-            createdAt: account.created_at,
-            postCount: account.post_count
-        });
-    } catch (error) {
-        console.error("Get account profile error:", error);
-
-        res.status(500).json({
-            message: "Cannot get account profile",
-            error: error.message
-        });
+    if (accountResult.rows.length === 0) {
+      return res.status(404).json({
+        message: "Account not found"
+      });
     }
+
+    const account = accountResult.rows[0];
+
+    res.json({
+      id: account.id,
+      username: account.username,
+      displayName: account.display_name,
+      bio: account.bio,
+      avatarUrl: account.avatar_url,
+      createdAt: account.created_at,
+      postCount: account.post_count
+    });
+  } catch (error) {
+    console.error("Get account profile error:", error);
+
+    res.status(500).json({
+      message: "Cannot get account profile",
+      error: error.message
+    });
+  }
 });
 
 router.get("/accounts/:id/posts", async (req, res) => {

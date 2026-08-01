@@ -40,8 +40,8 @@ body {
 }
 
 .about-grid2 {
-    display: grid;
-    margin: 0 0 67px 0;
+    gap: 24px;
+    margin-bottom: 60px;
 }
 
 .about-box {
