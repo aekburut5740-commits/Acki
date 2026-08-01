@@ -81,27 +81,35 @@ router.get("/me", requireAuth, async (req, res) => {
 });
 
 router.patch("/me", requireAuth, async (req, res) => {
+
   try {
+
+    console.log("PATCH /me called");
+    console.log("body:", req.body);
+    console.log("accountId:", req.accountId);
+
+
     const { displayName, bio } = req.body;
+
 
     const result = await pool.query(
       `
-      UPDATE accounts
-      SET
-        display_name = COALESCE($1, display_name),
-        bio = COALESCE($2, bio),
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = $4
-      RETURNING
-        id,
-        username,
-        display_name,
-        email,
-        bio,
-        avatar_url,
-        created_at,
-        updated_at
-      `,
+UPDATE accounts
+SET
+    display_name = COALESCE($1::text, display_name),
+    bio = COALESCE($2::text, bio),
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = $3::integer
+RETURNING
+    id,
+    username,
+    display_name,
+    email,
+    bio,
+    avatar_url,
+    created_at,
+    updated_at
+`,
       [
         displayName ?? null,
         bio ?? null,
@@ -109,16 +117,22 @@ router.patch("/me", requireAuth, async (req, res) => {
       ]
     );
 
+    console.log("UPDATE SUCCESS");
+
+
     if (result.rows.length === 0) {
       return res.status(404).json({
         message: "Account not found"
       });
     }
 
+
     const account = result.rows[0];
+
 
     res.json({
       message: "Profile updated successfully",
+
       account: {
         id: account.id,
         username: account.username,
@@ -130,13 +144,19 @@ router.patch("/me", requireAuth, async (req, res) => {
         updatedAt: account.updated_at
       }
     });
+
+
   } catch (error) {
-    console.error("Update profile error:", error);
+
+    console.log("PATCH ERROR");
+
+    console.error(error);
 
     res.status(500).json({
       message: "Cannot update profile",
       error: error.message
     });
+
   }
 });
 
