@@ -154,6 +154,10 @@ body.theme-light .feedback-login-hint {
     border-radius: 14px;
     padding: 16px 18px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .feedback-card-header {
@@ -161,6 +165,7 @@ body.theme-light .feedback-login-hint {
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
+    min-width: 0;
 }
 
 .feedback-avatar {
@@ -182,11 +187,25 @@ body.theme-light .feedback-login-hint {
     object-fit: cover;
 }
 
-.feedback-identity strong { display: block; font-size: 14px; }
+.feedback-identity {
+    min-width: 0;
+    flex: 1;
+}
+
+.feedback-identity strong,
+.feedback-identity small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.feedback-identity strong { font-size: 14px; }
 .feedback-identity small { color: #777; font-size: 12px; }
 
 .feedback-time {
     margin-left: auto;
+    flex-shrink: 0;
     color: #999;
     font-size: 12px;
 }

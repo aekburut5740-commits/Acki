@@ -1309,9 +1309,8 @@ async function loadPostsFromBackend() {
             if (alreadyExists) return;
 
             const postElement = createPostElement(postData);
-            const firstPost = document.querySelector(".post");
 
-            content.insertBefore(postElement, firstPost);
+            content.appendChild(postElement);
 
             if (!commentsData[postData.id]) {
                 commentsData[postData.id] = [];

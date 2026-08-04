@@ -99,7 +99,7 @@ async function loadProfile() {
         displayAccount(viewedAccount);
         profileCreatePostButton.hidden = !viewingOwnProfile;
         document.getElementById("profileMenuWrap").hidden = !viewingOwnProfile;
-        document.querySelector('.profile-tab[data-tab="saved"]').hidden = !viewingOwnProfile;
+        document.querySelector('.profile-tab-bio[data-tab="saved"]').hidden = !viewingOwnProfile;
         profileLoading.hidden = true;
         profileContent.hidden = false;
 
@@ -111,7 +111,7 @@ async function loadProfile() {
 
 async function switchProfileTab(tab, button) {
     currentProfileTab = tab;
-    document.querySelectorAll(".profile-tab").forEach((tabButton) => {
+    document.querySelectorAll(".profile-tab-bio").forEach((tabButton) => {
         tabButton.classList.remove("active");
     });
     button.classList.add("active");
@@ -369,7 +369,7 @@ function createOwnerButton(post) {
     });
 
     const avatar = document.createElement("span");
-    avatar.className = "profile-card-avatar";
+    avatar.className = "profile-card-avatar-bio";
     setAvatar(avatar, post.account);
 
     const identity = document.createElement("span");
