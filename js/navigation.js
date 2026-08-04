@@ -10,7 +10,7 @@ function goAbout() {
 }
 
 function goContact() {
-    window.location.href = "/page/contact.html";
+    window.location.href = "/page/feedbacks.html";
 }
 
 function goCommunity() {

@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth");
 const accountRoutes = require("./routes/accounts");
 const postRoutes = require("./routes/posts");
 const notificationRoutes = require("./routes/notifications");
+const feedbackRoutes = require("./routes/feedbacks");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.use(authRoutes);
 app.use(accountRoutes);
 app.use(postRoutes);
 app.use(notificationRoutes);
+app.use(feedbackRoutes);
 
 function requireAuth(req, res, next) {
   const authorization = req.headers.authorization;
