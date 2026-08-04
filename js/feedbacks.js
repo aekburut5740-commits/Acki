@@ -178,12 +178,73 @@ async function reactToFeedback(feedbackId, type) {
     }
 }
 
+let confirmDeleteCallback = null;
+
+function openConfirmPopup(callback) {
+
+    confirmDeleteCallback = callback;
+
+    const popup = document.getElementById("confirmPopup");
+
+    popup.classList.add("show");
+}
+
+function closeConfirmPopup() {
+
+    document.getElementById("confirmPopup")
+        .classList.remove("show");
+
+    confirmDeleteCallback = null;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document
+        .getElementById("confirmDeleteButton")
+        .onclick = () => {
+
+            if (confirmDeleteCallback) {
+
+                confirmDeleteCallback();
+            }
+
+            closeConfirmPopup();
+        };
+
+});
+
 async function deleteFeedback(feedbackId) {
     const token = getToken();
     if (!token) return;
 
-    const confirmText = getCurrentLanguage() === "th" ? "ลบความคิดเห็นนี้หรือไม่?" : "Delete this feedback?";
-    if (!confirm(confirmText)) return;
+    openConfirmPopup(async () => {
+
+        try {
+
+            const response = await fetch(`${ACKI_API_URL}/feedbacks/${feedbackId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok)
+                throw new Error(data.message || "Cannot delete feedback");
+
+            allFeedbacks = allFeedbacks.filter(item => item.id !== feedbackId);
+
+            renderFeedbackList();
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    });
+    return;
 
     try {
         const response = await fetch(`${ACKI_API_URL}/feedbacks/${feedbackId}`, {
