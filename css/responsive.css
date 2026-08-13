@@ -280,8 +280,8 @@ select {
 
     .edge-tab {
         justify-content: space-between;
-        gap: 6px;
-        padding-left: max(8px, env(safe-area-inset-left));
+        gap: 0px;
+        padding-left: max(90px, env(safe-area-inset-left));
         padding-right: max(8px, env(safe-area-inset-right));
     }
 
@@ -303,14 +303,24 @@ select {
         min-width: 46px;
         min-height: 30px;
         padding: 5px 10px;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .settings-menu {
         position: fixed;
         top: calc(var(--acki-topbar-height) + 8px);
-        right: 8px;
-        width: min(230px, calc(100vw - 16px));
+        right: 6px;
+        width: min(180px, calc(100vw - 18px));
+        padding: 6px;
+    }
+
+    .settings-menu button {
+        padding: 8px 9px;
+        font-size: 12.5px;
+    }
+
+    .setting-state {
+        font-size: 11px;
     }
 
     .content {
@@ -325,77 +335,83 @@ select {
     }
 
     .post-header {
-        gap: 8px;
+        gap: 5px;
         margin: 7px 9px;
         padding-right: 30px;
     }
 
     .post-avatar {
-        width: 40px;
-        height: 40px;
-        margin: 7px 3px;
+        width: 40px !important;
+        height: 40px !important;
+        margin: 8px 5px !important;
     }
 
     .post-name {
-        font-size: 15px;
+        font-size: 13px;
     }
 
     .post-time {
-        font-size: 12px;
+        font-size: 10px;
     }
 
     .post-menu-btn {
         right: 0;
+        top: 0;
+        width: 0px;
+        height: 25px;
+        padding: 0;
     }
 
     .post-body {
-        padding: 18px 18px 22px;
-        font-size: 15px;
+        padding: 2px 18px 15px;
+        font-size: 13.5px;
         line-height: 1.7;
     }
 
     .post-active {
-        left: 10px;
-        right: 10px;
-        bottom: -46px;
-        height: 48px;
+        left: 20px;
+        right: 20px;
+        bottom: -35px;
+        height: 35px;
         border-radius: 0 0 16px 16px;
+        z-index: 1;
     }
 
     .post-active button {
-        min-width: 40px;
-        min-height: 42px;
-        font-size: 22px;
+        min-width: 35px;
+        min-height: 35px;
+        font-size: 20px;
         padding: 0 5px;
     }
 
     .like-count,
     .comment-count,
     .share-count {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .create-post-tab {
         top: 48px;
-        padding: 12px 18px 7px;
+        padding: 10px 15px 5px;
     }
 
     .create-post {
         top: var(--acki-topbar-height);
-        width: calc(100% - 20px);
+        width: calc(100% - 0px);
         max-width: 100%;
-        padding: 54px 16px 20px;
+        padding: 20px 20px 20px;
         max-height: calc(100dvh - var(--acki-topbar-height) - 10px);
         border-radius: 0 0 18px 18px;
     }
 
     .create-text {
-        min-height: 180px;
+        min-height: 130px;
         max-height: 42dvh;
     }
 
     .create-btn {
         width: 100%;
+        max-width: 100%;
     }
 
     .comment-panel {
@@ -428,9 +444,26 @@ select {
 
     .notification-mini,
     .notification-full {
-        right: 0;
-        width: 100%;
-        max-width: 100%;
+        right: 0px;
+        width: min(88vw, 250px);
+        max-width: min(88vw, 250px);
+    }
+
+    .notification-mini {
+        position: fixed;
+        top: 60px;
+        right: 55px;
+        width: 220px;
+        height: 380px;
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 14px 14px 12px;
+        z-index: 1010;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: .25s;
     }
 
     .notification-full {
@@ -442,6 +475,16 @@ select {
 
     .notification-full.show {
         transform: translateX(0);
+    }
+
+    .notification-item-mini,
+    .notification-item-full {
+        padding: 10px 20px 5px;
+        border-radius: 10px;
+        background: #ececec;
+        margin-bottom: 10px;
+        line-height: 1.25;
+        cursor: pointer;
     }
 
     .coming-soon-box {
