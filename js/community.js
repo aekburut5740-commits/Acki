@@ -13,6 +13,114 @@ let nextPostId = 4;
 
 const commentsData = {};
 
+// ไฟล์แนบที่ผู้ใช้เลือกไว้สำหรับโพสต์ที่กำลังจะสร้าง
+let selectedAttachments = [];
+
+function handleAttachmentSelect(event) {
+    const newFiles = Array.from(event.target.files || []);
+
+    selectedAttachments = selectedAttachments.concat(newFiles);
+    event.target.value = "";
+
+    renderAttachmentPreview();
+}
+
+function removeSelectedAttachment(index) {
+    selectedAttachments.splice(index, 1);
+    renderAttachmentPreview();
+}
+
+function resetSelectedAttachments() {
+    selectedAttachments = [];
+    renderAttachmentPreview();
+}
+
+function renderAttachmentPreview() {
+    const container = document.getElementById("createAttachPreview");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    selectedAttachments.forEach((file, index) => {
+        const chip = document.createElement("div");
+        chip.className = "attach-chip";
+
+        const label = document.createElement("span");
+        label.textContent = file.name;
+        chip.appendChild(label);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "attach-chip-remove";
+        removeBtn.textContent = "×";
+        removeBtn.onclick = () => removeSelectedAttachment(index);
+        chip.appendChild(removeBtn);
+
+        container.appendChild(chip);
+    });
+}
+
+function isImageFileType(mimeType) {
+    return (mimeType || "").startsWith("image/");
+}
+
+function formatFileSize(bytes) {
+    if (!bytes && bytes !== 0) return "";
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function renderPostAttachments(attachments) {
+    if (!attachments || attachments.length === 0) return "";
+
+    const hasDangerous = attachments.some((a) => a.isDangerous);
+
+    const warningHtml = hasDangerous
+        ? `
+            <div class="post-attachment-warning">
+                ⚠️
+                <span data-en="This post contains a suspicious file"
+                    data-th="โพสต์นี้แนบไฟล์น่าสงสัย">
+                    โพสต์นี้แนบไฟล์น่าสงสัย
+                </span>
+            </div>
+        `
+        : "";
+
+    const itemsHtml = attachments.map((attachment) => {
+        if (isImageFileType(attachment.fileType) && !attachment.isDangerous) {
+            return `
+                <a href="${attachment.fileUrl}" target="_blank" rel="noopener noreferrer"
+                    class="post-attachment-image">
+                    <img src="${attachment.fileUrl}" alt="${attachment.fileName}" loading="lazy">
+                </a>
+            `;
+        }
+
+        const dangerClass = attachment.isDangerous
+            ? " post-attachment-file-dangerous"
+            : "";
+
+        return `
+            <a href="${attachment.fileUrl}" target="_blank" rel="noopener noreferrer"
+                class="post-attachment-file${dangerClass}" download>
+                <i class="ti ti-file"></i>
+                <span class="post-attachment-name">${attachment.fileName}</span>
+                <span class="post-attachment-size">${formatFileSize(attachment.fileSize)}</span>
+            </a>
+        `;
+    }).join("");
+
+    return `
+        ${warningHtml}
+        <div class="post-attachments">
+            ${itemsHtml}
+        </div>
+    `;
+}
+
 function openComment(button) {
     closeAllPanels();
 
@@ -893,6 +1001,8 @@ function resetCreatePostMode() {
                 ? t("Post", "โพสต์")
                 : "Post";
     }
+
+    resetSelectedAttachments();
 }
 
 function closeCreatePost() {
@@ -975,6 +1085,7 @@ function createPostElement(postData) {
 
         <div class="post-body">
             <p></p>
+            ${renderPostAttachments(postData.attachments)}
         </div>
 
         <div class="post-active">
@@ -1173,22 +1284,26 @@ async function createNewPost() {
                 }
             }
         } else {
+            const formData = new FormData();
+            formData.append("content", text);
+
+            selectedAttachments.forEach((file) => {
+                formData.append("attachments", file);
+            });
+
             const response = await fetch(
                 `${API_URL}/posts`,
                 {
                     method: "POST",
 
                     headers: {
-                        "Content-Type":
-                            "application/json",
-
+                        // ห้ามตั้ง Content-Type เอง ให้เบราว์เซอร์
+                        // ใส่ multipart boundary ให้อัตโนมัติ
                         Authorization:
                             `Bearer ${token}`
                     },
 
-                    body: JSON.stringify({
-                        content: text
-                    })
+                    body: formData
                 }
             );
 
@@ -1200,6 +1315,8 @@ async function createNewPost() {
                     "Cannot create post"
                 );
             }
+
+            resetSelectedAttachments();
 
             const postElement =
                 createPostElement(data);

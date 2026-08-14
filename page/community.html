@@ -119,6 +119,18 @@
                 data-en-placeholder="Share something..." data-th-placeholder="อยากแบ่งปันอะไรบ้าง..."
                 oninput="autoResizePost(this)"></textarea>
 
+            <div class="create-attach-row">
+                <label for="createAttachInput" class="create-attach-btn">
+                    <i class="ti ti-paperclip"></i>
+                    <span data-en="Attach files" data-th="แนบไฟล์">แนบไฟล์</span>
+                </label>
+
+                <input type="file" id="createAttachInput" multiple hidden
+                    onchange="handleAttachmentSelect(event)">
+            </div>
+
+            <div id="createAttachPreview" class="create-attach-preview"></div>
+
             <button id="createPostSubmitButton" type="button" class="create-btn" onclick="createNewPost()"
                 data-en="Post" data-th="โพสต์">
                 Post

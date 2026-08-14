@@ -1366,3 +1366,130 @@ body.theme-dark .create-post-close:hover {
     height: 100%;
     object-fit: cover;
 }
+
+/* ===== Attachments: create post form ===== */
+.create-attach-row {
+    margin-top: 8px;
+}
+
+.create-attach-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    font-size: 14px;
+    width: fit-content;
+}
+
+.create-attach-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.create-attach-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.attach-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.06);
+    font-size: 13px;
+    max-width: 200px;
+}
+
+.attach-chip span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attach-chip-remove {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: inherit;
+    opacity: 0.7;
+}
+
+.attach-chip-remove:hover {
+    opacity: 1;
+}
+
+/* ===== Attachments: inside a post ===== */
+.post-attachment-warning {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(255, 90, 90, 0.12);
+    color: #c0392b;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.post-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.post-attachment-image {
+    display: block;
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.post-attachment-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-attachment-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+    color: inherit;
+    font-size: 13px;
+    max-width: 220px;
+}
+
+.post-attachment-file:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.post-attachment-file-dangerous {
+    background: rgba(255, 90, 90, 0.1);
+    border: 1px solid rgba(255, 90, 90, 0.4);
+}
+
+.post-attachment-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.post-attachment-size {
+    opacity: 0.6;
+    flex-shrink: 0;
+}

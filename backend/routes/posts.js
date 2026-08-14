@@ -1,9 +1,72 @@
 const express = require("express");
+const multer = require("multer");
 const pool = require("../db");
 const requireAuth = require("../middleware/requireAuth");
 const optionalAuth = require("../middleware/optionalAuth");
+const { storeAttachment } = require("../utils/attachmentStorage");
 
 const router = express.Router();
+
+/*
+  ไฟล์แนบเก็บใน memory ก่อนชั่วคราว
+  แล้วค่อยตัดสินใจว่าจะส่งต่อไป Cloudinary
+  หรือเขียนลง local disk (ดูใน attachmentStorage.js)
+*/
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 25 * 1024 * 1024, // 25MB ต่อไฟล์
+        files: 10                    // สูงสุด 10 ไฟล์ต่อโพสต์
+    }
+});
+
+/*
+  ดึงไฟล์แนบของหลายโพสต์พร้อมกัน (ใช้ตอน GET /posts)
+  return เป็น Map: postId -> array ของไฟล์แนบ
+*/
+async function getAttachmentsForPosts(postIds) {
+    if (postIds.length === 0) return new Map();
+
+    const result = await pool.query(
+        `
+        SELECT
+            id,
+            post_id,
+            file_url,
+            file_name,
+            file_type,
+            file_size,
+            storage_type,
+            is_dangerous
+        FROM post_attachments
+        WHERE post_id = ANY($1::bigint[])
+        ORDER BY id ASC
+        `,
+        [postIds]
+    );
+
+    const map = new Map();
+
+    for (const row of result.rows) {
+        const attachment = {
+            id: row.id,
+            fileUrl: row.file_url,
+            fileName: row.file_name,
+            fileType: row.file_type,
+            fileSize: row.file_size,
+            storageType: row.storage_type,
+            isDangerous: row.is_dangerous
+        };
+
+        if (!map.has(row.post_id)) {
+            map.set(row.post_id, []);
+        }
+
+        map.get(row.post_id).push(attachment);
+    }
+
+    return map;
+}
 
 /*
   อ่านโพสต์ทั้งหมด
@@ -82,6 +145,9 @@ router.get(
                 [req.accountId]
             );
 
+            const postIds = result.rows.map((post) => post.id);
+            const attachmentsMap = await getAttachmentsForPosts(postIds);
+
             const posts = result.rows.map((post) => ({
                 id: post.id,
                 content: post.content,
@@ -94,6 +160,8 @@ router.get(
                 saveCount: post.save_count,
                 isSaved: post.is_saved,
                 shares: post.shares,
+
+                attachments: attachmentsMap.get(post.id) || [],
 
                 account: {
                     id: post.account_id,
@@ -119,18 +187,23 @@ router.get(
 
   ต้อง Login เพราะต้องรู้ว่าใครเป็นเจ้าของโพสต์
 */
-router.post("/posts", requireAuth, async (req, res) => {
-    try {
-        const content = req.body.content?.trim();
+router.post(
+    "/posts",
+    requireAuth,
+    upload.array("attachments", 10),
+    async (req, res) => {
+        try {
+            const content = req.body.content?.trim();
+            const files = req.files || [];
 
-        if (!content) {
-            return res.status(400).json({
-                message: "Post content cannot be empty"
-            });
-        }
+            if (!content) {
+                return res.status(400).json({
+                    message: "Post content cannot be empty"
+                });
+            }
 
-        const result = await pool.query(
-            `
+            const result = await pool.query(
+                `
       INSERT INTO posts
         (account_id, content)
 
@@ -144,17 +217,68 @@ router.post("/posts", requireAuth, async (req, res) => {
         created_at,
         updated_at
       `,
-            [
-                req.accountId,
-                content
-            ]
+                [
+                    req.accountId,
+                    content
+                ]
 
-        );
+            );
 
-        const newPost = result.rows[0];
+            const newPost = result.rows[0];
 
-        const accountResult = await pool.query(
-            `
+            // อัปโหลดและบันทึกไฟล์แนบทั้งหมด (ถ้ามี)
+            const attachments = [];
+
+            for (const file of files) {
+                const stored = await storeAttachment(file);
+
+                const attachmentResult = await pool.query(
+                    `
+                    INSERT INTO post_attachments (
+                        post_id,
+                        file_url,
+                        file_name,
+                        file_type,
+                        file_size,
+                        storage_type,
+                        is_dangerous
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
+                    RETURNING
+                        id,
+                        file_url,
+                        file_name,
+                        file_type,
+                        file_size,
+                        storage_type,
+                        is_dangerous
+                    `,
+                    [
+                        newPost.id,
+                        stored.fileUrl,
+                        stored.fileName,
+                        stored.fileType,
+                        stored.fileSize,
+                        stored.storageType,
+                        stored.isDangerous
+                    ]
+                );
+
+                const row = attachmentResult.rows[0];
+
+                attachments.push({
+                    id: row.id,
+                    fileUrl: row.file_url,
+                    fileName: row.file_name,
+                    fileType: row.file_type,
+                    fileSize: row.file_size,
+                    storageType: row.storage_type,
+                    isDangerous: row.is_dangerous
+                });
+            }
+
+            const accountResult = await pool.query(
+                `
       SELECT
         id,
         username,
@@ -165,40 +289,43 @@ router.post("/posts", requireAuth, async (req, res) => {
 
       WHERE id = $1
       `,
-            [req.accountId]
-        );
+                [req.accountId]
+            );
 
-        const account = accountResult.rows[0];
+            const account = accountResult.rows[0];
 
-        res.status(201).json({
-            id: newPost.id,
-            content: newPost.content,
+            res.status(201).json({
+                id: newPost.id,
+                content: newPost.content,
 
-            createdAt: newPost.created_at,
-            updatedAt: newPost.updated_at,
+                createdAt: newPost.created_at,
+                updatedAt: newPost.updated_at,
 
-            commentCount: 0,
-            likeCount: 0,
-            isLiked: false,
-            isSaved: false,
-            shares: 0,
+                commentCount: 0,
+                likeCount: 0,
+                isLiked: false,
+                isSaved: false,
+                shares: 0,
 
-            account: {
-                id: account.id,
-                username: account.username,
-                displayName: account.display_name,
-                avatarUrl: account.avatar_url
-            }
-        });
-    } catch (error) {
-        console.error("Create post error:", error);
+                attachments,
 
-        res.status(500).json({
-            message: "Cannot create post",
-            error: error.message
-        });
+                account: {
+                    id: account.id,
+                    username: account.username,
+                    displayName: account.display_name,
+                    avatarUrl: account.avatar_url
+                }
+            });
+        } catch (error) {
+            console.error("Create post error:", error);
+
+            res.status(500).json({
+                message: "Cannot create post",
+                error: error.message
+            });
+        }
     }
-});
+);
 
 /*
   แก้ไขโพสต์

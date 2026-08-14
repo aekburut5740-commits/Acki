@@ -15,6 +15,29 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+/*
+  ไฟล์แนบโพสต์ (ไม่ใช่รูป/วิดีโอ) ถูกเก็บที่ uploads/attachments
+  Serve แบบบังคับดาวน์โหลดเสมอ (Content-Disposition: attachment)
+  เพื่อกันไม่ให้เบราว์เซอร์เปิด/รัน ไฟล์ที่แอบอ้างเป็นไฟล์อื่น
+  (เช่น .html หรือ .svg ที่มี script ฝังอยู่) โดยตรงบนโดเมนเรา
+*/
+app.use(
+    "/uploads/attachments",
+    express.static("uploads/attachments", {
+        setHeaders(res, filePath) {
+            const fileName = path.basename(filePath);
+
+            res.setHeader(
+                "Content-Disposition",
+                `attachment; filename="${fileName}"`
+            );
+
+            res.setHeader("X-Content-Type-Options", "nosniff");
+        }
+    })
+);
+
 app.use("/uploads", express.static("uploads"));
 
 app.use(authRoutes);
