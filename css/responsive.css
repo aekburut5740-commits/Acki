@@ -398,8 +398,24 @@ select {
     }
 
     .create-post-tab {
-        top: 48px;
+        top: 38px;
         padding: 10px 15px 5px;
+        min-height: 25px;
+        min-width: 30px;
+        transition: background-color 0.15s ease;
+    }
+
+    /* Disable hover effect on mobile/touch devices */
+    .create-post-tab:hover,
+    .create-post-tab:active {
+        background: #2f2f2f;
+        transform: translateX(-50%);
+    }
+
+    body.theme-dark .create-post-tab:hover,
+    body.theme-dark .create-post-tab:active {
+        background: #ffffff;
+        transform: translateX(-50%);
     }
 
     .create-post {
@@ -767,8 +783,15 @@ select {
         transform: none;
     }
 
-    .create-post-tab:hover {
+    .create-post-tab:hover,
+    .create-post-tab:active {
         background: #2f2f2f;
+        transform: translateX(-50%);
+    }
+
+    body.theme-dark .create-post-tab:hover,
+    body.theme-dark .create-post-tab:active {
+        background: #ffffff;
         transform: translateX(-50%);
     }
 }
