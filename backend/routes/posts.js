@@ -11,11 +11,18 @@ const router = express.Router();
   ไฟล์แนบเก็บใน memory ก่อนชั่วคราว
   แล้วค่อยตัดสินใจว่าจะส่งต่อไป Cloudinary
   หรือเขียนลง local disk (ดูใน attachmentStorage.js)
+
+  จำกัดไว้ที่ 10MB ต่อไฟล์ เพราะ Cloudinary แผนฟรี
+  รับไฟล์ได้ไม่เกิน 10MB/ไฟล์อยู่แล้ว (ถ้าตั้งสูงกว่านี้
+  ไฟล์รูป/วิดีโอจะหลุดผ่าน multer มาแล้วโดน Cloudinary
+  ปฏิเสธทีหลัง เสียเวลาอัปโหลดเปล่าๆ)
 */
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
-        fileSize: 25 * 1024 * 1024, // 25MB ต่อไฟล์
+        fileSize: MAX_FILE_SIZE,
         files: 10                    // สูงสุด 10 ไฟล์ต่อโพสต์
     }
 });
@@ -187,10 +194,41 @@ router.get(
 
   ต้อง Login เพราะต้องรู้ว่าใครเป็นเจ้าของโพสต์
 */
+/*
+  ห่อ upload.array ด้วย middleware ของเราเอง
+  เพื่อดักจับ error จาก multer (เช่นไฟล์ใหญ่เกินกำหนด)
+  แล้วส่งข้อความที่เข้าใจง่ายกลับไปให้ frontend แทน
+  error กลางๆ ของ Express
+*/
+function handleAttachmentUpload(req, res, next) {
+    upload.array("attachments", 10)(req, res, (error) => {
+        if (!error) return next();
+
+        if (error.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({
+                message: `ไฟล์แนบมีขนาดใหญ่เกินไป (จำกัดไม่เกิน ${Math.floor(MAX_FILE_SIZE / (1024 * 1024))}MB ต่อไฟล์)`
+            });
+        }
+
+        if (error.code === "LIMIT_FILE_COUNT") {
+            return res.status(400).json({
+                message: "แนบไฟล์ได้สูงสุด 10 ไฟล์ต่อโพสต์"
+            });
+        }
+
+        console.error("Upload attachment error:", error);
+
+        return res.status(400).json({
+            message: "ไม่สามารถอัปโหลดไฟล์แนบได้",
+            error: error.message
+        });
+    });
+}
+
 router.post(
     "/posts",
     requireAuth,
-    upload.array("attachments", 10),
+    handleAttachmentUpload,
     async (req, res) => {
         try {
             const content = req.body.content?.trim();
